@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Trí tuệ Biên tập | Quy trình Phê duyệt</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
+    <link rel="stylesheet" href="admin1.css">
+</head>
+<body>
+
+<aside class="sidebar d-none d-lg-block">
+    <div class="px-4 mb-5 d-flex align-items-center gap-3">
+        <div class="bg-primary text-white p-2 rounded-3">
+            <span class="material-symbols-outlined">article</span>
+        </div>
+        <div>
+            <h2 class="h5 mb-0 fw-black">Biên tập</h2>
+            <p class="small mb-0 opacity-70">Editorial Intelligence</p>
+        </div>
+    </div>
+    <div class="nav flex-column">
+        <a href="#" class="nav-link-custom"><span class="material-symbols-outlined">dashboard</span> Bảng điều khiển</a>
+        <a href="#" class="nav-link-custom active"><span class="material-symbols-outlined">assignment_turned_in</span> Quy trình</a>
+        <a href="#" class="nav-link-custom"><span class="material-symbols-outlined">article</span> Nội dung</a>
+        <a href="#" class="nav-link-custom"><span class="material-symbols-outlined">group</span> Người dùng</a>
+        <a href="#" class="nav-link-custom"><span class="material-symbols-outlined">history</span> Nhật ký hệ thống</a>
+    </div>
+    <div class="px-3" style="margin-top: 80px;">
+        <button class="btn btn-primary w-100 rounded-pill py-3 fw-bold shadow-sm">+ Bài viết mới</button>
+    </div>
+</aside>
+
+<header class="topbar">
+    <div class="d-flex align-items-center gap-3">
+        <h1 class="h6 mb-0 fw-black text-uppercase">NewsPulse</h1>
+        <input type="text" class="form-control form-control-sm border-0 bg-light rounded-3 ms-3 d-none d-md-block" placeholder="Tìm kiếm quy trình..." style="width: 300px;">
+    </div>
+    <div class="d-flex align-items-center gap-4 fw-bold small text-muted">
+        <span class="d-none d-sm-inline">Phân tích</span>
+        <span class="d-none d-sm-inline">Hiệu suất</span>
+        <span class="text-primary border-bottom border-primary border-2">Chế độ xem trực tiếp</span>
+        <span class="material-symbols-outlined">notifications</span>
+        <img src="https://i.pravatar.cc/150?u=chief" class="rounded-circle" width="32">
+    </div>
+</header>
+
+<main class="main-content">
+    <div class="container-fluid px-5 pb-5">
+        
+        <section class="workflow-header-card shadow-sm">
+            <div class="d-flex justify-content-between align-items-end mb-5">
+                <div>
+                    <span class="text-primary fw-bold small text-uppercase">Giai đoạn: Phê duyệt của Tổng biên tập</span>
+                    <h2 class="display-6 fw-black mt-1">Tương lai của AI trong Tòa soạn</h2>
+                </div>
+                <div class="text-danger bg-danger-subtle px-3 py-2 rounded-3 border border-danger-subtle small fw-bold mb-2">
+                    <span class="material-symbols-outlined fs-6">timer</span> Thời gian tại giai đoạn này: 14 giờ 22 phút
+                </div>
+            </div>
+
+            <div class="position-relative py-2">
+                <div class="pipeline-line"></div>
+                <div class="d-flex justify-content-between position-relative z-2">
+                    <div class="text-center step-complete">
+                        <div class="step-box"><span class="material-symbols-outlined fill-icon" style="font-variation-settings:'FILL' 1">check_circle</span></div>
+                        <p class="small fw-bold mt-2 mb-0">Bản thảo</p>
+                    </div>
+                    <div class="text-center step-complete">
+                        <div class="step-box"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">check_circle</span></div>
+                        <p class="small fw-bold mt-2 mb-0">Biên tập viên soát xét</p>
+                    </div>
+                    <div class="text-center step-active">
+                        <div class="step-box"><span class="material-symbols-outlined">radio_button_checked</span></div>
+                        <p class="small fw-bold mt-2 mb-0 text-primary">Tổng biên tập phê duyệt</p>
+                    </div>
+                    <div class="text-center opacity-50">
+                        <div class="step-box" style="background:#eee;color:#999"><span class="material-symbols-outlined">pending</span></div>
+                        <p class="small fw-bold mt-2 mb-0">Đã duyệt</p>
+                    </div>
+                    <div class="text-center opacity-50">
+                        <div class="step-box" style="background:#eee;color:#999"><span class="material-symbols-outlined">rocket_launch</span></div>
+                        <p class="small fw-bold mt-2 mb-0">Đã xuất bản</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="white-card mb-4 article-body">
+                    <div class="d-flex justify-content-between align-items-start mb-4">
+                        <h3 class="h4 fw-bold mb-0">Chi tiết biên tập</h3>
+                        <div class="d-flex gap-2">
+                            <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">2,840 từ</span>
+                            <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2">Ưu tiên cao</span>
+                        </div>
+                    </div>
+
+                    <div class="border-start border-primary border-4 ps-4 py-3 bg-light mb-4 rounded-end shadow-sm">
+                        <p class="fst-italic fw-bold text-dark mb-0 fs-5">"Việc tích hợp nhanh chóng AI tạo sinh vào các tòa soạn khu vực không còn là khái niệm viễn tưởng — nó là nền tảng vận hành để tồn tại trong năm 2024."</p>
+                    </div>
+
+                    <p>Trong kỷ nguyên số hóa hiện nay, các tòa soạn báo đang đứng trước một cuộc cách mạng chưa từng có. Việc áp dụng Trí tuệ nhân tạo (AI) không chỉ đơn thuần là tự động hóa các tác vụ lặp đi lặp lại, mà còn là việc tái cấu trúc hoàn toàn cách thức thông tin được thu thập, xử lý và phân phối đến độc giả.</p>
+
+                    <h4 class="fw-bold mt-4 mb-3">1. Sự dịch chuyển từ thủ công sang thuật toán</h4>
+                    <p>Theo báo cáo mới nhất từ Viện Nghiên cứu Reuters, hơn 75% các tập đoàn truyền thông lớn tại Châu Âu đã bắt đầu triển khai các mô hình ngôn ngữ lớn (LLM) để hỗ trợ biên tập viên.</p>
+                    
+                    <div class="row g-3 my-4">
+                        <div class="col-md-6">
+                            <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=800" class="img-fluid rounded-4 shadow-sm" alt="Công nghệ AI">
+                            <p class="small fst-italic mt-2 text-center text-muted">Hệ thống AI xử lý dữ liệu thời gian thực.</p>
+                        </div>
+                        <div class="col-md-6">
+                            <img src="https://images.unsplash.com/photo-1738734021916-13e949136b25?q=80&w=1170&auto=format&fit=crop" class="img-fluid rounded-4 shadow-sm" alt="Tòa soạn hiện đại">
+                            <p class="small fst-italic mt-2 text-center text-muted">Môi trường tòa soạn hiện đại.</p>
+                        </div>
+                    </div>
+
+                    <h4 class="fw-bold mt-4 mb-3">2. Thách thức về đạo đức và tính chính xác</h4>
+                    <p>Tuy nhiên, "ánh sáng" của AI cũng đi kèm với "bóng tối" của sự hoài nghi...</p>
+                </div>
+
+                <div class="white-card">
+                    <div class="d-flex align-items-center gap-2 mb-4">
+                        <span class="material-symbols-outlined text-primary">chat_bubble</span>
+                        <h4 class="h6 fw-bold mb-0">Luồng ý kiến biên tập</h4>
+                    </div>
+
+                    <div class="comment-item">
+                        <img src="https://i.pravatar.cc/150?u=sarah" class="comment-avatar">
+                        <div class="comment-bubble">
+                            <div class="d-flex justify-content-between small mb-1">
+                                <span class="fw-bold">Sarah Chen <span class="fw-normal text-muted">(Phóng viên nội dung)</span></span>
+                                <span class="text-muted" style="font-size: 10px;">10:45 SA</span>
+                            </div>
+                            <p class="small mb-0">Em đã cập nhật số liệu mới nhất từ Reuters vào Phần 1.</p>
+                        </div>
+                    </div>
+
+                    <div class="comment-item">
+                        <img src="https://i.pravatar.cc/150?u=marcus" class="comment-avatar">
+                        <div class="comment-bubble active">
+                            <div class="d-flex justify-content-between small mb-1">
+                                <span class="fw-bold text-primary">Marcus Thorne <span class="fw-normal text-muted">(Biên tập viên)</span></span>
+                                <span class="text-muted" style="font-size: 10px;">11:12 SA</span>
+                            </div>
+                            <p class="small mb-0">Nội dung rất ổn. Đã chuyển lên Tổng biên tập phê duyệt.</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-top">
+                        <textarea class="form-control border-0 bg-light rounded-4 p-3 small mb-2" rows="2" placeholder="Thêm bình luận..."></textarea>
+                        <div class="text-end"><button class="btn btn-link text-primary fw-bold text-decoration-none small p-0">Gửi ghi chú</button></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="right-panel shadow-sm">
+                    <h6 class="text-uppercase fw-black small mb-4 opacity-75">Thao tác quy trình</h6>
+                    <button class="btn-approve shadow-sm"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">check_circle</span> Duyệt & Xuất bản</button>
+                    <button class="btn-revision shadow-sm"><span class="material-symbols-outlined">edit_note</span> Yêu cầu chỉnh sửa</button>
+                    
+                    <div class="text-center mt-4">
+                        <span class="text-danger fw-bold small cursor-pointer"><span class="material-symbols-outlined fs-6">cancel</span> Từ chối bài viết</span>
+                    </div>
+
+                    <div class="mt-5 small">
+                        <div class="d-flex justify-content-between mb-2"><span>Người phụ trách:</span><span class="fw-bold">Julian Vane</span></div>
+                        <div class="d-flex justify-content-between mb-1"><span>Hạn chót:</span><span class="text-danger fw-bold">Quá hạn 2 giờ</span></div>
+                        <div class="progress" style="height: 6px; background: #e0e6f5;"><div class="progress-bar bg-danger w-100"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
