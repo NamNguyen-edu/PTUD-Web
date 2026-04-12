@@ -8,127 +8,20 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-
-    <style>
-        :root {
-            --primary: #0c56d0;
-            --sidebar-blue: #dae5ff;
-            --bg-body: #f9f9ff;
-            --text-main: #143161;
-            --text-muted: #455f90;
-        }
-
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: var(--bg-body);
-            color: var(--text-main);
-        }
-
-        h1, h2, h3, .fw-black { font-family: 'Manrope', sans-serif; font-weight: 800; }
-
-        .sidebar {
-            background-color: var(--sidebar-blue);
-            width: 260px;
-            height: 100vh;
-            position: fixed;
-            left: 0; top: 0;
-            padding-top: 24px;
-            z-index: 1050;
-        }
-
-        .main-content {
-            margin-left: 260px;
-            padding-top: 80px;
-        }
-
-        .topbar {
-            height: 64px;
-            background: #fff;
-            border-bottom: 1px solid rgba(20,49,97,0.08);
-            position: fixed;
-            top: 0; right: 0; left: 260px;
-            z-index: 1040;
-            padding: 0 40px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .nav-link-custom {
-            display: flex; align-items: center; gap: 12px;
-            padding: 10px 24px; margin: 2px 12px;
-            border-radius: 50px; color: var(--text-muted);
-            text-decoration: none; font-weight: 600; font-size: 14px;
-        }
-        .nav-link-custom.active { background: #c1d3ff; color: var(--primary); }
-
-        .workflow-header-card {
-            background: #f1f4ff;
-            border-radius: 24px;
-            padding: 40px;
-            margin-bottom: 24px;
-        }
-
-        .pipeline-line {
-            position: absolute; top: 20px; left: 0; right: 0;
-            height: 2px; background: #d8e2ff; z-index: 1;
-        }
-
-        .step-box {
-            width: 40px; height: 40px; border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            background: #dae2ff; color: var(--primary);
-            position: relative; z-index: 2; margin: 0 auto;
-        }
-        .step-complete .step-box { background: var(--primary); color: white; }
-        .step-active .step-box { border: 2px solid var(--primary); background: #dae2ff; }
-
-        .white-card {
-            background: white; border-radius: 20px; padding: 32px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
-        }
-
-        .right-panel {
-            background: #e9edff; border-radius: 24px; padding: 24px;
-            position: sticky; top: 84px;
-        }
-
-        .comment-item { display: flex; gap: 12px; margin-bottom: 20px; }
-        .comment-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
-        .comment-bubble { 
-            background: #f8f9fa; border-radius: 16px; padding: 12px 16px; flex: 1;
-        }
-        .comment-bubble.active { background: #dae5ff; border: 1px solid rgba(12,86,208,0.1); }
-
-        .btn-approve {
-            background: #0c56d0; color: white; border-radius: 12px;
-            padding: 14px; font-weight: 700; width: 100%; border: none;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-        }
-        .btn-revision {
-            background: white; color: var(--primary); border-radius: 12px;
-            padding: 14px; font-weight: 700; width: 100%; border: 1px solid #dae2ff;
-            margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 8px;
-        }
-
-        .article-body p {
-            line-height: 1.7;
-            margin-bottom: 1.5rem;
-            color: var(--text-muted);
-        }
-
-        @media (max-width: 991px) {
-            .sidebar { transform: translateX(-100%); }
-            .topbar, .main-content { left: 0; margin-left: 0; }
-        }
-    </style>
+    
+    <link rel="stylesheet" href="admin1.css">
 </head>
 <body>
 
 <aside class="sidebar d-none d-lg-block">
     <div class="px-4 mb-5 d-flex align-items-center gap-3">
-        <div class="bg-primary text-white p-2 rounded-3"><span class="material-symbols-outlined">article</span></div>
-        <div><h2 class="h5 mb-0 fw-black">Biên tập</h2><p class="small mb-0 opacity-70">Editorial Intelligence</p></div>
+        <div class="bg-primary text-white p-2 rounded-3">
+            <span class="material-symbols-outlined">article</span>
+        </div>
+        <div>
+            <h2 class="h5 mb-0 fw-black">Biên tập</h2>
+            <p class="small mb-0 opacity-70">Editorial Intelligence</p>
+        </div>
     </div>
     <div class="nav flex-column">
         <a href="#" class="nav-link-custom"><span class="material-symbols-outlined">dashboard</span> Bảng điều khiển</a>
@@ -148,7 +41,9 @@
         <input type="text" class="form-control form-control-sm border-0 bg-light rounded-3 ms-3 d-none d-md-block" placeholder="Tìm kiếm quy trình..." style="width: 300px;">
     </div>
     <div class="d-flex align-items-center gap-4 fw-bold small text-muted">
-        <span class="d-none d-sm-inline">Phân tích</span><span class="d-none d-sm-inline">Hiệu suất</span><span class="text-primary border-bottom border-primary border-2">Chế độ xem trực tiếp</span>
+        <span class="d-none d-sm-inline">Phân tích</span>
+        <span class="d-none d-sm-inline">Hiệu suất</span>
+        <span class="text-primary border-bottom border-primary border-2">Chế độ xem trực tiếp</span>
         <span class="material-symbols-outlined">notifications</span>
         <img src="https://i.pravatar.cc/150?u=chief" class="rounded-circle" width="32">
     </div>
@@ -171,11 +66,26 @@
             <div class="position-relative py-2">
                 <div class="pipeline-line"></div>
                 <div class="d-flex justify-content-between position-relative z-2">
-                    <div class="text-center step-complete"><div class="step-box"><span class="material-symbols-outlined fill-icon" style="font-variation-settings:'FILL' 1">check_circle</span></div><p class="small fw-bold mt-2 mb-0">Bản thảo</p></div>
-                    <div class="text-center step-complete"><div class="step-box"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">check_circle</span></div><p class="small fw-bold mt-2 mb-0">Biên tập viên soát xét</p></div>
-                    <div class="text-center step-active"><div class="step-box"><span class="material-symbols-outlined">radio_button_checked</span></div><p class="small fw-bold mt-2 mb-0 text-primary">Tổng biên tập phê duyệt</p></div>
-                    <div class="text-center opacity-50"><div class="step-box" style="background:#eee;color:#999"><span class="material-symbols-outlined">pending</span></div><p class="small fw-bold mt-2 mb-0">Đã duyệt</p></div>
-                    <div class="text-center opacity-50"><div class="step-box" style="background:#eee;color:#999"><span class="material-symbols-outlined">rocket_launch</span></div><p class="small fw-bold mt-2 mb-0">Đã xuất bản</p></div>
+                    <div class="text-center step-complete">
+                        <div class="step-box"><span class="material-symbols-outlined fill-icon" style="font-variation-settings:'FILL' 1">check_circle</span></div>
+                        <p class="small fw-bold mt-2 mb-0">Bản thảo</p>
+                    </div>
+                    <div class="text-center step-complete">
+                        <div class="step-box"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">check_circle</span></div>
+                        <p class="small fw-bold mt-2 mb-0">Biên tập viên soát xét</p>
+                    </div>
+                    <div class="text-center step-active">
+                        <div class="step-box"><span class="material-symbols-outlined">radio_button_checked</span></div>
+                        <p class="small fw-bold mt-2 mb-0 text-primary">Tổng biên tập phê duyệt</p>
+                    </div>
+                    <div class="text-center opacity-50">
+                        <div class="step-box" style="background:#eee;color:#999"><span class="material-symbols-outlined">pending</span></div>
+                        <p class="small fw-bold mt-2 mb-0">Đã duyệt</p>
+                    </div>
+                    <div class="text-center opacity-50">
+                        <div class="step-box" style="background:#eee;color:#999"><span class="material-symbols-outlined">rocket_launch</span></div>
+                        <p class="small fw-bold mt-2 mb-0">Đã xuất bản</p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -198,21 +108,21 @@
                     <p>Trong kỷ nguyên số hóa hiện nay, các tòa soạn báo đang đứng trước một cuộc cách mạng chưa từng có. Việc áp dụng Trí tuệ nhân tạo (AI) không chỉ đơn thuần là tự động hóa các tác vụ lặp đi lặp lại, mà còn là việc tái cấu trúc hoàn toàn cách thức thông tin được thu thập, xử lý và phân phối đến độc giả.</p>
 
                     <h4 class="fw-bold mt-4 mb-3">1. Sự dịch chuyển từ thủ công sang thuật toán</h4>
-                    <p>Theo báo cáo mới nhất từ Viện Nghiên cứu Reuters, hơn 75% các tập đoàn truyền thông lớn tại Châu Âu đã bắt đầu triển khai các mô hình ngôn ngữ lớn (LLM) để hỗ trợ biên tập viên. Các công cụ này giúp tóm tắt báo cáo dài hàng trăm trang trong giây lát, cho phép phóng viên tập trung vào việc xác minh nguồn tin và phân tích chuyên sâu thay vì mất thời gian cho các bản thảo sơ khai.</p>
+                    <p>Theo báo cáo mới nhất từ Viện Nghiên cứu Reuters, hơn 75% các tập đoàn truyền thông lớn tại Châu Âu đã bắt đầu triển khai các mô hình ngôn ngữ lớn (LLM) để hỗ trợ biên tập viên.</p>
                     
                     <div class="row g-3 my-4">
                         <div class="col-md-6">
                             <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=800" class="img-fluid rounded-4 shadow-sm" alt="Công nghệ AI">
-                            <p class="small fst-italic mt-2 text-center text-muted">Hệ thống AI xử lý dữ liệu thời gian thực tại trung tâm điều hành.</p>
+                            <p class="small fst-italic mt-2 text-center text-muted">Hệ thống AI xử lý dữ liệu thời gian thực.</p>
                         </div>
                         <div class="col-md-6">
-                            <img src="https://images.unsplash.com/photo-1738734021916-13e949136b25?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0" class="img-fluid rounded-4 shadow-sm" alt="Tòa soạn hiện đại">
-                            <p class="small fst-italic mt-2 text-center text-muted">Môi trường tòa soạn hiện đại tích hợp các công cụ hỗ trợ thông minh.</p>
+                            <img src="https://images.unsplash.com/photo-1738734021916-13e949136b25?q=80&w=1170&auto=format&fit=crop" class="img-fluid rounded-4 shadow-sm" alt="Tòa soạn hiện đại">
+                            <p class="small fst-italic mt-2 text-center text-muted">Môi trường tòa soạn hiện đại.</p>
                         </div>
                     </div>
 
                     <h4 class="fw-bold mt-4 mb-3">2. Thách thức về đạo đức và tính chính xác</h4>
-                    <p>Tuy nhiên, "ánh sáng" của AI cũng đi kèm với "bóng tối" của sự hoài nghi. Vấn đề "ảo giác" (hallucination) của máy móc vẫn là mối lo ngại hàng đầu. Marcus Thorne, biên tập viên cao cấp, nhấn mạnh rằng AI có thể hỗ trợ viết lách nhưng không thể thay thế trái tim và khối óc của một nhà báo thực thụ trong việc thẩm định đạo đức và nhạy cảm chính trị.</p>
+                    <p>Tuy nhiên, "ánh sáng" của AI cũng đi kèm với "bóng tối" của sự hoài nghi...</p>
                 </div>
 
                 <div class="white-card">
@@ -228,7 +138,7 @@
                                 <span class="fw-bold">Sarah Chen <span class="fw-normal text-muted">(Phóng viên nội dung)</span></span>
                                 <span class="text-muted" style="font-size: 10px;">10:45 SA</span>
                             </div>
-                            <p class="small mb-0">Em đã cập nhật số liệu mới nhất từ Reuters vào Phần 1. Anh Marcus xem qua giúp em nhé.</p>
+                            <p class="small mb-0">Em đã cập nhật số liệu mới nhất từ Reuters vào Phần 1.</p>
                         </div>
                     </div>
 
@@ -236,15 +146,15 @@
                         <img src="https://i.pravatar.cc/150?u=marcus" class="comment-avatar">
                         <div class="comment-bubble active">
                             <div class="d-flex justify-content-between small mb-1">
-                                <span class="fw-bold text-primary">Marcus Thorne <span class="fw-normal text-muted">(Biên tập viên cấp cao)</span></span>
+                                <span class="fw-bold text-primary">Marcus Thorne <span class="fw-normal text-muted">(Biên tập viên)</span></span>
                                 <span class="text-muted" style="font-size: 10px;">11:12 SA</span>
                             </div>
-                            <p class="small mb-0">Nội dung rất ổn. Phần phân tích đạo đức ở mục 2 rất sắc sảo. Đã chuyển lên Tổng biên tập phê duyệt cuối cùng.</p>
+                            <p class="small mb-0">Nội dung rất ổn. Đã chuyển lên Tổng biên tập phê duyệt.</p>
                         </div>
                     </div>
 
                     <div class="mt-4 pt-3 border-top">
-                        <textarea class="form-control border-0 bg-light rounded-4 p-3 small mb-2" rows="2" placeholder="Thêm bình luận hoặc ghi chú nội bộ..."></textarea>
+                        <textarea class="form-control border-0 bg-light rounded-4 p-3 small mb-2" rows="2" placeholder="Thêm bình luận..."></textarea>
                         <div class="text-end"><button class="btn btn-link text-primary fw-bold text-decoration-none small p-0">Gửi ghi chú</button></div>
                     </div>
                 </div>
@@ -252,7 +162,7 @@
 
             <div class="col-lg-4">
                 <div class="right-panel shadow-sm">
-                    <h6 class="text-uppercase fw-black small tracking-widest mb-4 opacity-75">Thao tác quy trình</h6>
+                    <h6 class="text-uppercase fw-black small mb-4 opacity-75">Thao tác quy trình</h6>
                     <button class="btn-approve shadow-sm"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">check_circle</span> Duyệt & Xuất bản</button>
                     <button class="btn-revision shadow-sm"><span class="material-symbols-outlined">edit_note</span> Yêu cầu chỉnh sửa</button>
                     
@@ -260,32 +170,10 @@
                         <span class="text-danger fw-bold small cursor-pointer"><span class="material-symbols-outlined fs-6">cancel</span> Từ chối bài viết</span>
                     </div>
 
-                    <div class="mt-4 border-top pt-4">
-                        <label class="small fw-black text-uppercase opacity-50 mb-2 d-block" style="font-size: 10px;">Lý do từ chối (Bắt buộc)</label>
-                        <select class="form-select border-0 bg-white rounded-3 small shadow-sm">
-                            <option>Chọn lý do...</option>
-                            <option>Sai lệch thông tin</option>
-                            <option>Vi phạm bản quyền</option>
-                            <option>Văn phong không phù hợp</option>
-                        </select>
-                    </div>
-
                     <div class="mt-5 small">
-                        <div class="d-flex justify-content-between mb-2"><span>Người phụ trách:</span><span class="fw-bold">Julian Vane (Tổng biên tập)</span></div>
-                        <div class="d-flex justify-content-between mb-1"><span>Hạn chót cam kết (SLA):</span><span class="text-danger fw-bold">Quá hạn 2 giờ</span></div>
+                        <div class="d-flex justify-content-between mb-2"><span>Người phụ trách:</span><span class="fw-bold">Julian Vane</span></div>
+                        <div class="d-flex justify-content-between mb-1"><span>Hạn chót:</span><span class="text-danger fw-bold">Quá hạn 2 giờ</span></div>
                         <div class="progress" style="height: 6px; background: #e0e6f5;"><div class="progress-bar bg-danger w-100"></div></div>
-                    </div>
-
-                    <div class="mt-4 p-3 bg-white rounded-4 border border-primary border-opacity-10">
-                        <p class="small fw-bold mb-2">Thông tin tệp tin:</p>
-                        <div class="d-flex align-items-center gap-2 small text-muted overflow-hidden">
-                           <span class="material-symbols-outlined fs-6 flex-shrink-0">image</span> 
-                             <span class="text-truncate">AI_Newsroom_v2.jpg</span>
-                         </div>
-                         <div class="d-flex align-items-center gap-2 small text-muted mt-1 overflow-hidden">
-                          <span class="material-symbols-outlined fs-6 flex-shrink-0">attachment</span> 
-                         <span class="text-truncate">Statistics_Report_2024.pdf</span>
-                         </div>
                     </div>
                 </div>
             </div>
