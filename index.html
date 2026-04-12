@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+   <meta charset="UTF-8">
+   <title>Hệ Thống Quản Trị Tin Tức - UEH Project</title>
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+   <style>
+       :root {
+           --bg-main: #B7D8F7;  /* Màu trang chính */
+           --bg-admin: #4682B4; /* Màu Admin/Hành động */
+           --border: #8fb3d4;
+       }
+       body {
+           background-color: var(--bg-main);
+           padding-top: 20px;
+           font-family: 'Segoe UI', Arial, sans-serif;
+       }
+      
+       /* Custom Tiles */
+       .tile { border: 1px solid var(--border); padding: 10px; height: 100%; background: #ebf5ff; }
+       .header-tile { background: var(--bg-main); font-weight: bold; text-align: center; border: 1px solid var(--border); }
+       .footer-tile { background: var(--bg-admin); color: white; text-align: center; border: 1px solid var(--border); }
+      
+       .form-label { font-size: 11px; font-weight: bold; color: var(--bg-admin); text-transform: uppercase; }
+       .btn-admin { background-color: var(--bg-admin); color: white; border-radius: 0; font-weight: bold; width: 100%; margin-bottom: 5px; }
+       .btn-admin:hover { background-color: #36648B; color: #fff; }
+      
+       /* Đảm bảo row sát nhau giống mẫu */
+       .row { margin-bottom: 2px; }
+   </style>
+</head>
+<body>
+
+
+<div class="container-fluid px-4">
+   <div class="row">
+       <div class="col-12 p-1">
+           <div class="header-tile p-3 shadow-sm">
+               <h3 class="mb-0">CỔNG THÔNG TIN TIN TỨC - TRANG ĐĂNG BÀI</h3>
+           </div>
+       </div>
+   </div>
+
+
+   <div class="row">
+       <div class="col-md-9 p-1">
+           <div class="tile">
+               <div class="row">
+                   <div class="col-12"><span class="form-label">Thông tin bài viết</span><hr class="my-1 border-secondary"></div>
+               </div>
+               <div class="row">
+                   <div class="col-md-2 p-1 text-right"><span class="form-label">Tiêu đề:</span></div>
+                   <div class="col-md-10 p-1"><input type="text" class="form-control" placeholder="Nhập tiêu đề bài báo..."></div>
+               </div>
+               <div class="row">
+                   <div class="col-md-2 p-1 text-right"><span class="form-label">Tóm tắt:</span></div>
+                   <div class="col-md-10 p-1"><textarea class="form-control" rows="2" placeholder="Nội dung tóm tắt (Sapo)"></textarea></div>
+               </div>
+           </div>
+       </div>
+       <div class="col-md-3 p-1">
+           <div class="tile text-center">
+               <div class="row"><div class="col-12"><span class="form-label">Ảnh đại diện</span></div></div>
+               <div class="row"><div class="col-12 p-2"><div style="height:80px; border:2px dashed var(--border); background:white; display: flex; align-items: center; justify-content: center;" class="text-muted small">Chưa có ảnh</div></div></div>
+               <div class="row"><div class="col-12"><button class="btn btn-sm btn-admin">TẢI ẢNH LÊN</button></div></div>
+           </div>
+       </div>
+   </div>
+
+
+   <div class="row">
+       <div class="col-md-4 p-1">
+           <div class="tile">
+               <div class="row">
+                   <div class="col-5 p-1"><span class="form-label">Chuyên mục:</span></div>
+                   <div class="col-7 p-1">
+                       <select class="form-control form-control-sm">
+                           <option>Thời sự</option>
+                           <option>Kinh tế</option>
+                           <option>Giáo dục (UEH)</option>
+                       </select>
+                   </div>
+               </div>
+           </div>
+       </div>
+       <div class="col-md-4 p-1">
+           <div class="tile">
+               <div class="row">
+                   <div class="col-4 p-1"><span class="form-label">Từ khóa:</span></div>
+                   <div class="col-8 p-1"><input type="text" class="form-control form-control-sm" placeholder="#tintuc, #ueh"></div>
+               </div>
+           </div>
+       </div>
+       <div class="col-md-4 p-1">
+           <div class="tile">
+               <div class="row">
+                   <div class="col-4 p-1"><span class="form-label">Tác giả:</span></div>
+                   <div class="col-8 p-1"><input type="text" class="form-control form-control-sm" placeholder="Nguyễn Duy Bảo"></div>
+               </div>
+           </div>
+       </div>
+   </div>
+
+
+   <div class="row">
+       <div class="col-12 p-1">
+           <div class="tile">
+               <div class="row"><div class="col-12 p-1"><span class="form-label">Nội dung chi tiết</span></div></div>
+               <div class="row px-1">
+                   <div class="col-md-1 p-1 bg-white border text-center font-weight-bold" style="cursor:pointer">B</div>
+                   <div class="col-md-1 p-1 bg-white border text-center font-italic" style="cursor:pointer">I</div>
+                   <div class="col-md-1 p-1 bg-white border text-center" style="text-decoration:underline; cursor:pointer">U</div>
+                   <div class="col-md-1 p-1 bg-white border text-center" style="cursor:pointer">🔗</div>
+                   <div class="col-md-8 p-1 bg-light border small text-muted">Công cụ hỗ trợ soạn thảo văn bản Rich Text</div>
+               </div>
+               <div class="row">
+                   <div class="col-12 p-1"><textarea class="form-control" rows="8" placeholder="Bắt đầu viết nội dung bài báo tại đây..."></textarea></div>
+               </div>
+           </div>
+       </div>
+   </div>
+
+
+   <div class="row">
+       <div class="col-md-6 p-1">
+           <div class="tile">
+               <div class="row"><div class="col-12"><span class="form-label">Cấu hình SEO (Google)</span></div></div>
+               <div class="row">
+                   <div class="col-md-4 p-1"><span class="form-label">Tiêu đề SEO</span></div>
+                   <div class="col-md-8 p-1"><input type="text" class="form-control form-control-sm"></div>
+               </div>
+               <div class="row">
+                   <div class="col-md-4 p-1"><span class="form-label">Mô tả Meta</span></div>
+                   <div class="col-md-8 p-1"><input type="text" class="form-control form-control-sm"></div>
+               </div>
+           </div>
+       </div>
+       <div class="col-md-6 p-1">
+           <div class="tile">
+               <div class="row"><div class="col-12"><span class="form-label">Lịch đăng & Trạng thái</span></div></div>
+               <div class="row">
+                   <div class="col-md-3 p-1"><span class="form-label">Ngày đăng:</span></div>
+                   <div class="col-md-3 p-1"><input type="date" class="form-control form-control-sm"></div>
+                   <div class="col-md-3 p-1"><span class="form-label">Trạng thái:</span></div>
+                   <div class="col-md-3 p-1">
+                       <select class="form-control form-control-sm font-weight-bold">
+                           <option>Bản nháp</option>
+                           <option>Chờ duyệt</option>
+                           <option>Công khai</option>
+                       </select>
+                   </div>
+               </div>
+           </div>
+       </div>
+   </div>
+
+
+   <div class="row">
+       <div class="col-md-6 p-1">
+           <div class="tile bg-light d-flex align-items-center">
+               <small class="font-italic text-secondary">Lưu ý: Mọi bài viết đều phải qua khâu kiểm duyệt trước khi xuất bản.</small>
+           </div>
+       </div>
+       <div class="col-md-2 p-1"><button class="btn btn-admin py-3 shadow-sm">LƯU TẠM</button></div>
+       <div class="col-md-2 p-1"><button class="btn btn-admin py-3 shadow-sm" style="background-color: #2e5a7e;">GỬI DUYỆT</button></div>
+       <div class="col-md-2 p-1"><button class="btn btn-secondary btn-block py-3 shadow-sm">HỦY BỎ</button></div>
+   </div>
+
+
+   <div class="row">
+       <div class="col-12 p-1">
+           <div class="footer-tile p-2">
+               <small>HỆ THỐNG GRID BOOTSTRAP - THIẾT KẾ BỞI NHÓM 5 - UEH © 2026</small>
+           </div>
+       </div>
+   </div>
+</div>
+
+
+</body>
+</html>
+
