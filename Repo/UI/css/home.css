@@ -1,0 +1,165 @@
+body {
+  font-family: Georgia, serif;
+  background: #f5f9ff;
+}
+
+/* TOPBAR */
+.topbar {
+  background: #B7D8F7;
+  padding: 12px;
+  font-weight: bold;
+}
+
+/* NAV */
+.navbar-custom {
+  background: white;
+  border-bottom: 2px solid black;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.nav-link {
+  cursor: pointer;
+  position: relative;
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  width: 0%;
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background: orange;
+  transition: 0.3s;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+/* MEGA MENU */
+.nav-item {
+  position: relative;
+}
+
+.mega-menu {
+  display: none;
+  position: absolute;
+  width: 900px;
+  background: white;
+  padding: 20px;
+  z-index: 999;
+}
+
+.nav-item:hover .mega-menu {
+  display: block;
+}
+
+/* HERO */
+.hero {
+  background: linear-gradient(to right, white, #eef6ff);
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.hero-title {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+/* TAG */
+.tag {
+  background: #B7D8F7;
+  padding: 4px 10px;
+  border-radius: 20px;
+  margin-right: 5px;
+}
+
+/* TRUST */
+.trust-score.high {
+  background: rgba(25,135,84,0.1);
+  color: #198754;
+  padding: 5px 10px;
+  border-radius: 20px;
+}
+
+/* ARTICLE CARD */
+.article-card {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  transition: 0.25s;
+}
+
+.article-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+/* CATEGORY */
+.category {
+  padding: 10px;
+}
+
+/* SIDEBAR */
+.sidebar {
+  background: rgba(255,255,255,0.7);
+  padding: 15px;
+  border-radius: 10px;
+}
+
+/* VOTE */
+.vote-box {
+  margin-top: 5px;
+  font-size: 0.85rem;
+}
+
+.vote.up {
+  color: #198754;
+}
+
+.vote.down {
+  color: #dc3545;
+}
+
+/* FOOTER */
+.footer {
+  background: #111;
+  color: white;
+  padding: 15px;
+}
+/* SEARCH */
+.search-box {
+  width: 100%;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid #ddd;
+  outline: none;
+  transition: 0.2s;
+}
+
+.search-box:focus {
+  border-color: #B7D8F7;
+  box-shadow: 0 0 5px rgba(183,216,247,0.5);
+}
+
+/* ICONS */
+.top-icon {
+  margin-left: 12px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.top-icon:hover {
+  transform: scale(1.2);
+}
+
+/* USER */
+.user img {
+  border-radius: 50%;
+  margin-left: 12px;
+  cursor: pointer;
+}
