@@ -189,3 +189,14 @@ function submitFinalForm() {
     alert("🚀 NewsPulse: Bài viết đã được gửi cho Ban Biên Tập để thẩm định xuất bản!");
     // window.location.href = "profile.html"; [cite: 35, 49]
 }
+function goToProfile() {
+    // Nếu người dùng đang nhập dở nội dung bài viết
+    const currentContent = document.getElementById('richEditor').innerText.trim();
+    if (currentContent.length > 0) {
+        const confirmLeave = confirm("Hệ thống NewsPulse: Bạn có nội dung chưa lưu, bạn có chắc muốn quay lại Profile không?");
+        if (!confirmLeave) return;
+    }
+    
+    // Chuyển hướng sang trang profile
+    window.location.href = 'profile.html';
+}
