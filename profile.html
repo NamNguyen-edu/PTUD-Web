@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NewsPulse Professional | Hồ sơ cá nhân - Nguyễn Duy Bảo</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    
+    <link rel="stylesheet" href="profile.css">
+</head>
+<body class="bg-light-custom">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-pulse-primary sticky-top shadow-sm">
+    <div class="container">
+        <a class="navbar-brand font-weight-bold" href="#">
+            <span class="text-warning">⚡</span> NEWSPULSE
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#profileNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="profileNav">
+            <ul class="navbar-nav ml-auto align-items-center">
+                <li class="nav-item mr-3">
+                    <a class="nav-link" href="postnews.html"><i class="fas fa-plus-circle mr-1"></i> Viết bài mới</a>
+                </li>
+                <li class="nav-item active border-left pl-3 ml-2">
+                    <div class="d-flex align-items-center">
+                        <span class="nav-link p-0 mr-2 text-white small">Nguyễn Duy Bảo</span>
+                        <img src="https://ui-avatars.com/api/?name=Nguyen+Duy+Bao&background=0D8ABC&color=fff" 
+                             class="rounded-circle border border-white shadow-sm" width="35" alt="Avatar">
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-5 pb-5">
+    <div class="row">
+        <aside class="col-lg-4 mb-4">
+            <div class="card border-0 shadow-sm rounded-lg overflow-hidden profile-sidebar">
+                <div class="profile-cover" style="height: 100px; background: linear-gradient(45deg, #4682B4, #B7D8F7);"></div>
+                
+                <div class="card-body text-center pt-0">
+                    <div class="avatar-wrapper" style="margin-top: -50px;">
+                        <img src="https://ui-avatars.com/api/?name=Nguyen+Duy+Bao&size=150" 
+                             class="img-thumbnail rounded-circle shadow-sm" alt="Profile Picture" style="width: 120px; height: 120px;">
+                        <button class="btn btn-sm btn-light btn-edit-avatar shadow-sm" title="Đổi ảnh đại diện">
+                            <i class="fas fa-camera"></i>
+                        </button>
+                    </div>
+                    
+                    <h4 class="font-weight-bold mt-3 mb-1">Nguyễn Duy Bảo</h4>
+                    <p class="text-muted small mb-3">Chuyên ngành Hệ thống thông tin | UEH</p>
+                    
+                    <div class="d-flex justify-content-around border-top border-bottom py-3 mb-3">
+                        <div class="stat-item text-center">
+                            <span class="d-block font-weight-bold h5 mb-0" id="statPosts">24</span>
+                            <small class="text-muted">Bài viết</small>
+                        </div>
+                        <div class="stat-item border-left border-right px-3 text-center">
+                            <span class="d-block font-weight-bold h5 mb-0" id="statBookmarks">15</span>
+                            <small class="text-muted">Đã lưu</small>
+                        </div>
+                        <div class="stat-item text-center">
+                            <span class="d-block font-weight-bold h5 mb-0" id="statViews">8.2K</span>
+                            <small class="text-muted">Lượt đọc</small>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-bio px-2 mb-4">
+                        <p class="small text-secondary italic">
+                            "Nhà văn tự do, đam mê viết lách."
+                        </p>
+                    </div>
+                    
+                    <button class="btn btn-primary btn-block mb-2 font-weight-bold py-2 shadow-sm" onclick="switchTab('settings')">
+                        <i class="fas fa-user-edit mr-2"></i> CHỈNH SỬA HỒ SƠ
+                    </button>
+                    <button class="btn btn-outline-danger btn-block btn-sm border-0" onclick="handleLogout()">
+                        Đăng xuất tài khoản
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card border-0 shadow-sm rounded-lg mt-4 p-3">
+                <h6 class="font-weight-bold text-uppercase small text-muted mb-3">Kỹ năng chuyên môn</h6>
+                <div class="d-flex flex-wrap">
+                    <span class="badge badge-pulse p-2 m-1">Học sâu</span>
+                    <span class="badge badge-pulse p-2 m-1">Hiểu rộng</span>
+                    <span class="badge badge-pulse p-2 m-1">Phóng khoáng</span>
+                    <span class="badge badge-pulse p-2 m-1">Paparazi</span>
+                    <span class="badge badge-pulse p-2 m-1">Trạm tỷ</span>
+                </div>
+            </div>
+        </aside>
+
+        <main class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-lg">
+                <div class="card-header bg-white border-0 p-0">
+                    <ul class="nav nav-tabs nav-fill profile-tabs" id="profileTab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="bookmarks-tab" data-toggle="tab" href="#bookmarks" role="tab">
+                                <i class="fas fa-bookmark mr-2"></i> Bookmark
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="history-tab" data-toggle="tab" href="#history" role="tab">
+                                <i class="fas fa-history mr-2"></i> Lịch sử đọc
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="my-posts-tab" data-toggle="tab" href="#myposts" role="tab">
+                                <i class="fas fa-paper-plane mr-2"></i> Bài đăng
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="settings-tab" data-toggle="tab" href="#settings" role="tab">
+                                <i class="fas fa-cog mr-2"></i> Thiết lập
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="tab-content p-4" id="profileTabContent">
+                <div class="tab-pane fade show active" id="bookmarks" role="tabpanel">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="font-weight-bold mb-0">Bài viết đã lưu (15)</h5>
+                            <div class="dropdown">
+                                <button class="btn btn-light btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+                                    Mới nhất
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right">
+                                    <a class="dropdown-item" href="#">Mới nhất</a>
+                                    <a class="dropdown-item" href="#">Cũ nhất</a>
+                                    <a class="dropdown-item" href="#">Theo chuyên mục</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row" id="bookmarkContainer">
+                            <div class="col-md-6 mb-4">
+                                <div class="card h-100 border-0 shadow-sm article-card-mini">
+                                    <img src="https://images.unsplash.com/photo-1504711432869-5d39a142ad5c?w=400" class="card-img-top" alt="News">
+                                    <div class="card-body p-3">
+                                        <span class="badge badge-soft-primary mb-2">Công nghệ</span>
+                                        <h6 class="font-weight-bold line-clamp-2">Tương lai của AI trong phân tích nghiệp vụ Business Analyst năm 2026</h6>
+                                        <div class="d-flex justify-content-between align-items-center mt-3">
+                                            <small class="text-muted"><i class="far fa-clock mr-1"></i> 2 giờ trước</small>
+                                            <button class="btn btn-link btn-sm text-danger p-0" title="Bỏ lưu"><i class="fas fa-bookmark"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="card h-100 border-0 shadow-sm article-card-mini">
+                                    <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400" class="card-img-top" alt="News">
+                                    <div class="card-body p-3">
+                                        <span class="badge badge-soft-success mb-2">Kinh tế</span>
+                                        <h6 class="font-weight-bold line-clamp-2">Thị trường Startup Việt Nam: Cơ hội và thách thức cho Gen Z</h6>
+                                        <div class="d-flex justify-content-between align-items-center mt-3">
+                                            <small class="text-muted"><i class="far fa-clock mr-1"></i> Hôm qua</small>
+                                            <button class="btn btn-link btn-sm text-danger p-0" title="Bỏ lưu"><i class="fas fa-bookmark"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-light btn-block font-weight-bold text-primary py-2 mt-2">XEM THÊM BOOKMARK</button>
+                    </div>
+
+                    <div class="tab-pane fade" id="history" role="tabpanel">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="font-weight-bold mb-0">Lịch sử đọc gần đây</h5>
+                            <button class="btn btn-outline-secondary btn-sm" onclick="clearHistory()">Xóa lịch sử</button>
+                        </div>
+                        
+                        <div class="history-timeline">
+                            <div class="history-item d-flex align-items-center p-3 mb-3 bg-white rounded shadow-sm border-left-pulse">
+                                <div class="history-date mr-4 text-center">
+                                    <span class="d-block font-weight-bold text-primary">18</span>
+                                    <small class="text-uppercase text-muted">Th4</small>
+                                </div>
+                                <div class="history-info flex-grow-1">
+                                    <h6 class="mb-1 font-weight-bold">Ứng dụng SHAP và LIME trong mô hình dự đoán khách hàng rời bỏ</h6>
+                                    <small class="text-muted"><i class="fas fa-eye mr-1"></i> Đã đọc 80% • 10:30 AM</small>
+                                </div>
+                                <i class="fas fa-chevron-right text-light"></i>
+                            </div>
+                            </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="myposts" role="tabpanel">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="font-weight-bold mb-0">Quản lý bài đăng của tôi</h5>
+                            <a href="postnews.html" class="btn btn-pulse-primary btn-sm"><i class="fas fa-plus mr-1"></i> Tạo bài mới</a>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-hover border-0">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th class="border-0 small text-uppercase font-weight-bold">Tiêu đề</th>
+                                        <th class="border-0 small text-uppercase font-weight-bold text-center">Trạng thái</th>
+                                        <th class="border-0 small text-uppercase font-weight-bold text-center">Thống kê</th>
+                                        <th class="border-0 small text-uppercase font-weight-bold text-right">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="max-width: 250px;">
+                                            <div class="font-weight-bold text-truncate">Dự án NightOwl Market: Giải pháp cho sinh viên thức khuya</div>
+                                            <small class="text-muted">Cập nhật: 02/03/2026</small>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span class="badge badge-pill badge-success px-3">Đã đăng</span>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <div class="small"><i class="fas fa-eye mr-1"></i> 1.2K</div>
+                                            <div class="small text-primary"><i class="fas fa-comment mr-1"></i> 45</div>
+                                        </td>
+                                        <td class="text-right align-middle">
+                                            <button class="btn btn-light btn-sm mr-1"><i class="fas fa-edit"></i></button>
+                                            <button class="btn btn-light btn-sm text-danger"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="font-weight-bold text-truncate">Phân tích hệ thống ERP tại doanh nghiệp bán lẻ Việt Nam</div>
+                                            <small class="text-muted">Lưu nháp: 15/04/2026</small>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span class="badge badge-pill badge-warning px-3">Bản nháp</span>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <span class="text-muted">--</span>
+                                        </td>
+                                        <td class="text-right align-middle">
+                                            <button class="btn btn-light btn-sm mr-1"><i class="fas fa-edit"></i></button>
+                                            <button class="btn btn-light btn-sm text-danger"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="settings" role="tabpanel">
+                        <h5 class="font-weight-bold mb-4">Thiết lập tài khoản chuyên sâu</h5>
+                        <form id="profileUpdateForm">
+                            <div class="row">
+                                <div class="col-md-6 form-group">
+                                    <label class="small font-weight-bold text-uppercase">Họ và tên</label>
+                                    <input type="text" class="form-control bg-light border-0" value="Nguyễn Duy Bảo" id="fullName">
+                                </div>
+                                <div class="col-md-6 form-group">
+                                    <label class="small font-weight-bold text-uppercase">Email liên hệ</label>
+                                    <input type="email" class="form-control bg-light border-0" value="bebao2005at@gmail.com" readonly>
+                                </div>
+                            </div>
+                            <div class="form-group mt-2">
+                                <label class="small font-weight-bold text-uppercase">Chuyên môn / Nghề nghiệp</label>
+                                <input type="text" class="form-control bg-light border-0" value="Business Information Systems">
+                            </div>
+                            <div class="form-group mt-2">
+                                <label class="small font-weight-bold text-uppercase">Giới thiệu ngắn (Bio)</label>
+                                <textarea class="form-control bg-light border-0" rows="4">Nhà văn tự do, đam mê viết lách</textarea>
+                            </div>
+                            
+                            <hr class="my-4">
+                            <h6 class="font-weight-bold mb-3">Thông báo & Bảo mật</h6>
+                            <div class="custom-control custom-switch mb-3">
+                                <input type="checkbox" class="custom-control-input" id="notifyEmail" checked>
+                                <label class="custom-control-label small" for="notifyEmail">Nhận thông báo bài viết mới qua Email</label>
+                            </div>
+                            <div class="custom-control custom-switch mb-4">
+                                <input type="checkbox" class="custom-control-input" id="privateProfile">
+                                <label class="custom-control-label small" for="privateProfile">Để hồ sơ ở chế độ riêng tư (Private)</label>
+                            </div>
+                            
+                            <div class="d-flex">
+                                <button type="button" class="btn btn-pulse-primary px-5 font-weight-bold shadow-sm" onclick="saveProfileChanges()">LƯU THAY ĐỔI</button>
+                                <button type="button" class="btn btn-light ml-2 font-weight-bold" onclick="resetForm()">HỦY BỎ</button>
+                            </div>
+                        </form>
+                    </div>
+                </div> </div> </main>
+    </div> </div> <div class="modal fade" id="userPreferenceModal" tabindex="-1" role="dialog" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content border-0 shadow-lg rounded-xl">
+            <div class="modal-body p-5 text-center">
+                <div class="pref-icon mb-4">
+                    <i class="fas fa-bullseye fa-3x text-warning"></i>
+                </div>
+                <h4 class="font-weight-bold">Tối ưu trải nghiệm của bạn</h4>
+                <p class="text-muted">Chào Bảo! Hãy chọn các chủ đề bạn quan tâm để NewsPulse đề xuất những bài viết phù hợp nhất cho bạn.</p>
+                
+                <div class="d-flex flex-wrap justify-content-center mt-4" id="topicSelection">
+                    <div class="topic-tag" data-topic="Tech">Công nghệ</div>
+                    <div class="topic-tag" data-topic="Biz">Kinh doanh</div>
+                    <div class="topic-tag" data-topic="Fin">Tài chính</div>
+                    <div class="topic-tag" data-topic="Start">Startup</div>
+                    <div class="topic-tag" data-topic="Edu">Giáo dục</div>
+                    <div class="topic-tag" data-topic="Life">Đời sống</div>
+                </div>
+                
+                <button type="button" class="btn btn-pulse-primary btn-block mt-4 py-3 font-weight-bold shadow" onclick="saveUserPreferences()">
+                    BẮT ĐẦU KHÁM PHÁ <i class="fas fa-rocket ml-2"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="text-center py-4 text-muted border-top bg-white mt-auto">
+    <small>© 2026 NewsPulse</small>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="profile.js"></script>
+</body>
+</html>
