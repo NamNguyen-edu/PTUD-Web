@@ -53,7 +53,6 @@
     color: var(--dark-text) !important;
 }
 
-/* PHẦN MỚI: BỔ SUNG CHO TRANG ĐĂNG KÝ */
 
 /* 1. Tùy chỉnh ô Checkbox (Guarantee) */
 .form-check-input {
@@ -107,6 +106,24 @@
 
 .tracking-widest {
     letter-spacing: 4px;
+}
+
+.color-newspulse {
+    color: #007bff;
+}
+
+/* Thay đổi màu chủ đạo tại đây */
+.btn-newspulse {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-newspulse:hover {
+    background-color: #0056b3;
+}
+
+.tracking-widest {
+    letter-spacing: 0.2em;
 }
 
 /* Responsive cho mobile */
