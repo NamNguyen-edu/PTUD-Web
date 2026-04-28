@@ -62,7 +62,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // 1. Chọn đúng bảng dựa trên ID bảng trong HTML của ní (tableCategory hoặc tableTag)
-    const targetTableBody = document.querySelector(`#${type === 'Category' ? 'tableCategory' : 'tableTag'} tbody`);
+    const tbodyId = (type === 'Category') ? 'category-tbody' : 'tag-tbody';
+    const targetTableBody = document.getElementById(tbodyId);
 
     if (!targetTableBody) {
         console.error("Không tìm thấy tbody của bảng!");
