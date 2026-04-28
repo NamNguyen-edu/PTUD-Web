@@ -1,0 +1,71 @@
+<div class="row topbar align-items-center">
+    <div class="col-3 logo">NewsPulse</div>
+    <div class="col-6 p-0">
+        <input type="text" class="search-box" placeholder="Search news, topics...">
+    </div>
+    <div class="col-3 text-end actions" id="user-actions">
+        <!-- Login Section -->
+        <div id="login-section" class="d-flex gap-2 justify-content-end align-items-center">
+            <a href="../html/Login.html" class="btn btn-login">Đăng nhập</a>
+            <a href="../html/SignUp.html" class="btn btn-signup">Đăng ký</a>
+        </div>
+
+        <!-- Profile Section (Hidden by default) -->
+        <div id="profile-section" class="d-none profile-container">
+            <div class="profile-info" role="button" tabindex="0">
+                <div class="profile-avatar">
+                    <img src="https://ui-avatars.com/api/?name=User&background=0d6efd&color=fff" alt="User">
+                </div>
+                <div class="profile-details">
+                    <div class="profile-name" id="profile-name">Người dùng</div>
+                    <small class="profile-email" id="profile-email">user</small>
+                </div>
+                <div class="profile-chevron">
+                    <span>▼</span>
+                </div>
+            </div>
+            <div class="profile-menu">
+                <div class="profile-menu-header">
+                    <div class="profile-menu-user">
+                        <div class="profile-menu-avatar">
+                            <img src="https://ui-avatars.com/api/?name=User&background=0d6efd&color=fff" alt="User">
+                        </div>
+                        <div>
+                            <div class="profile-menu-name" id="profile-menu-name">Người dùng</div>
+                            <small class="profile-menu-email" id="profile-menu-email">user</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="profile-menu-divider"></div>
+                <a href="../html/profile.html" class="profile-menu-item">
+                    <span class="menu-icon"></span>
+                    <div class="menu-content">
+                        <div class="menu-title">Hồ sơ</div>
+                        <small>Quản lý thông tin cá nhân</small>
+                    </div>
+                </a>
+                <a href="#" class="profile-menu-item">
+                    <span class="menu-icon"></span>
+                    <div class="menu-content">
+                        <div class="menu-title">Cài đặt</div>
+                        <small>Tùy chọn và quyền riêng tư</small>
+                    </div>
+                </a>
+                <a href="#" class="profile-menu-item">
+                    <span class="menu-icon"></span>
+                    <div class="menu-content">
+                        <div class="menu-title">Yêu thích</div>
+                        <small>Những bài viết bạn lưu</small>
+                    </div>
+                </a>
+                <div class="profile-menu-divider"></div>
+                <a href="#" id="logout-btn" class="profile-menu-item logout-item">
+                    <span class="menu-icon logout-icon">→</span>
+                    <div class="menu-content">
+                        <div class="menu-title">Đăng xuất</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

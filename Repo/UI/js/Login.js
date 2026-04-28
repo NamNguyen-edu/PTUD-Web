@@ -1,3 +1,8 @@
+// ===== TEST ACCOUNTS DATABASE =====
+const testAccounts = {
+  'user': 'admin123'
+};
+
 // Hàm validate dùng chung cho cả 2 trang
 function checkValid(element, condition) {
   if (condition) {
@@ -9,6 +14,15 @@ function checkValid(element, condition) {
     element.classList.add('is-invalid'); // Bôi đỏ
     return false;
   }
+}
+
+// ===== AUTHENTICATE USER =====
+function authenticateUser(username, password) {
+  // Check if account exists and password matches
+  if (testAccounts[username] && testAccounts[username] === password) {
+    return { success: true, message: 'Đăng nhập thành công!' };
+  }
+  return { success: false, message: 'Tài khoản hoặc mật khẩu không đúng!' };
 }
 
 // Xử lý Login
@@ -23,7 +37,26 @@ if (loginForm) {
     ok &= checkValid(user, user.value.trim() !== "");
     ok &= checkValid(pass, pass.value.length >= 6);
 
-    if (ok) alert("Đăng nhập thành công!");
+    if (ok) {
+      // Authenticate user
+      const auth = authenticateUser(user.value.trim(), pass.value);
+      
+      if (auth.success) {
+        alert(auth.message);
+        // Call login function from main.js
+        if (typeof login === 'function') {
+          login(user.value.trim());
+          // Redirect to home
+          setTimeout(() => {
+            window.location.href = '../html/home.html';
+          }, 500);
+        }
+      } else {
+        alert(auth.message);
+        checkValid(user, false);
+        checkValid(pass, false);
+      }
+    }
   });
 }
 
