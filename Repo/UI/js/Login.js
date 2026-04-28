@@ -1,3 +1,31 @@
+document.addEventListener('DOMContentLoaded', function () {
+  // Khởi tạo Modal
+  const pushModalElement = document.getElementById('pushModal');
+  const pushModal = new bootstrap.Modal(pushModalElement);
+  const btnAllow = document.getElementById('btnAllow');
+
+  // 1. Tự động hiện sau 2 giây (Chưa cần làm gì đã hiện)
+  setTimeout(() => {
+    // Chỉ hiện nếu trình duyệt chưa được cấp quyền (tránh làm phiền người đã bật rồi)
+    if (Notification.permission === "default") {
+      pushModal.show();
+    }
+  }, 2000);
+
+  // 2. Xử lý khi nhấn nút "Bật thông báo ngay"
+  btnAllow.addEventListener('click', function () {
+    Notification.requestPermission().then(permission => {
+      if (permission === "granted") {
+        // Hiện cái push thật của trình duyệt để test
+        new Notification("NewsPulse", {
+          body: "Tuyệt vời! Bạn sẽ nhận được tin tức mới nhất từ chúng tôi.",
+          icon: "https://via.placeholder.com/100"
+        });
+      }
+      pushModal.hide(); // Đóng modal sau khi chọn
+    });
+  });
+});
 // Hàm validate dùng chung cho cả 2 trang
 function checkValid(element, condition) {
   if (condition) {

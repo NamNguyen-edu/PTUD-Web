@@ -26,8 +26,8 @@ function createItem() {
   let down = Math.floor(Math.random() * 100);
   let trust = 60 + Math.floor(Math.random() * 40);
   let colors = ["bg-1", "bg-2", "bg-3", "bg-4", "bg-5"];
-let random = colors[Math.floor(Math.random() * colors.length)];
-div.classList.add(random);
+  let random = colors[Math.floor(Math.random() * colors.length)];
+  div.classList.add(random);
 
   div.innerHTML = `
     <div class="meta">${currentCategory.toUpperCase()} • just now</div>
