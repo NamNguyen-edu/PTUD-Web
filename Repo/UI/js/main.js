@@ -1,9 +1,11 @@
 document.addEventListener("DOMContentLoaded", function() {
+    const basePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+
     // Header Load
-    loadComponent("header-placeholder", "../components/header.html");
+    loadComponent("header-placeholder", basePath + "UI/components/header.html");
     
     // Footer Load
-    loadComponent("footer-placeholder", "../components/footer.html");
+    loadComponent("footer-placeholder", basePath + "UI/components/footer.html");
 
     // Initialize auth UI after components load
     setTimeout(initAuthUI, 100);

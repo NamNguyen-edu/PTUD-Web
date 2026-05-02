@@ -46,10 +46,10 @@ if (loginForm) {
         // Call login function from main.js
         if (typeof login === 'function') {
           login(user.value.trim());
-          // Redirect to home
+          // Redirect to home page after login
           setTimeout(() => {
-            window.location.href = '../html/home.html';
-          }, 500);
+            window.location.href = 'index.php?page=home'; 
+        }, 500);
         }
       } else {
         alert(auth.message);
