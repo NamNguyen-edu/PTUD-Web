@@ -1,198 +1,195 @@
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NewPulse - Quản lý Danh mục</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NewPulse - Quản lý Phân loại</title>
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
-    rel="stylesheet" />
-
-  <link rel="stylesheet" href="../css/CatalogManagement.css">
+    <!-- Thư viện CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/CatalogManagement.css">
+    
+    <style>
+        :root { --np-primary: #2563eb; --np-light-blue: #B7D8F7; --np-dark-blue: #002D5E; }
+        .slug-preview { color: #6c757d; font-size: 0.85rem; font-style: italic; }
+    </style>
 </head>
 
 <body>
-
-  <aside class="sidebar">
-    <div class="brand-logo">
-      <div class="brand-icon"><i class="fas fa-layer-group"></i></div>
-      <div>
-        <div class="fw-bold fs-5 text-dark" style="line-height: 1.2;">NewPulse</div>
-        <div class="text-muted" style="font-size: 12px;">Editorial Intelligence</div>
-      </div>
-    </div>
-
-    <div class="nav flex-column">
-      <a href="#" class="nav-link-custom">
-        <span class="material-symbols-outlined">dashboard</span> Bảng điều khiển
-      </a>
-      <a href="#" class="nav-link-custom">
-        <span class="material-symbols-outlined">assignment_turned_in</span> Quy trình
-      </a>
-      <a href="#" class="nav-link-custom active">
-        <span class="material-symbols-outlined">folder_open</span> Quản lý danh mục
-      </a>
-      <a href="#" class="nav-link-custom">
-        <span class="material-symbols-outlined">article</span> Nội dung
-      </a>
-      <a href="#" class="nav-link-custom">
-        <span class="material-symbols-outlined">group</span> Người dùng
-      </a>
-      <a href="#" class="nav-link-custom">
-        <span class="material-symbols-outlined">history</span> Nhật ký hệ thống
-      </a>
-    </div>
-
-    <button class="btn btn-new-article"><i class="fas fa-plus me-2"></i> Thêm bài viết</button>
-  </aside>
-
-  <div class="main-wrapper">
-
-    <header class="top-header">
-      <div class="header-left">
-        <span class="brand-text">NEWPULSE</span>
-        <input type="text" class="search-bar" placeholder="Tìm kiếm chuyên mục...">
-      </div>
-      <div class="header-right">
-        <div class="header-links d-none d-md-flex gap-4">
-          <a href="#">Phân tích</a>
-          <a href="#">Hiệu suất</a>
-          <a href="#" class="active">Chế độ xem trực tiếp</a>
-        </div>
-        <div class="d-flex align-items-center border-start ps-4 ms-2">
-          <a href="#" class="text-dark position-relative me-4">
-            <i class="far fa-bell fs-5"></i>
-            <span
-              class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
-          </a>
-          <img src="https://i.pravatar.cc/150?u=admin" alt="User"
-            class="rounded-circle user-profile border border-2 border-white shadow-sm" width="38" height="38">
-        </div>
-      </div>
-    </header>
-
-    <main class="content-area">
-
-      <div class="d-flex justify-content-between align-items-end mb-4">
-        <div>
-          <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-2" style="font-size: 13px;">
-              <li class="breadcrumb-item"><a href="#" class="text-decoration-none text-muted">Bảng điều khiển</a></li>
-              <li class="breadcrumb-item active fw-medium text-dark" aria-current="page">Danh mục</li>
-            </ol>
-          </nav>
-          <h1 class="page-title m-0">Quản lý chuyên mục</h1>
-        </div>
-        <button class="btn btn-primary px-4 py-2"
-          style="border-radius: 8px; font-weight: 500; background-color: var(--np-blue);">
-          Xuất báo cáo <i class="fas fa-download ms-2"></i>
-        </button>
-      </div>
-
-      <div class="row g-4 mb-4">
-        <div class="col-md-4">
-          <div class="stat-card">
-            <div class="text-muted small fw-bold mb-2">TỔNG SỐ CHUYÊN MỤC</div>
-            <div class="d-flex align-items-center">
-              <h2 class="fw-bold m-0 me-3">12</h2>
-              <span class="badge bg-success-subtle text-success"><i class="fas fa-arrow-up me-1"></i> 2</span>
+    <aside class="sidebar">
+        <div class="brand-logo">
+            <div class="brand-icon"><i class="fas fa-layer-group"></i></div>
+            <div>
+                <div class="fw-bold fs-5 text-dark" style="line-height: 1.2;">NewPulse</div>
+                <div class="text-muted" style="font-size: 12px;">Editorial Intelligence</div>
             </div>
-          </div>
         </div>
-        <div class="col-md-4">
-          <div class="stat-card">
-            <div class="text-muted small fw-bold mb-2">CHUYÊN MỤC HOT NHẤT</div>
-            <h2 class="fw-bold m-0 text-primary">Technology</h2>
-            <div class="small text-muted mt-1">Chiếm 45% tổng số bài viết</div>
-          </div>
+        <div class="nav flex-column">
+            <a href="#" class="nav-link-custom"><span class="material-symbols-outlined">dashboard</span> Bảng điều khiển</a>
+            <a href="#" class="nav-link-custom"><span class="material-symbols-outlined">assignment_turned_in</span> Quy trình</a>
+            <a href="#" class="nav-link-custom active"><span class="material-symbols-outlined">folder_open</span> Quản lý chuyên mục</a>
+            <a href="#" class="nav-link-custom"><span class="material-symbols-outlined">article</span> Nội dung</a>
+            <a href="#" class="nav-link-custom"><span class="material-symbols-outlined">group</span> Người dùng</a>
+            <a href="#" class="nav-link-custom"><span class="material-symbols-outlined">history</span> Nhật ký hệ thống</a>
         </div>
-        <div class="col-md-4">
-          <div class="stat-card">
-            <div class="text-muted small fw-bold mb-2">TỔNG BÀI VIẾT (ALL)</div>
-            <h2 class="fw-bold m-0">2,528</h2>
-            <div class="small text-muted mt-1">Cập nhật 5 phút trước</div>
-          </div>
-        </div>
-      </div>
+        <button class="btn btn-new-article"><i class="fas fa-plus me-2"></i> Thêm bài viết</button>
+    </aside>
 
-      <div class="table-card">
-        <div class="table-responsive">
-          <table class="table align-middle m-0">
-            <thead>
-              <tr>
-                <th style="width: 40%;">Tên chuyên mục</th>
-                <th class="text-center">Đường dẫn (Slug)</th>
-                <th class="text-center">Số lượng bài</th>
-                <th class="text-end">Thao tác</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  <div class="d-flex align-items-center">
-                    <div class="cat-icon bg-tech"><i class="fas fa-microchip"></i></div>
-                    <div>
-                      <div class="fw-bold text-dark fs-6">Technology</div>
-                      <div class="text-muted small">Công nghệ & Đổi mới</div>
+    <div class="main-wrapper">
+        <header class="top-header">
+            <div class="header-left">
+                <span class="brand-text">NEWPULSE</span>
+                <!-- Bổ sung ID cho ô tìm kiếm -->
+                <input type="text" id="globalSearch" class="search-bar" placeholder="Tìm kiếm tên hoặc slug...">
+            </div>
+            <div class="header-right">
+                <div class="header-links d-none d-md-flex gap-4">
+                    <a href="#">Phân tích</a><a href="#">Hiệu suất</a><a href="#" class="active">Trực tiếp</a>
+                </div>
+                <div class="d-flex align-items-center border-start ps-4 ms-2">
+                    <a href="#" class="text-dark position-relative me-4">
+                        <i class="far fa-bell fs-5"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
+                    </a>
+                    <img src="https://i.pravatar.cc/150?u=admin" alt="User" class="rounded-circle user-profile" width="38" height="38">
+                </div>
+            </div>
+        </header>
+
+        <main class="content-area p-4">
+            <div class="d-flex justify-content-between align-items-end mb-4">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-2" style="font-size: 13px;">
+                            <li class="breadcrumb-item"><a href="#" class="text-decoration-none text-muted">Bảng điều khiển</a></li>
+                            <li class="breadcrumb-item active fw-medium text-dark">Quản lý nội dung</li>
+                        </ol>
+                    </nav>
+                    <h1 id="pageTitle" class="page-title m-0">Quản lý chuyên mục</h1>
+                </div>
+                <button class="btn btn-primary px-4 py-2" data-bs-toggle="modal" data-bs-target="#addItemModal"
+                    style="border-radius: 8px; font-weight: 500; background-color: var(--np-light-blue); border:none; color:#000;">
+                    Thêm mới <i class="fas fa-plus ms-2"></i>
+                </button>
+            </div>
+
+            <ul class="nav nav-tabs mb-4" id="managementTab" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active" id="category-tab-btn" data-bs-toggle="tab" data-bs-target="#category-content" type="button" role="tab">Chuyên mục chính</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="tag-tab-btn" data-bs-toggle="tab" data-bs-target="#tag-content" type="button" role="tab">Thẻ từ khóa (Tags)</button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="myTabContent">
+                <!-- Tab Category -->
+                <div class="tab-pane fade show active" id="category-content" role="tabpanel">
+                    <div class="table-card bg-white shadow-sm rounded overflow-hidden">
+                        <table class="table align-middle m-0" id="tableCategory">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4">TÊN CHUYÊN MỤC</th>
+                                    <th class="text-center">ĐƯỜNG DẪN (SLUG)</th>
+                                    <th class="text-center">SỐ LƯỢNG BÀI</th>
+                                    <th class="text-end pe-4">THAO TÁC</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="d-flex align-items-center">
+                                            <div class="cat-icon bg-info text-white p-2 rounded me-3"><i class="fas fa-microchip"></i></div>
+                                            <div class="fw-bold item-name">Technology</div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center item-slug">/technology</td>
+                                    <td class="text-center">1,240</td>
+                                    <td class="text-end pe-4">
+                                        <button class="btn btn-light btn-sm btn-edit me-1"><i class="fas fa-edit"></i></button>
+                                        <button class="btn btn-light btn-sm btn-delete text-danger"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                  </div>
-                </td>
-                <td class="text-center text-muted">/technology</td>
-                <td class="text-center fw-bold text-dark">1,240</td>
-                <td class="text-end">
-                  <button class="btn-action me-1"><i class="fas fa-pen"></i></button>
-                  <button class="btn-action"><i class="fas fa-trash"></i></button>
-                </td>
-              </tr>
+                </div>
 
-              <tr>
-                <td>
-                  <div class="d-flex align-items-center">
-                    <div class="cat-icon bg-biz"><i class="fas fa-briefcase"></i></div>
-                    <div>
-                      <div class="fw-bold text-dark fs-6">Business</div>
-                      <div class="text-muted small">Tài chính & Kinh tế số</div>
+                <!-- Tab Tags -->
+                <div class="tab-pane fade" id="tag-content" role="tabpanel">
+                    <div class="table-card bg-white shadow-sm rounded overflow-hidden">
+                        <table class="table align-middle m-0" id="tableTag">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4">TÊN THẺ (TAG)</th>
+                                    <th class="text-center">SLUG</th>
+                                    <th class="text-center">SỬ DỤNG</th>
+                                    <th class="text-end pe-4">THAO TÁC</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="d-flex align-items-center">
+                                            <span class="text-muted fw-bold me-2">#</span>
+                                            <div class="fw-bold item-name">ArtificialIntelligence</div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center item-slug">/tag/ai</td>
+                                    <td class="text-center">542</td>
+                                    <td class="text-end pe-4">
+                                        <button class="btn btn-light btn-sm btn-edit me-1"><i class="fas fa-edit"></i></button>
+                                        <button class="btn btn-light btn-sm btn-delete text-danger"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                  </div>
-                </td>
-                <td class="text-center text-muted">/business</td>
-                <td class="text-center fw-bold text-dark">856</td>
-                <td class="text-end">
-                  <button class="btn-action me-1"><i class="fas fa-pen"></i></button>
-                  <button class="btn-action"><i class="fas fa-trash"></i></button>
-                </td>
-              </tr>
-
-              <tr>
-                <td>
-                  <div class="d-flex align-items-center">
-                    <div class="cat-icon bg-ai"><i class="fas fa-brain"></i></div>
-                    <div>
-                      <div class="fw-bold text-dark fs-6">Artificial Intelligence</div>
-                      <div class="text-muted small">AI & Machine Learning</div>
-                    </div>
-                  </div>
-                </td>
-                <td class="text-center text-muted">/ai</td>
-                <td class="text-center fw-bold text-dark">432</td>
-                <td class="text-end">
-                  <button class="btn-action me-1"><i class="fas fa-pen"></i></button>
-                  <button class="btn-action"><i class="fas fa-trash"></i></button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                </div>
+            </div>
+        </main>
+    </div>
+    <!-- Modal Thêm mới -->
+<div class="modal fade" id="addItemModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">Tạo mới Phân loại</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body py-3">
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-muted">LOẠI</label>
+                    <select class="form-select border-0 bg-light" id="modal-type">
+                        <option value="Category">Chuyên mục (Category)</option>
+                        <option value="Tag">Thẻ (Tag)</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-muted">TÊN HIỂN THỊ</label>
+                    <input type="text" class="form-control border-0 bg-light" id="modal-name" placeholder="Nhập tên...">
+                </div>
+                <div class="mb-0">
+                    <label class="form-label small fw-bold text-muted">SLUG TỰ ĐỘNG</label>
+                    <input type="text" class="form-control border-0 bg-light text-primary fw-medium" id="modal-slug" readonly placeholder="/slug-tu-dong">
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-light px-4 fw-bold" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary px-4 fw-bold" id="btn-save-item" 
+                    style="background-color: #002D5E !important; border: none !important; color: white !important; opacity: 1 !important;">
+                    Lưu dữ liệu
+                </button>
+            </div>
         </div>
-      </div>
+    </div>
+</div>
+  
 
-    </main>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/CatalogManagement.js"></script>
 </body>
-
 </html>
