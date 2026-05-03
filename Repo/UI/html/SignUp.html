@@ -15,24 +15,35 @@
   <div class="container-fluid p-0">
     <div class="row g-0 vh-100">
 
+
       <div class="col-lg-4 d-flex flex-column justify-content-center px-5 bg-white position-relative">
-        <div class="logo mb-2 mt-5">NEWSPULSE</div>
-        <h4 class="fw-bold mb-4">Create your account</h4>
+
+        <div class="lang-switch position-absolute top-0 start-0 p-4 small text-secondary">
+          <span id="btn-vi" role="button" style="cursor: pointer;" class="fw-bold">Tiếng Việt</span> |
+          <span id="btn-en" role="button" style="cursor: pointer;" class="fw-bold">English</span>
+        </div>
+
+
+        <div class="logo mb-2 mt-5" data-key="logo">NEWSPULSE</div>
+        <h4 class="fw-bold mb-4" data-key="create_account">Create your account</h4>
 
         <form id="signupForm" novalidate>
           <div class="mb-3 text-start">
-            <label class="form-label small fw-bold">Full Name</label>
-            <input type="text" id="fullName" class="form-control" placeholder="Nhập họ và tên">
+            <label class="form-label small fw-bold" data-key="full_name">Full Name</label>
+            <input type="text" id="fullName" class="form-control" data-placeholder="placeholder_full_name"
+              placeholder="Nhập họ và tên">
           </div>
 
           <div class="mb-3 text-start">
-            <label class="form-label small fw-bold">Email or phone</label>
-            <input type="text" id="signupUser" class="form-control" placeholder="Nhập email hoặc SĐT">
+            <label class="form-label small fw-bold" data-key="email_or_phone">Email or phone</label>
+            <input type="text" id="signupUser" class="form-control" data-placeholder="placeholder_user"
+              placeholder="Nhập email hoặc số điện thoại">
           </div>
 
           <div class="mb-3 text-start">
-            <label class="form-label small fw-bold">Password</label>
-            <input type="password" id="signupPass" class="form-control" placeholder="Tạo mật khẩu">
+            <label class="form-label small fw-bold" data-key="password">Password</label>
+            <input type="password" id="signupPass" class="form-control" data-placeholder="placeholder_pass"
+              placeholder="Tạo mật khẩu">
           </div>
 
           <div class="mb-3">
@@ -41,25 +52,27 @@
 
           <div class="mb-4 form-check text-start">
             <input type="checkbox" class="form-check-input" id="agreeTerms">
-            <label class="form-check-label small" for="agreeTerms">
-              I guarantee that the information provided is correct and I agree to the
-              <a href="#" class="text-decoration-none color-newspulse fw-bold">Terms & Conditions</a>.
+            <label class="form-check-label small" for="agreeTerms" data-key="agree_terms">
+
+              <a href="#" class="text-decoration-none color-newspulse fw-bold" data-key="term-condition">Terms &
+                Conditions</a>.
             </label>
           </div>
 
-          <button type="submit" class="btn btn-newspulse w-100 py-2 fw-bold">Sign Up</button>
+          <button type="submit" class="btn btn-newspulse w-100 py-2 fw-bold" data-key="sign_up">Sign Up</button>
         </form>
 
         <p class="mt-4 text-center small">
-          Already have an account? <a href="login.html" class="text-decoration-none fw-bold color-newspulse">Log in
+          <span data-key="have_acc">Already have an account?</span>
+          <a href="login.html" class="text-decoration-none fw-bold color-newspulse" data-key="log_in_here">Log in
             here</a>
         </p>
       </div>
 
       <div class="col-lg-8 d-none d-lg-flex bg-banner text-center">
         <div class="banner-content">
-          <h1 class="display-2 fw-bold mb-2">NEWSPULSE</h1>
-          <p class="h4 fw-light tracking-widest">JOIN US - CONNECTING TRUST</p>
+          <h1 class="display-2 fw-bold mb-2" data-key="logo">NEWSPULSE</h1>
+          <p class="h4 fw-light tracking-widest" data-key="slogan">JOIN US - CONNECTING TRUST</p>
         </div>
       </div>
 
