@@ -6,36 +6,28 @@
   --text-muted: #455f90;
 }
 
-/* Định dạng chung cho Sidebar */
 .sidebar {
   width: 260px;
-  /* Thêm chiều rộng cố định để dễ căn chỉnh */
   background-color: var(--sidebar-blue);
   height: 100vh;
   position: fixed;
   padding: 24px 0;
-  /* Padding trên dưới, không để trái phải để các link tràn được ra */
 }
 
-/* Định dạng chung cho các link */
 .sidebar a.nav-link-custom {
   text-decoration: none !important;
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 10px 24px;
-  /* Padding này sẽ tạo khoảng cách đều từ lề trái */
   margin: 2px 12px;
-  /* Margin nhỏ để tạo khoảng hở khi hover/active */
   border-radius: 12px;
-  /* Bo góc nhẹ nhìn hiện đại hơn 50px */
   color: var(--text-muted);
   font-weight: 600;
   font-size: 14px;
   transition: all 0.2s ease;
 }
 
-/* Active và Hover */
 .sidebar a.nav-link-custom:hover {
   background-color: rgba(12, 86, 208, 0.08);
   color: var(--primary);
@@ -46,20 +38,17 @@
   color: var(--primary);
 }
 
-/* Căn chỉnh Logo cho thẳng hàng với Menu bên dưới */
+
 .brand-logo-container {
   padding: 0 24px !important;
-  /* Phải khớp với padding của nav-link-custom */
   margin-bottom: 32px !important;
 }
 
-/* Icon */
 .nav-link-custom .material-symbols-outlined {
   font-size: 22px;
-  /* Tăng nhẹ để cân đối với chữ */
 }
 
-/* Menu dưới đáy */
+
 .sidebar .bottom-menu {
   margin-top: auto;
   padding-top: 16px;

@@ -22,7 +22,6 @@ body {
   background-color: var(--np-sidebar-bg);
   height: 100vh;
   position: fixed;
-  /* Bắt buộc phải có để nó không đẩy nội dung khác */
   top: 0;
   left: 0;
   z-index: 1000;
@@ -34,7 +33,6 @@ body {
 
 .main-wrapper {
   margin-left: 260px;
-  /* Đẩy toàn bộ nội dung sang phải 260px để nhường chỗ cho sidebar */
   min-height: 100vh;
   display: flex;
   flex-direction: column;

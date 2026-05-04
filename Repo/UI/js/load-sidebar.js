@@ -1,43 +1,43 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // --- LOAD SIDEBAR ---
-  const sidebarPlaceholder = document.getElementById('sidebar-placeholder');
-  if (sidebarPlaceholder) {
-    fetch('/Repo/UI/html/sidebar_nav.html')
+  // Hàm bổ trợ để fetch HTML
+  const loadComponent = (id, url, callback) => {
+    const el = document.getElementById(id);
+    if (!el) return Promise.resolve(); // Nếu không có placeholder thì bỏ qua
+
+    return fetch(url)
       .then(response => {
-        if (!response.ok) throw new Error("Không thấy file sidebar");
+        if (!response.ok) throw new Error(`Lỗi nạp ${url}`);
         return response.text();
       })
       .then(data => {
-        sidebarPlaceholder.innerHTML = data;
-
-        // Tìm tên file hiện tại (vd: admin1.html)
-        const currentPath = window.location.pathname.split("/").pop();
-
-        // Tìm tất cả link trong sidebar (nhớ dùng class đúng của ní)
-        const navLinks = document.querySelectorAll('.nav-link-custom, .nav-link');
-
-        navLinks.forEach(link => {
-          if (link.getAttribute('href') && link.getAttribute('href').includes(currentPath)) {
-            link.classList.add('active');
-          }
-        });
+        el.innerHTML = data;
+        if (callback) callback(el);
       })
-      .catch(err => console.error("Lỗi Sidebar:", err));
-  }
+      .catch(err => console.error(err));
+  };
 
-  // --- LOAD HEADER ---
-  const headerAdmin = document.getElementById('header_admin');
-  if (headerAdmin) {
-    fetch('/Repo/UI/html/header_admin.html')
-      .then(response => {
-        if (!response.ok) throw new Error("Không tìm thấy file header_admin.html");
-        return response.text();
-      })
-      .then(data => {
-        headerAdmin.innerHTML = data;
-        // Thêm class top-header sau khi đổ dữ liệu để ăn CSS định vị
-        headerAdmin.className = "top-header";
-      })
-      .catch(err => console.error("Lỗi Header:", err));
-  }
+  // Chạy nạp cả hai cùng lúc
+  Promise.all([
+    loadComponent('sidebar-placeholder', '/Repo/UI/html/sidebar_nav.html', (el) => {
+      // Xử lý Active Link
+      const currentPath = window.location.pathname.split("/").pop() || "admin_dashboard.html";
+      const navLinks = el.querySelectorAll('.nav-link-custom, .nav-link');
+
+      navLinks.forEach(link => {
+        link.classList.remove('active'); // Dọn dẹp trước khi add
+        const href = link.getAttribute('href');
+        if (href && (href.includes(currentPath) || (currentPath === "" && href.includes("index")))) {
+          link.classList.add('active');
+        }
+      });
+    }),
+    loadComponent('header_admin', '/Repo/UI/html/header_admin.html', (el) => {
+      el.className = "top-header";
+    })
+  ]).then(() => {
+    // --- QUAN TRỌNG NHẤT Ở ĐÂY ---
+    // Sau khi nạp xong tất cả HTML, chúng ta mới phát sự kiện cho Dashboard
+    console.log("Hệ thống UI đã nạp xong, bắt đầu đổ dữ liệu Dashboard...");
+    document.dispatchEvent(new Event('appReady'));
+  });
 });

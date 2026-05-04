@@ -18,20 +18,17 @@ body {
 /* ================= SIDEBAR CỐ ĐỊNH ================= */
 .sidebar {
     width: 260px;
-    background-color: var(--sidebar-blue);
-    /* Dùng biến màu sidebar-blue */
+    background-color: var(--np-sidebar-bg);
     height: 100vh;
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 1050;
+    z-index: 1000;
     display: flex;
     flex-direction: column;
-    padding-top: 24px;
-    border-right: 1px solid rgba(20, 49, 97, 0.05);
 }
 
-/* ================= KHUNG NỘI DUNG CHÍNH (NÉ SIDEBAR) ================= */
+/* ================= KHUNG NỘI DUNG CHÍNH ================= */
 .main-wrapper {
     margin-left: 260px;
     min-height: 100vh;
@@ -39,29 +36,13 @@ body {
     flex-direction: column;
 }
 
-/* ================= PHẦN RUỘT (NÉ HEADER) ================= */
 .content-area {
-    margin-top: 64px;
+    margin-top: 70px;
     padding: 40px;
-    background-color: var(--bg-body);
+    background-color: var(--np-bg-content);
     flex-grow: 1;
 }
 
-/* Header định vị lại cho chuẩn */
-.top-header {
-    height: 64px;
-    background: #ffffff;
-    border-bottom: 1px solid var(--np-border);
-    position: fixed;
-    top: 0;
-    right: 0;
-    left: 260px;
-    z-index: 1040;
-    padding: 0 40px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
 
 /* Components */
 .workflow-header-card {
