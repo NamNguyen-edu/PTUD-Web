@@ -40,7 +40,7 @@ if (loginForm) {
     if (ok) {
       // Authenticate user
       const auth = authenticateUser(user.value.trim(), pass.value);
-      
+
       if (auth.success) {
         alert(auth.message);
         // Call login function from main.js
@@ -48,8 +48,8 @@ if (loginForm) {
           login(user.value.trim());
           // Redirect to home page after login
           setTimeout(() => {
-            window.location.href = 'index.php?page=home'; 
-        }, 500);
+            window.location.href = 'index.php?page=home';
+          }, 500);
         }
       } else {
         alert(auth.message);
@@ -78,3 +78,40 @@ if (registerForm) {
     if (ok) alert("Đăng ký thành công!");
   });
 }
+
+
+function handleCredentialResponse(response) {
+  // Đây là nơi nhận Token sau khi user chọn tài khoản xong
+  console.log("Token: " + response.credential);
+
+  // Gửi token này sang file PHP để xử lý
+  const formData = new FormData();
+  formData.append('credential', response.credential);
+
+  fetch('Login.php', {
+    method: 'POST',
+    body: formData
+  })
+    .then(res => res.text())
+    .then(data => {
+      alert("Server trả về: " + data);
+      // Nếu thành công, chuyển hướng về trang chủ
+      // window.location.href = "../../index.php"; 
+    });
+}
+
+window.onload = function () {
+  // 2. Khởi tạo với Client ID bạn vừa lấy
+  google.accounts.id.initialize({
+    client_id: "124352835901-jqh4f03ga43s57qpi10pcbhatlj2pj8k.apps.googleusercontent.com",
+    callback: handleCredentialResponse
+  });
+
+  // 3. Kết nối nút bấm của NewsPulse với Google
+  const googleBtn = document.getElementById('google-login-btn'); // Đảm bảo nút của bạn có id này
+  if (googleBtn) {
+    googleBtn.onclick = () => {
+      google.accounts.id.prompt(); // Hiện bảng chọn tài khoản
+    };
+  }
+};
