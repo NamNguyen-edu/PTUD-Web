@@ -11,7 +11,7 @@ function checkValid(element, condition) {
     return true;
   } else {
     element.classList.remove('is-valid');
-    element.classList.add('is-invalid'); // Bôi đỏ
+    element.classList.add('is-invalid');
     return false;
   }
 }
@@ -60,15 +60,13 @@ if (loginForm) {
   });
 }
 
-// Xử lý Register
+// --- XỬ LÝ REGISTER ---
 const registerForm = document.getElementById('registerForm');
 if (registerForm) {
   registerForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const email = document.getElementById('regEmail');
     const pass = document.getElementById('regPass');
-
-    // Check pass: ít nhất 8 ký tự, 1 hoa, 1 số
     const passRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
 
     let ok = true;

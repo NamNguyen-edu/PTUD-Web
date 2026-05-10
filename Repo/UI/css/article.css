@@ -1,4 +1,3 @@
-
 body {
   background: linear-gradient(to bottom, #f5f9ff, #eef4ff);
   font-family: 'Inter', sans-serif;
@@ -10,7 +9,7 @@ body {
   padding: 40px;
   border-radius: 16px;
   border: 1px solid #e6ecf5;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
   line-height: 1.8;
   color: #2c3e50;
@@ -18,7 +17,7 @@ body {
 
 .article-container:hover {
   transform: translateY(-3px);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
 }
 
 /* CATEGORY */
@@ -68,7 +67,7 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.1);
+  background: rgba(0, 0, 0, 0.1);
 }
 
 .image-overlay {
@@ -144,8 +143,13 @@ body {
   transition: 0.2s;
 }
 
-.vote.up { color: green; }
-.vote.down { color: red; }
+.vote.up {
+  color: green;
+}
+
+.vote.down {
+  color: red;
+}
 
 .vote.up:hover {
   color: #16a34a;
@@ -242,6 +246,7 @@ body {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -253,6 +258,7 @@ body {
     opacity: 1;
     transform: translateY(0);
   }
+
   to {
     opacity: 0;
     transform: translateY(20px);
