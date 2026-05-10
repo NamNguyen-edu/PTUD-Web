@@ -1,8 +1,61 @@
+// MODULE TỰ ĐỘNG LOAD COMPONENT (HEADER/FOOTER)
+document.addEventListener("DOMContentLoaded", function() {
+    // Tải Header
+    fetch("../components/header.html")
+        .then(response => {
+            if (!response.ok) throw new Error("Không thể load header");
+            return response.text();
+        })
+        .then(data => {
+            document.getElementById("header-placeholder").innerHTML = data;
 
-// 1. GIẢ LẬP DỮ LIỆU NGƯỜI DÙNG (MOCK DATA)
-const userData = {
+            // 1. Ẩn nút Đăng nhập / Đăng ký
+            document.getElementById("login-section").classList.add("d-none");
+            
+            // 2. Bật khu vực Profile lên
+            document.getElementById("profile-section").classList.remove("d-none");
+            document.getElementById("profile-section").classList.add("d-flex"); 
+            
+            // 3. Đổi tên và email cho trang cá nhân
+            document.getElementById("profile-name").innerText = userData.fullName;
+            document.getElementById("profile-menu-name").innerText = userData.fullName;
+            document.getElementById("profile-email").innerText = userData.major;
+            document.getElementById("profile-menu-email").innerText = userData.email;
+
+            // 4. Xử lý click xổ menu mượt mà
+            const profileBtn = document.querySelector('.profile-info');
+            const profileMenu = document.querySelector('.profile-menu');
+
+            profileBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                profileMenu.classList.toggle('d-block');
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!profileMenu.contains(e.target) && !profileBtn.contains(e.target)) {
+                    profileMenu.classList.remove('d-block');
+                }
+            });
+        })
+        .catch(err => console.error(err));
+
+    // Tải Footer
+    fetch("../components/footer.html")
+        .then(response => {
+            if (!response.ok) throw new Error("Không thể load footer");
+            return response.text();
+        })
+        .then(data => {
+            document.getElementById("footer-placeholder").innerHTML = data;
+        })
+        .catch(err => console.error(err));
+});
+
+
+// 1. GIẢ LẬP DỮ LIỆU NGƯỜI DÙNG CÓ LƯU TRỮ LOCALSTORAGE
+const defaultUserData = {
     fullName: "Nguyễn Duy Bảo",
-    email: "bebao2005at@gmai.com",
+    email: "bebao2005at@gmail.com",
     major: "Business Information Systems",
     bio: "Nhà văn tự do, đam mê viết lách",
     stats: {
@@ -12,7 +65,9 @@ const userData = {
     }
 };
 
-// 2. KHỞI TẠO KHI TRANG LOAD XONG
+// Kiểm tra xem trong máy đã lưu thông tin sửa đổi chưa, nếu chưa thì xài mặc định
+let userData = JSON.parse(localStorage.getItem('newsPulse_UserData')) || defaultUserData;
+// 2. KHỞI TẠO KHI TRANG LOAD XONG (Phần logic cũ của Profile)
 document.addEventListener('DOMContentLoaded', function() {
     console.log("⚡ NewsPulse Profile System Ready!");
     
@@ -28,101 +83,90 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // 3. LOGIC CHUYỂN TAB (SỬ DỤNG BOOTSTRAP TABS KẾT HỢP CUSTOM LOGIC)
 function switchTab(tabId) {
-    // Kích hoạt tab tương ứng thông qua ID
     $(`#profileTab a[href="#${tabId}"]`).tab('show');
     
-    // Cuộn nhẹ lên đầu nội dung tab trên mobile để dễ nhìn
     if (window.innerWidth < 992) {
         document.querySelector('.tab-content').scrollIntoView({ behavior: 'smooth' });
     }
 }
 
-// Lắng nghe sự kiện chuyển tab của Bootstrap để thực hiện hành động phụ
 $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-    const targetTab = $(e.target).attr("href"); // Tab vừa hiện
+    const targetTab = $(e.target).attr("href"); 
     console.log("Switched to tab: " + targetTab);
     
-    // Ví dụ: Nếu vào tab History thì mới load dữ liệu lịch sử để tối ưu hiệu năng
     if (targetTab === "#history") {
         renderHistoryList();
     }
 });
 
-// 4. LOAD DỮ LIỆU HỒ SƠ LÊN UI
+// 4. LOAD DỮ LIỆU HỒ SƠ LÊN UI (Phủ dữ liệu lên mọi ngóc ngách)
 function loadUserProfile() {
-    // Cập nhật các chỉ số stats
+    // 1. Cập nhật thống kê
     document.getElementById('statPosts').innerText = userData.stats.posts;
     document.getElementById('statBookmarks').innerText = userData.stats.bookmarks;
     document.getElementById('statViews').innerText = userData.stats.views;
     
-    // Cập nhật thông tin trong form Settings
+    // 2. Đổ dữ liệu vào Form Chỉnh sửa
     const nameInput = document.getElementById('fullName');
+    const majorInput = document.getElementById('majorInput');
+    const bioInput = document.getElementById('bioInput');
+    
     if (nameInput) nameInput.value = userData.fullName;
+    if (majorInput) majorInput.value = userData.major;
+    if (bioInput) bioInput.value = userData.bio;
+
+    // 3. Đổ dữ liệu ra Cột Sidebar bên trái
+    const sidebarName = document.querySelector('.profile-sidebar h4');
+    const sidebarBio = document.querySelector('.profile-bio p');
+    const sidebarMajor = document.querySelector('.profile-sidebar p.text-muted');
+
+    if (sidebarName) sidebarName.innerText = userData.fullName;
+    if (sidebarBio) sidebarBio.innerText = `"${userData.bio}"`;
+    if (sidebarMajor) sidebarMajor.innerText = userData.major;
+
+    // 4. Đổ dữ liệu lên tên ở thanh Navbar riêng của trang Profile
+    const profileNavName = document.querySelector('.navbar-nav .nav-item.active .text-white.small');
+    if (profileNavName) profileNavName.innerText = userData.fullName;
 }
 
-/**
- * HÀM XỬ LÝ ĐĂNG XUẤT
- */
-function handleLogout() {
-    const confirmLogout = confirm("Bạn có chắc chắn muốn đăng xuất khỏi NewsPulse?");
-    if (confirmLogout) {
-        alert("Đang đăng xuất...");
-        // Thực tế: Xóa token/session và redirect về trang chủ
-        window.location.href = "index.html"; 
-    }
-}
-/**
- * NEWSPULSE PROFILE - LOGIC SỞ THÍCH & LƯU TRỮ (PHẦN 2/3)
- * Chức năng: Xử lý Popup chọn chủ đề và quản lý bộ nhớ LocalStorage
- */
-
-// 1. KIỂM TRA TRẠNG THÁI ĐĂNG NHẬP LẦN ĐẦU
+// 5. KIỂM TRA TRẠNG THÁI ĐĂNG NHẬP LẦN ĐẦU
 function checkFirstTimeLogin() {
-    // Kiểm tra xem trong record của user đã có dữ liệu sở thích chưa
     const hasPrefs = localStorage.getItem('newsPulse_UserPrefs');
     
     if (!hasPrefs) {
         console.log("First time login detected. Showing Preferences Modal...");
-        // Delay 1 giây để user kịp nhìn thấy giao diện trước khi hiện Popup
         setTimeout(() => {
             $('#userPreferenceModal').modal('show');
         }, 1000);
     }
 }
 
-// 2. XỬ LÝ CHỌN TAG CHỦ ĐỀ TRONG POPUP
+// 6. XỬ LÝ CHỌN TAG CHỦ ĐỀ TRONG POPUP
 $(document).on('click', '.topic-tag', function() {
-    // Cho phép chọn hoặc bỏ chọn bằng cách toggle class 'selected'
     $(this).toggleClass('selected');
-    
     const selectedCount = $('.topic-tag.selected').length;
     console.log("Topics selected: " + selectedCount);
 });
 
-// 3. LƯU RECORD SỞ THÍCH VÀO BỘ NHỚ
 function saveUserPreferences() {
     const selectedTags = [];
     $('.topic-tag.selected').each(function() {
         selectedTags.push($(this).data('topic'));
     });
 
-    // Yêu cầu chọn ít nhất 2 chủ đề để tối ưu trải nghiệm
     if (selectedTags.length < 2) {
         alert("Bảo ơi, bạn hãy chọn ít nhất 2 chủ đề để NewsPulse có thể đề xuất tin tốt nhất nhé!");
         return;
     }
 
-    // Tạo đối tượng record sở thích
     const prefRecord = {
         userId: "nguyenduybao_87",
         topics: selectedTags,
         updatedAt: new Date().toISOString()
     };
 
-    // Lưu vào LocalStorage để giả lập lưu vào Database
     localStorage.setItem('newsPulse_UserPrefs', JSON.stringify(prefRecord));
     
-    // Hiệu ứng hoàn thành
     const btn = event.target;
     btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i> ĐÃ LƯU THÀNH CÔNG';
     btn.classList.replace('btn-pulse-primary', 'btn-success');
@@ -133,44 +177,40 @@ function saveUserPreferences() {
     }, 800);
 }
 
-// 4. XỬ LÝ LƯU THAY ĐỔI HỒ SƠ (TAB SETTINGS)
+// 7. XỬ LÝ LƯU THAY ĐỔI HỒ SƠ (TAB SETTINGS)
 function saveProfileChanges() {
+    // Lấy dữ liệu mới từ các ô input
     const newName = document.getElementById('fullName').value;
+    const newMajor = document.getElementById('majorInput').value;
+    const newBio = document.getElementById('bioInput').value;
     
     if (!newName.trim()) {
         alert("Tên không được để trống bạn nhé!");
         return;
     }
 
-    // Cập nhật giả lập vào biến userData và UI
+    // Cập nhật dữ liệu vào biến
     userData.fullName = newName;
-    document.querySelector('.nav-link .small.text-white').innerText = newName;
-    document.querySelector('.profile-sidebar h4').innerText = newName;
+    userData.major = newMajor;
+    userData.bio = newBio;
 
-    alert("✔️ Hồ sơ của Nguyễn Duy Bảo đã được cập nhật thành công!");
+    // LƯU CHẶT VÀO Ổ CỨNG TRÌNH DUYỆT
+    localStorage.setItem('newsPulse_UserData', JSON.stringify(userData));
+
+    alert("✔️ Hồ sơ của bạn đã được cập nhật thành công!");
+    
+    // Ép trình duyệt tự động F5 lại trang để hàm loadUserProfile() chạy và đắp giao diện mới lên
+    window.location.reload(); 
 }
 
-function resetForm() {
-    if(confirm("Bạn muốn hủy bỏ các thay đổi vừa nhập?")) {
-        loadUserProfile(); // Tải lại dữ liệu cũ từ biến userData
-    }
-}
-/**
- * NEWSPULSE PROFILE - LOGIC TƯƠNG TÁC (PHẦN 3/3)
- * Chức năng: Render danh sách bài viết, quản lý lịch sử và các thao tác nhanh
- */
-
-// 1. RENDER DANH SÁCH BÀI VIẾT TRONG TAB BOOKMARK
+// 8. RENDER DANH SÁCH BÀI VIẾT TRONG TAB BOOKMARK
 function renderBookmarkList() {
     const container = document.getElementById('bookmarkContainer');
-    // Dữ liệu này có thể lấy từ LocalStorage hoặc API trong thực tế
     console.log("Rendering bookmarks for user: Nguyễn Duy Bảo");
 }
 
-// 2. XỬ LÝ TAB LỊCH SỬ ĐỌC BÀI (READING HISTORY)
 function renderHistoryList() {
     const historyTimeline = document.querySelector('.history-timeline');
-    // Hàm này được gọi từ sự kiện 'shown.bs.tab' ở Phần 1
     console.log("History timeline updated.");
 }
 
@@ -187,7 +227,6 @@ function clearHistory() {
     }
 }
 
-// 3. XỬ LÝ HÀNH ĐỘNG NHANH (QUICK ACTIONS)
 function handleQuickAction(action) {
     switch(action) {
         case 'editProfile':
@@ -204,17 +243,20 @@ function handleQuickAction(action) {
     }
 }
 
-// 4. LOGIC ĐỔI ẢNH ĐẠI DIỆN (AVATAR)
+// 9. LOGIC ĐỔI ẢNH ĐẠI DIỆN (AVATAR)
 document.querySelector('.btn-edit-avatar').addEventListener('click', function() {
     const newUrl = prompt("Nhập URL ảnh đại diện mới của bạn:", "https://ui-avatars.com/api/?name=Nguyen+Duy+Bao");
     if (newUrl) {
         document.querySelector('.avatar-wrapper img').src = newUrl;
-        document.querySelector('.nav-item img').src = newUrl;
+        
+        // Thay đổi avatar trên header component
+        const headerAvatars = document.querySelectorAll('.profile-avatar img, .profile-menu-avatar img');
+        headerAvatars.forEach(img => img.src = newUrl);
+        
         alert("Cập nhật ảnh đại diện thành công!");
     }
 });
 
-// 5. ĐỒNG BỘ SLUG TỰ ĐỘNG (Dùng cho các bài đăng cũ)
 function generateSlug(text) {
     return text.toLowerCase()
         .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
@@ -224,10 +266,3 @@ function generateSlug(text) {
         .replace(/-+/g, '-')
         .replace(/^-+|-+$/g, '');
 }
-
-/**
- * COMMIT RULES GHI NHỚ CHO BẢO:
- * 1. git add profile.html profile.css profile.js
- * 2. git commit -m "Creating new method - handleProfileManagement"
- * 3. git push origin Bao1
- */
