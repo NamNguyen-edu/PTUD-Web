@@ -2,6 +2,7 @@
 session_start();
 
 require_once __DIR__ . '/Model/pdo.php';
+require_once __DIR__ . '/Database/init_db.php';
 
 function redirect($url)
 {
