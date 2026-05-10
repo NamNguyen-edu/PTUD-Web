@@ -2,10 +2,13 @@
 /**
  * Mở kết nối đến CSDL NewsPulse sử dụng PDO
  */
+
+// Thêm query 2 lần cho search //
+
 function pdo_get_connection(){
     $dburl = "mysql:host=localhost;dbname=news_db;charset=utf8mb4";
     $username = 'root';
-    $password = '';
+    $password = ''; 
 
     try {
         $conn = new PDO($dburl, $username, $password);
