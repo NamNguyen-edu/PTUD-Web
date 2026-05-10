@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NewPulse - Quản lý Phân loại</title>
+
+    <!-- Thư viện CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="../css/CatalogManagement.css">
+    <link rel="stylesheet" href="../css/sidebar.css">
+    <link rel="stylesheet" href="../css/header_nav.css">
+</head>
+
+<body>
+    <!-- Include the sidebar navigation -->
+    <div id="sidebar-placeholder"></div>
+
+    <div class="main-wrapper">
+        <!-- Include the header -->
+        <div id="header_admin"></div>
+
+        <main class="content-area p-4">
+
+            <ul class="nav nav-tabs mb-4" id="managementTab" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active" id="category-tab-btn" data-bs-toggle="tab"
+                        data-bs-target="#category-content" type="button" role="tab">Chuyên mục chính</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="tag-tab-btn" data-bs-toggle="tab" data-bs-target="#tag-content"
+                        type="button" role="tab">Thẻ từ khóa (Tags)</button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="myTabContent">
+                <!-- Tab Category -->
+                <div class="tab-pane fade show active" id="category-content" role="tabpanel">
+                    <div class="table-card bg-white shadow-sm rounded overflow-hidden">
+                        <table class="table align-middle m-0" id="tableCategory">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4">TÊN CHUYÊN MỤC</th>
+                                    <th class="text-center">ĐƯỜNG DẪN (SLUG)</th>
+                                    <th class="text-center">SỐ LƯỢNG BÀI</th>
+                                    <th class="text-end pe-4">THAO TÁC</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="d-flex align-items-center">
+                                            <div class="cat-icon bg-info text-white p-2 rounded me-3"><i
+                                                    class="fas fa-microchip"></i></div>
+                                            <div class="fw-bold item-name">Technology</div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center item-slug">/technology</td>
+                                    <td class="text-center">1,240</td>
+                                    <td class="text-end pe-4">
+                                        <button class="btn btn-light btn-sm btn-edit me-1"><i
+                                                class="fas fa-edit"></i></button>
+                                        <button class="btn btn-light btn-sm btn-delete text-danger"><i
+                                                class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab Tags -->
+                <div class="tab-pane fade" id="tag-content" role="tabpanel">
+                    <div class="table-card bg-white shadow-sm rounded overflow-hidden">
+                        <table class="table align-middle m-0" id="tableTag">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4">TÊN THẺ (TAG)</th>
+                                    <th class="text-center">SLUG</th>
+                                    <th class="text-center">SỬ DỤNG</th>
+                                    <th class="text-end pe-4">THAO TÁC</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="d-flex align-items-center">
+                                            <span class="text-muted fw-bold me-2">#</span>
+                                            <div class="fw-bold item-name">ArtificialIntelligence</div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center item-slug">/tag/ai</td>
+                                    <td class="text-center">542</td>
+                                    <td class="text-end pe-4">
+                                        <button class="btn btn-light btn-sm btn-edit me-1"><i
+                                                class="fas fa-edit"></i></button>
+                                        <button class="btn btn-light btn-sm btn-delete text-danger"><i
+                                                class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Thêm mới -->
+    <div class="modal fade" id="addItemModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">Tạo mới Phân loại</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body py-3">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">LOẠI</label>
+                        <select class="form-select border-0 bg-light" id="modal-type">
+                            <option value="Category">Chuyên mục (Category)</option>
+                            <option value="Tag">Thẻ (Tag)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">TÊN HIỂN THỊ</label>
+                        <input type="text" class="form-control border-0 bg-light" id="modal-name"
+                            placeholder="Nhập tên...">
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label small fw-bold text-muted">SLUG TỰ ĐỘNG</label>
+                        <input type="text" class="form-control border-0 bg-light text-primary fw-medium" id="modal-slug"
+                            readonly placeholder="/slug-tu-dong">
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light px-4 fw-bold" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary px-4 fw-bold" id="btn-save-item"
+                        style="background-color: #002D5E !important; border: none !important; color: white !important; opacity: 1 !important;">
+                        Lưu dữ liệu
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Xác nhận xóa -->
+    <div class="modal fade" id="deleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Xác nhận xóa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    Bạn có chắc muốn xóa bài viết này không? Hành động này không thể hoàn tác.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-danger" onclick="executeDelete()">Đồng ý xóa</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/CatalogManagement.js"></script>
+    <script src="../js/load-sidebar.js"></script>
+</body>
+
+</html>

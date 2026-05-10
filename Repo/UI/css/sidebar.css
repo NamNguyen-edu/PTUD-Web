@@ -1,0 +1,56 @@
+/* sidebar.css */
+:root {
+  --primary: #0c56d0;
+  --sidebar-blue: #dae5ff;
+  --text-main: #143161;
+  --text-muted: #455f90;
+}
+
+.sidebar {
+  width: 260px;
+  background-color: var(--sidebar-blue);
+  height: 100vh;
+  position: fixed;
+  padding: 24px 0;
+}
+
+.sidebar a.nav-link-custom {
+  text-decoration: none !important;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 24px;
+  margin: 2px 12px;
+  border-radius: 12px;
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.sidebar a.nav-link-custom:hover {
+  background-color: rgba(12, 86, 208, 0.08);
+  color: var(--primary);
+}
+
+.sidebar a.nav-link-custom.active {
+  background-color: #c1d3ff;
+  color: var(--primary);
+}
+
+
+.brand-logo-container {
+  padding: 0 24px !important;
+  margin-bottom: 32px !important;
+}
+
+.nav-link-custom .material-symbols-outlined {
+  font-size: 22px;
+}
+
+
+.sidebar .bottom-menu {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid rgba(20, 49, 97, 0.1);
+}
