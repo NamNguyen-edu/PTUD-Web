@@ -1,79 +1,86 @@
 let feed = document.getElementById("feed");
+let loader = document.getElementById("loader");
+let paginationWrapper = document.getElementById("pagination-wrapper");
+let loadMoreBtn = document.getElementById("load-more-btn");
 let currentCategory = "world";
+let lastScrollTop = 0;
+const navbar = document.querySelector('.navbar-custom');
+const scrollThreshold = 100; // Khoảng cách cuộn tối thiểu để bắt đầu ẩn navbar
 let loading = false;
 
-// Load default
+// INIT
 loadCategory(null, "world");
 
 function loadCategory(e, category) {
-  currentCategory = category;
+    currentCategory = category;
 
-  document.querySelectorAll(".nav-link").forEach(link => {
-    link.classList.remove("active");
-  });
+    document.querySelectorAll(".nav-link").forEach(link => {
+        link.classList.remove("active");
+    });
 
-  if (e) e.target.classList.add("active");
+    if (e) e.target.classList.add("active");
 
-  feed.innerHTML = "";
-  loadMore();
+    feed.innerHTML = "";
+    loadMore();
 }
 
-function createItem() {
-  let div = document.createElement("div");
-  div.className = "article-item";
+// ==========================
+// GENERATE DATA FAKE
+// ==========================
 
-  let up = Math.floor(Math.random() * 500);
-  let down = Math.floor(Math.random() * 100);
-  let trust = 60 + Math.floor(Math.random() * 40);
-  let colors = ["bg-1", "bg-2", "bg-3", "bg-4", "bg-5"];
-let random = colors[Math.floor(Math.random() * colors.length)];
-div.classList.add(random);
-
-  div.innerHTML = `
-    <div class="meta">${currentCategory.toUpperCase()} • just now</div>
-
-    <div class="article-title">
-      ${currentCategory} headline ${Math.floor(Math.random() * 100)}
-    </div>
-
-    <p>Sample content for ${currentCategory}...</p>
-
-    <div class="vote-box">
-      <span class="vote up">▲ ${up}</span>
-      <span class="vote down">▼ ${down}</span>
-      • <span class="text-success">${trust}% Trust</span>
-    </div>
-  `;
-
-  return div;
+function generateFakeData() {
+    return {
+        category: currentCategory.toUpperCase(),
+        time: "just now",
+        title: `${currentCategory} headline ${Math.floor(Math.random() * 100)}`,
+        desc: `Sample content for ${currentCategory}...`,
+        tags: ["News", currentCategory],
+        up: Math.floor(Math.random() * 500),
+        down: Math.floor(Math.random() * 100)
+    };
 }
+
+// ==========================
+// LOAD MORE (USE COMPONENT)
+// ==========================
 
 function loadMore() {
-  for (let i = 0; i < 5; i++) {
-    feed.appendChild(createItem());
-  }
+    for (let i = 0; i < 5; i++) {
+        let data = generateFakeData();
+        feed.innerHTML += createArticle(data);
+    }
 }
 
-// Infinite scroll
+// ==========================
+// INFINITE SCROLL
+// ==========================
+
 window.addEventListener("scroll", () => {
-  if (!loading && window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
-    loading = true;
+    // Chỉ chạy infinite scroll nếu:
+    // 1. Không đang load
+    // 2. Chưa đạt giới hạn 10 bài
+    // 3. Đã cuộn xuống gần cuối trang
+    let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
 
-    setTimeout(() => {
-      loadMore();
-      loading = false;
-    }, 500);
-  }
+    // Kiểm tra hướng cuộn
+    if (scrollTop > lastScrollTop && scrollTop > scrollThreshold) {
+        // Cuộn xuống -> Ẩn
+        navbar.classList.add('navbar-hidden');
+    } else {
+        // Cuộn lên -> Hiện
+        navbar.classList.remove('navbar-hidden');
+    }
+
+    lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+    if (!loading && articlesCount < LIMIT_BEFORE_PAGINATION &&
+        window.innerHeight + window.scrollY >= document.body.offsetHeight - 400) {
+
+        loading = true;
+        loader.classList.remove('d-none');
+
+        setTimeout(() => {
+            loadMore();
+            loading = false;
+        }, 500);
+    }
 });
-
-function applyRandomColors() {
-  let colors = ["bg-1", "bg-2", "bg-3", "bg-4", "bg-5"];
-
-  document.querySelectorAll(".article-item").forEach(item => {
-    let random = colors[Math.floor(Math.random() * colors.length)];
-    item.classList.add(random);
-  });
-}
-
-// chạy khi load
-window.addEventListener("load", applyRandomColors);
