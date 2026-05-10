@@ -4,6 +4,15 @@
  */
 
 // Thêm query 2 lần cho search //
+// Lưu bài viết --> tạo bản ghi mới trong DB, cập nhật bản ghi cũ nếu đã tồn tại (dựa vào ID) //
+<?php btn -> Click 
+call xacnhanxuatban(
+    IN _id INT
+);
+?>
+
+
+
 
 function pdo_get_connection(){
     $dburl = "mysql:host=localhost;dbname=news_db;charset=utf8mb4";
