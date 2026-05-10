@@ -93,8 +93,7 @@ function handleCredentialResponse(response) {
     .then(res => res.text())
     .then(data => {
       alert("Server trả về: " + data);
-      // Nếu thành công, chuyển hướng về trang chủ
-      // window.location.href = "../../index.php"; 
+
     });
 }
 
