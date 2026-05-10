@@ -165,7 +165,29 @@
                     <h6 class="text-uppercase fw-black small mb-4 opacity-75">Thao tác quy trình</h6>
                     <button class="btn-approve shadow-sm"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">check_circle</span> Duyệt & Xuất bản</button>
                     <button class="btn-revision shadow-sm"><span class="material-symbols-outlined">edit_note</span> Yêu cầu chỉnh sửa</button>
-                    
+                    <div class="revision-form mt-3" id="revisionForm" style="display:none;">
+    
+    <label class="small fw-bold text-warning-emphasis mb-2 d-block">
+        Nội dung yêu cầu chỉnh sửa
+    </label>
+
+    <textarea 
+        id="revisionText"
+        class="form-control rounded-4 border-warning-subtle bg-warning-subtle small p-3"
+        rows="4"
+        placeholder="Mô tả cụ thể những gì cần chỉnh sửa..."
+    ></textarea>
+
+    <button 
+        class="btn btn-warning text-white fw-bold w-100 rounded-pill mt-3 py-2"
+        onclick="submitRevision()">
+        <span class="material-symbols-outlined align-middle fs-6">
+            send
+        </span>
+        Gửi yêu cầu chỉnh sửa
+            </button>
+
+                </div>
                     <div class="text-center mt-4">
                         <span class="text-danger fw-bold small cursor-pointer"><span class="material-symbols-outlined fs-6">cancel</span> Từ chối bài viết</span>
                     </div>
@@ -182,5 +204,7 @@
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/admin1.js"></script>
+
 </body>
 </html>
