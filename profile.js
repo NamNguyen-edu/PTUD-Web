@@ -1,8 +1,3 @@
-/**
- * NEWSPULSE PROFILE - CORE LOGIC (PHẦN 1/3)
- * Chức năng: Khởi tạo dữ liệu và điều khiển chuyển Tab
- * Naming Convention: camelCase
- */
 
 // 1. GIẢ LẬP DỮ LIỆU NGƯỜI DÙNG (MOCK DATA)
 const userData = {

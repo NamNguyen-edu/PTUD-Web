@@ -1,7 +1,4 @@
-/* ==========================================================================
-   NEWSPULSE PROFILE - CSS HOÀN CHỈNH (PHẦN 1/3)
-   MÀU CHỦ ĐẠO: #4682B4 (Pulse Primary) | NỀN: #B7D8F7
-   ========================================================================== */
+
 
 :root {
     --pulse-primary: #4682B4;
@@ -112,10 +109,6 @@ body {
     background-color: var(--pulse-primary);
     color: var(--white);
 }
-/* ==========================================================================
-   NEWSPULSE PROFILE - CSS HOÀN CHỈNH (PHẦN 2/3)
-   ========================================================================== */
-
 /* 3. PROFILE TABS STYLING (Hệ thống điều hướng nội dung) */
 .profile-tabs {
     border-bottom: 2px solid var(--border-color);
@@ -220,10 +213,6 @@ body {
 .history-date {
     min-width: 50px;
 }
-/* ==========================================================================
-   NEWSPULSE PROFILE - CSS HOÀN CHỈNH (PHẦN 3/3)
-   ========================================================================== */
-
 /* 6. TABLE MANAGEMENT (Quản lý bài đăng) */
 .table thead th {
     background-color: #f8f9fa;
@@ -285,7 +274,7 @@ body {
 
 /* 8. FORM SETTINGS STYLING */
 .bg-light-custom {
-    background-color: #f0f4f8; /* Màu nền lót nhẹ hơn để nổi bật Card */
+    background-color: #f0f4f8; 
 }
 
 input.form-control:focus, 
@@ -298,7 +287,7 @@ textarea.form-control:focus {
 /* 9. RESPONSIVE DESIGN (Tối ưu thiết bị di động) */
 @media (max-width: 991.98px) {
     .profile-sidebar {
-        position: static; /* Bỏ sticky trên mobile */
+        position: static;
         margin-bottom: 2rem;
     }
     
@@ -308,7 +297,7 @@ textarea.form-control:focus {
     }
     
     .profile-tabs .nav-link span {
-        display: none; /* Ẩn bớt chữ trên màn hình nhỏ, chỉ giữ icon */
+        display: none; 
     }
 }
 
