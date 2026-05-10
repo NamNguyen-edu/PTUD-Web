@@ -143,6 +143,16 @@ body {
     margin-bottom: 12px;
 }
 
+.step-rejected .step-box{
+    background:#dc2626 !important;
+    color:#fff !important;
+    box-shadow:0 0 0 6px rgba(220,38,38,.15);
+}
+
+.step-rejected p{
+    color:#dc2626 !important;
+}
+
 .btn-revision {
     background: white;
     color: var(--primary);
