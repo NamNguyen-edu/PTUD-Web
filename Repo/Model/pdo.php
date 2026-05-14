@@ -5,19 +5,15 @@
 
 // Thêm query 2 lần cho search //
 // Lưu bài viết --> tạo bản ghi mới trong DB, cập nhật bản ghi cũ nếu đã tồn tại (dựa vào ID) //
-<?php btn -> Click 
-call xacnhanxuatban(
-    IN _id INT
-);
-?>
+
 
 
 
 
 function pdo_get_connection(){
-    $dburl = "mysql:host=localhost;dbname=news_db;charset=utf8mb4";
-    $username = 'root';
-    $password = ''; 
+    $dburl = "mysql:host=newspulsedb-newspulseg5.h.aivencloud.com;dbname=defaultdb;charset=utf8mb4";
+    $username = 'avnadmin';
+    $password = 'AVNS_5kpa6shKuuTPQ13VEIo'; 
 
     try {
         $conn = new PDO($dburl, $username, $password);

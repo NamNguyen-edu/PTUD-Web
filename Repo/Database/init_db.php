@@ -19,7 +19,7 @@ try {
 
     // 2. Tạo Database nếu chưa tồn tại
     $pdo->exec("CREATE DATABASE IF NOT EXISTS `$dbname` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
-    $pdo->exec("USE `$dbname` text");
+    $pdo->exec("USE `$dbname`");
     echo "✔ Đã kết nối Database: <b>$dbname</b><br>";
 
     // 3. Khởi tạo bảng Migration (Lưu vết các thay đổi như m yêu cầu)
