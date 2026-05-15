@@ -311,22 +311,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // ===== GOOGLE INIT =====
   if (window.google && google.accounts) {
-
     google.accounts.id.initialize({
-      client_id:
-        "124352835901-jqh4f03ga43s57qpi10pcbhatlj2pj8k.apps.googleusercontent.com",
-
+      client_id: "124352835901-jqh4f03ga43s57qpi10pcbhatlj2pj8k.apps.googleusercontent.com",
       callback: handleCredentialResponse
     });
-
-    const googleBtn =
-      document.getElementById('google-login-btn');
-
+    const googleBtn = document.getElementById('google-login-btn');
     if (googleBtn) {
-
-      googleBtn.onclick = () => {
-        google.accounts.id.prompt();
-      };
+      google.accounts.id.renderButton(
+        googleBtn,
+        { theme: "outline", size: "large", width: "100%" } // Tùy chỉnh nút cho đẹp
+      );
     }
   }
 }); 
