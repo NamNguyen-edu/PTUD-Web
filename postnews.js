@@ -1,70 +1,14 @@
 /**
  * NewsPulse Professional CMS - Core Logic
- * Naming Convention: camelCase for Methods & Variables
+ * Naming Convention: camelCase for Methods & Variables 
  */
-
-// MODULE TỰ ĐỘNG LOAD COMPONENT (HEADER/FOOTER) TỪ TEAM
-document.addEventListener("DOMContentLoaded", function() {
-    // Tải Header
-    // Tải Header
-fetch("../components/header.html")
-    .then(response => {
-        if (!response.ok) throw new Error("Không thể load header");
-        return response.text();
-    })
-    .then(data => {
-        // Đắp HTML của header vào trang
-        document.getElementById("header-placeholder").innerHTML = data;
-
-        // 1. Ẩn nút Đăng nhập / Đăng ký
-        document.getElementById("login-section").classList.add("d-none");
-        
-        // 2. Bật khu vực Profile lên (bỏ class d-none)
-        document.getElementById("profile-section").classList.remove("d-none");
-        document.getElementById("profile-section").classList.add("d-flex"); 
-        
-        // 3. Đổi tên và email
-        document.getElementById("profile-name").innerText = "Nguyễn Duy Bảo";
-        document.getElementById("profile-menu-name").innerText = "Nguyễn Duy Bảo";
-        document.getElementById("profile-email").innerText = "Biên tập viên";
-        document.getElementById("profile-menu-email").innerText = "baond@newspulse.vn";
-
-        // --- ĐOẠN JS MỚI: XỬ LÝ CLICK XỔ MENU ---
-        const profileBtn = document.querySelector('.profile-info');
-        const profileMenu = document.querySelector('.profile-menu');
-
-        // Khi click vào nút profile -> Bật/tắt menu
-        profileBtn.addEventListener('click', function(e) {
-            e.stopPropagation(); // Ngăn sự kiện click truyền ra ngoài
-            profileMenu.classList.toggle('d-block'); // Ép hiển thị bằng class của Bootstrap
-        });
-
-        // Khi click ra vùng trống ngoài màn hình -> Tự động đóng menu
-        document.addEventListener('click', function(e) {
-            if (!profileMenu.contains(e.target) && !profileBtn.contains(e.target)) {
-                profileMenu.classList.remove('d-block');
-            }
-        });
-        // ----------------------------------------
-    })
-    .catch(err => console.error(err));
-    // Tải Footer 
-    fetch("../components/footer.html")
-        .then(response => {
-            if (!response.ok) throw new Error("Không thể load footer");
-            return response.text();
-        })
-        .then(data => {
-            document.getElementById("footer-placeholder").innerHTML = data;
-        })
-        .catch(err => console.error(err));
-});
 
 let currentStep = 1;
 const totalSteps = 4;
 
-// 1. ĐIỀU KHIỂN LUỒNG ĐƯỜNG ỐNG (PIPELINE NAVIGATION)
+// 1. ĐIỀU KHIỂN LUỒNG ĐƯỜNG ỐNG (PIPELINE NAVIGATION) [cite: 148, 153]
 function handleMoveStep(stepIncrement) {
+    // Chỉ kiểm tra lỗi khi nhấn "Tiếp theo" (stepIncrement = 1) [cite: 190]
     if (stepIncrement === 1 && !validateCurrentStep()) {
         console.warn("Validation failed for step " + currentStep);
         return; 
@@ -73,6 +17,7 @@ function handleMoveStep(stepIncrement) {
     const nextStep = currentStep + stepIncrement;
     
     if (nextStep >= 1 && nextStep <= totalSteps) {
+        // Cập nhật trạng thái hiển thị của các khối nội dung [cite: 104]
         document.getElementById(`step-${currentStep}`).classList.remove('active');
         document.getElementById(`p-step-${currentStep}`).classList.remove('active');
         
@@ -83,19 +28,22 @@ function handleMoveStep(stepIncrement) {
         
         updateNavigationUI();
         
+        // Nếu chuyển sang bước SEO, thực hiện đồng bộ dữ liệu ngay [cite: 164]
         if (currentStep === 3) {
             syncSeoPreview(); 
         }
     }
 }
 
-// 2. CẬP NHẬT GIAO DIỆN NÚT BẤM
+// 2. CẬP NHẬT GIAO DIỆN NÚT BẤM [cite: 105]
 function updateNavigationUI() {
     const btnPrev = document.getElementById('btnPrev');
     const btnNext = document.getElementById('btnNext');
 
+    // Ẩn nút "Quay lại" nếu ở bước đầu tiên [cite: 101]
     btnPrev.style.display = currentStep === 1 ? 'none' : 'inline-block';
     
+    // Đổi nhãn nút ở bước cuối cùng [cite: 181]
     if (currentStep === totalSteps) {
         btnNext.innerHTML = 'XÁC NHẬN XUẤT BẢN <i class="fas fa-paper-plane ml-2"></i>';
         btnNext.classList.replace('btn-pulse-action', 'btn-success');
@@ -105,7 +53,7 @@ function updateNavigationUI() {
     }
 }
 
-// 3. HỆ THỐNG KIỂM TRA LỖI (VALIDATION)
+// 3. HỆ THỐNG KIỂM TRA LỖI (VALIDATION) [cite: 139, 153]
 window.validateCurrentStep = function() {
     let isValid = true;
     const currentContainer = document.getElementById(`step-${currentStep}`);
@@ -117,6 +65,7 @@ window.validateCurrentStep = function() {
         const errorMsg = input.parentElement.querySelector('.error-msg');
         let value = input.value.trim();
 
+        // Kiểm tra đặc biệt: Nếu là input ẩn lưu nội dung, phải lấy dữ liệu từ richEditor
         if (input.id === 'postContent') {
             value = document.getElementById('richEditor').innerText.trim();
         }
@@ -134,22 +83,24 @@ window.validateCurrentStep = function() {
     return isValid;
 };
 
-// 4. BỘ CÔNG CỤ SOẠN THẢO (RICH TEXT EDITOR)
+// 4. BỘ CÔNG CỤ SOẠN THẢO (RICH TEXT EDITOR) [cite: 138, 153, 163]
 function formatText(command) {
+    // Sử dụng execCommand để thực hiện in đậm, nghiêng, gạch chân... [cite: 138]
     document.execCommand(command, false, null);
     document.getElementById('richEditor').focus();
 }
 
+// Đảm bảo placeholder cho contenteditable hoạt động tự nhiên
 document.getElementById('richEditor').addEventListener('input', function() {
     const hiddenContentInput = document.getElementById('postContent');
-    hiddenContentInput.value = this.innerHTML; 
+    hiddenContentInput.value = this.innerHTML; // Đồng bộ nội dung vào input ẩn để submit [cite: 138]
 });
-
 /**
  * NewsPulse Professional CMS - Advanced Logic
+ * Naming Convention: camelCase [cite: 154, 197]
  */
 
-// 5. CHÈN ẢNH VÀO NỘI DUNG TẠI VỊ TRÍ CON TRỎ
+// 5. CHÈN ẢNH VÀO NỘI DUNG TẠI VỊ TRÍ CON TRỎ (REALISTIC CMS) [cite: 163]
 function triggerContentImage() {
     document.getElementById('contentImageInput').click();
 }
@@ -161,6 +112,7 @@ function processContentImage(event) {
         reader.onload = function(e) {
             const imgHtml = `<img src="${e.target.result}" alt="Content Image" class="img-fluid my-3 shadow-sm">`;
             
+            // Chèn ảnh vào vị trí con trỏ đang đứng trong trình soạn thảo
             document.getElementById('richEditor').focus();
             document.execCommand('insertHTML', false, imgHtml);
         };
@@ -168,7 +120,7 @@ function processContentImage(event) {
     }
 }
 
-// 6. XỬ LÝ ẢNH ĐẠI DIỆN (THUMBNAIL)
+// 6. XỬ LÝ ẢNH ĐẠI DIỆN (THUMBNAIL) [cite: 110, 119]
 function previewThumbnail(event) {
     const file = event.target.files[0];
     const previewZone = document.getElementById('thumbPreview');
@@ -182,20 +134,24 @@ function previewThumbnail(event) {
     }
 }
 
-// 7. SEO REAL-TIME PREVIEW & AUTO SLUG
+// 7. SEO REAL-TIME PREVIEW & AUTO SLUG [cite: 164, 183]
 function syncSeoPreview() {
     const headline = document.getElementById('postTitle').value;
     const seoTitleInput = document.getElementById('seoTitle');
     const metaDescInput = document.getElementById('metaDesc');
 
+    // Tự động điền SEO Title nếu để trống
     if (!seoTitleInput.value) seoTitleInput.value = headline;
 
+    // Cập nhật độ dài ký tự
     document.getElementById('seoTitleCount').innerText = `${seoTitleInput.value.length}/60`;
     document.getElementById('metaDescCount').innerText = `${metaDescInput.value.length}/160`;
 
+    // Cập nhật Google Preview
     document.getElementById('previewSeoTitle').innerText = seoTitleInput.value || "Tiêu đề bài viết...";
     document.getElementById('previewMetaDesc').innerText = metaDescInput.value || "Mô tả Meta bài viết...";
 
+    // Xử lý tạo Slug thực tế (Khử dấu, gạch ngang) [cite: 30]
     const slug = headline.toLowerCase()
         .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
         .replace(/[đĐ]/g, 'd')
@@ -208,7 +164,7 @@ function syncSeoPreview() {
     document.getElementById('previewSlug').innerText = slug || "slug-bai-viet";
 }
 
-// 8. LOGIC HẸN GIỜ XUẤT BẢN
+// 8. LOGIC HẸN GIỜ XUẤT BẢN [cite: 167, 185]
 function togglePublishTime(show) {
     const picker = document.getElementById('schedulePicker');
     if (show) {
@@ -218,23 +174,29 @@ function togglePublishTime(show) {
     }
 }
 
-// 9. XỬ LÝ CÁC HÀNH ĐỘNG NHANH
+// 9. XỬ LÝ CÁC HÀNH ĐỘNG NHANH (LƯU NHÁP / XUẤT BẢN) [cite: 167]
 function handleQuickAction(actionType) {
     if (actionType === 'draft') {
         alert("✔️ Hệ thống NewsPulse: Đã lưu bản nháp thành công vào bộ nhớ tạm!");
+        // Sử dụng commit: Creating new method - handleQuickAction [cite: 4, 12, 129]
     }
 }
 
 function submitFinalForm() {
+    // Thu thập nội dung từ Rich Editor
     document.getElementById('postContent').value = document.getElementById('richEditor').innerHTML;
+    
     alert("🚀 NewsPulse: Bài viết đã được gửi cho Ban Biên Tập để thẩm định xuất bản!");
+    // window.location.href = "profile.html"; [cite: 35, 49]
 }
-
 function goToProfile() {
+    // Nếu người dùng đang nhập dở nội dung bài viết
     const currentContent = document.getElementById('richEditor').innerText.trim();
     if (currentContent.length > 0) {
         const confirmLeave = confirm("Hệ thống NewsPulse: Bạn có nội dung chưa lưu, bạn có chắc muốn quay lại Profile không?");
         if (!confirmLeave) return;
     }
+    
+    // Chuyển hướng sang trang profile
     window.location.href = 'profile.html';
 }
