@@ -4,22 +4,33 @@
  * Cơ chế: Auto-create DB -> Schema -> Migration -> Seed
  */
 
-// 1. Cấu hình kết nối (Dành cho XAMPP mặc định)
-$host = 'localhost';
-$user = 'root';
-$pass = '';
-$dbname = 'news_db';
+// 1. Cấu hình kết nối (Aiven Cloud + SSL nếu cần)
+$host = 'newspulsedb-newspulseg5.h.aivencloud.com';
+$port = 18427;
+$user = 'avnadmin';
+$pass = 'AVNS_5kpa6shKuuTPQ13VEIo';
+$dbname = 'defaultdb';
+$sslCaFile = realpath(__DIR__ . '/../ca.perm');
 
 try {
     // Kết nối MySQL Server (không chọn DB để tạo mới nếu cần)
-    $pdo = new PDO("mysql:host=$host", $user, $pass);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $dsn = "mysql:host=$host;port=$port;charset=utf8mb4";
+    $options = [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+    ];
+    if ($sslCaFile && file_exists($sslCaFile) && defined('PDO::MYSQL_ATTR_SSL_CA')) {
+        $options[PDO::MYSQL_ATTR_SSL_CA] = $sslCaFile;
+        if (defined('PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT')) {
+            $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false;
+        }
+    }
+    $pdo = new PDO($dsn, $user, $pass, $options);
 
     echo "<h2>Hệ thống khởi tạo Database NewsPulse</h2>";
 
     // 2. Tạo Database nếu chưa tồn tại
     $pdo->exec("CREATE DATABASE IF NOT EXISTS `$dbname` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
-    $pdo->exec("USE `$dbname` text");
+    $pdo->exec("USE `$dbname`");
     echo "✔ Đã kết nối Database: <b>$dbname</b><br>";
 
     // 3. Khởi tạo bảng Migration (Lưu vết các thay đổi như m yêu cầu)
@@ -65,7 +76,7 @@ try {
                 // Lưu lại vào bảng migration
                 $ins = $pdo->prepare("INSERT INTO migrations (title) VALUES (?)");
                 $ins->execute([$fileName]);
-                echo "🚀 Đã chạy migration thành công: <b>$fileName</b><br>";
+                echo " Đã chạy migration thành công: <b>$fileName</b><br>";
             }
         }
     }
