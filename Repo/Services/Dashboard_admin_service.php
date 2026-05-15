@@ -7,7 +7,7 @@ function getPDO(): PDO {
         $pdo = new PDO(
             'mysql:host=localhost;dbname=news_db;charset=utf8mb4',
             'root',      // username
-            '',          // password
+            '123456',          // password
             [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
         );
     }
