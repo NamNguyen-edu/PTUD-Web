@@ -13,7 +13,37 @@ let blockCounter = 0;
 let articlesCount = 0; 
 const LIMIT_BEFORE_PAGINATION = 10; // After 10 articles, stop infinite scroll and show "Load More" button
 
+function loadPageComponents() {
+    const headerPlaceholder = document.getElementById('header-placeholder');
+    const footerPlaceholder = document.getElementById('footer-placeholder');
+    if (!headerPlaceholder || !footerPlaceholder) return;
+
+    fetch('UI/components/header.html')
+        .then(response => {
+            if (!response.ok) throw new Error('Không thể load header');
+            return response.text();
+        })
+        .then(html => {
+            html = html.replace(/href="\.\.\/html\/Login\.html"/g, 'href="?page=login"');
+            html = html.replace(/href="\.\.\/html\/SignUp\.html"/g, 'href="?page=signup"');
+            html = html.replace(/href="\.\.\/html\/profile\.html"/g, 'href="?page=profile"');
+            headerPlaceholder.innerHTML = html;
+        })
+        .catch(err => console.error(err));
+
+    fetch('UI/components/footer.html')
+        .then(response => {
+            if (!response.ok) throw new Error('Không thể load footer');
+            return response.text();
+        })
+        .then(html => {
+            footerPlaceholder.innerHTML = html;
+        })
+        .catch(err => console.error(err));
+}
+
 // Khởi tạo lần đầu
+loadPageComponents();
 loadMore();
 loadMoreBtn.addEventListener("click", () => {
     paginationWrapper.classList.add("d-none"); // Ẩn nút đi
