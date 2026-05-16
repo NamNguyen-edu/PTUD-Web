@@ -1,109 +1,41 @@
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1" name="viewport" />
     <title>User Management | Editorial Intelligence</title>
-    <!-- Bootstrap 5 CSS -->
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link
-        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap"
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap"
         rel="stylesheet" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-        rel="stylesheet" />
-    <link rel="stylesheet" href="../css/admin userm.css" />
 
+    <link rel="stylesheet" href="../css/admin userm.css" />
+    <link rel="stylesheet" href="../css/sidebar.css" />
+    <link rel="stylesheet" href="../css/header_nav.css" />
 </head>
 
 <body>
+
     <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1060;">
         <div aria-atomic="true" aria-live="assertive" class="toast align-items-center border-0" id="actionToast"
             role="alert">
             <div class="d-flex">
-                <div class="toast-body fw-bold">Action performed successfully</div><button aria-label="Close"
-                    class="btn-close me-2 m-auto" data-bs-dismiss="toast" type="button"></button>
+                <div class="toast-body fw-bold">Action performed successfully</div>
+                <button aria-label="Close" class="btn-close me-2 m-auto" data-bs-dismiss="toast" type="button"></button>
             </div>
         </div>
     </div>
-    <!-- Sidebar -->
-    <aside id="sidebar">
-        <div class="px-4 mb-5 d-flex align-items-center gap-3 brand-logo-container">
-            <div class="brand-logo" id="sidebar-toggle" style="cursor: pointer;">
-                <span class="material-symbols-outlined">menu</span>
-            </div>
-            <div class="brand-text">
-                <div class="fw-bold fs-5 lh-1" style="color: var(--text-main);">NewPulse</div>
-                <div class="text-uppercase tracking-wider fw-bold"
-                    style="font-size: 0.65rem; color: rgba(20, 49, 97, 0.6); letter-spacing: 1px;">Intelligence</div>
-            </div>
-        </div>
-        <nav class="nav flex-column">
-            <a class="nav-link gap-3" href="../html/admin dashboard.html">
-                <span class="material-symbols-outlined">dashboard</span> <span class="nav-text">Dashboard</span>
-            </a>
-            <a class="nav-link gap-3" href="#">
-                <span class="material-symbols-outlined">article</span> <span class="nav-text">Content</span>
-            </a>
-            <a class="nav-link gap-3" href="../html/admin1.html">
-                <span class="material-symbols-outlined">assignment_turned_in</span> <span
-                    class="nav-text">Workflow</span>
-            </a>
-            <a class="nav-link active gap-3" href="../html/admin userm.html">
-                <span class="material-symbols-outlined">group</span> <span class="nav-text">Users</span>
-            </a>
-            <a class="nav-link gap-3" href="#">
-                <span class="material-symbols-outlined">history</span> <span class="nav-text">Audit Logs</span>
-            </a>
-            <a class="nav-link gap-3" href="#">
-                <span class="material-symbols-outlined">settings</span> <span class="nav-text">Settings</span>
-            </a>
-        </nav>
-        <div class="px-4 mt-4 btn-container">
-            <button class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2">
-                <span class="material-symbols-outlined">add</span> <span class="btn-text">New Article</span>
-            </button>
-        </div>
-        <div class="mt-5 pt-4 border-top border-secondary border-opacity-10">
-            <a class="nav-link gap-3" href="#">
-                <span class="material-symbols-outlined">help</span> <span class="nav-text">Help</span>
-            </a>
-            <a class="nav-link gap-3" href="#">
-                <span class="material-symbols-outlined">contact_support</span> <span class="nav-text">Support</span>
-            </a>
-        </div>
-    </aside>
-    <!-- Main Content -->
+
+    <div id="sidebar-placeholder"></div>
+
     <main class="main-content">
-        <!-- Top Navigation -->
-        <header class="top-navbar d-flex align-items-center justify-content-between">
-            <div class="search-container flex-grow-1">
-                <span class="material-symbols-outlined">search</span>
-                <input class="form-control search-input" placeholder="Search users, roles, or logs..." type="text" />
-            </div>
-            <div class="d-flex align-items-center gap-3">
-                <button class="btn btn-link text-secondary p-1 position-relative">
-                    <span class="material-symbols-outlined">notifications</span>
-                    <span
-                        class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"
-                        style="width: 8px; height: 8px; margin-top: 10px; margin-left: -10px;"></span>
-                </button>
-                <button class="btn btn-link text-secondary p-1">
-                    <span class="material-symbols-outlined">help_outline</span>
-                </button>
-                <div class="vr mx-2 text-muted opacity-25" style="height: 32px;"></div>
-                <div class="d-flex align-items-center gap-2 cursor-pointer">
-                    <img alt="Profile" class="rounded-circle"
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVUnCRsKWq09uZbNDs1up-U1K_iboln3Pm7Ghib8akJ8-BttXOkfk8t1eCe_G19n6JXqGM-6mzwZPcPSEZHw0clL0NbNLc3720OctZqT5X4rhlgMyM4epxRdOUQF4qYsSyOeTfMdnbpF1R0Y-PC6KNZc6boburm7wU9urm0owz0ILv5hFlLC6aiA4bPvEkH2SuV_pF-Dd65WYhR-LZPyb86qObJZ59AxzswIziRrUUS3z7UyxwzQbBlMWQXWrIUiwcMmd1qD60H0X-"
-                        style="width: 32px; height: 32px;" />
-                    <span class="small fw-bold headline-font">Editorial Intelligence</span>
-                </div>
-            </div>
-        </header>
-        <div class="p-4 flex-grow-1">
-            <!-- Page Header -->
+
+        <div id="header_admin"></div>
+
+        <div class="content-body p-4 flex-grow-1">
+
             <div class="d-flex justify-content-between align-items-end mb-4">
                 <div>
                     <h2 class="fw-bolder headline-font mb-1 h3">User Management</h2>
@@ -117,7 +49,7 @@
                     </button>
                 </div>
             </div>
-            <!-- Stats Grid -->
+
             <div class="row g-4 mb-4">
                 <div class="col-md-4">
                     <div class="card h-100 p-4 kpi-card">
@@ -130,6 +62,7 @@
                         <h3 class="fw-bolder headline-font mb-0">1,284</h3>
                     </div>
                 </div>
+
                 <div class="col-md-4">
                     <div class="card h-100 p-4 kpi-card">
                         <div class="d-flex justify-content-between align-items-start mb-3">
@@ -141,6 +74,7 @@
                         <h3 class="fw-bolder headline-font mb-0">42</h3>
                     </div>
                 </div>
+
                 <div class="col-md-4">
                     <div class="card h-100 p-4 kpi-card">
                         <div class="d-flex justify-content-between align-items-start mb-3">
@@ -153,8 +87,8 @@
                     </div>
                 </div>
             </div>
+
             <div class="row g-4">
-                <!-- Directory Table -->
                 <div class="col-lg-8">
                     <div class="card h-100 overflow-hidden">
                         <div
@@ -167,13 +101,14 @@
                                         class="material-symbols-outlined fs-6">sort</span></button>
                             </div>
                         </div>
+
                         <div class="table-responsive">
                             <table class="table table-hover mb-0">
                                 <thead>
                                     <tr>
                                         <th class="ps-4" style="width: 40px;"><input class="form-check-input"
                                                 id="selectAll" type="checkbox" /></th>
-                                        <th class="">User</th>
+                                        <th>User</th>
                                         <th>Role</th>
                                         <th>Status</th>
                                         <th>Last Active</th>
@@ -203,31 +138,33 @@
                                         </td>
                                         <td class="py-3 text-secondary small">2 mins ago</td>
                                         <td class="py-3 text-end pe-4">
-                                            <div class="dropdown"><button class="btn btn-link btn-sm text-secondary p-0"
-                                                    data-bs-toggle="dropdown" type="button"><span
-                                                        class="material-symbols-outlined">more_vert</span></button>
+                                            <div class="dropdown">
+                                                <button class="btn btn-link btn-sm text-secondary p-0"
+                                                    data-bs-toggle="dropdown" type="button">
+                                                    <span class="material-symbols-outlined">more_vert</span>
+                                                </button>
                                                 <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
                                                     <li class="small px-3 py-1 text-muted fw-bold uppercase">Actions
                                                     </li>
                                                     <li><a class="dropdown-item d-flex align-items-center gap-2 py-2"
                                                             href="#"><span
-                                                                class="material-symbols-outlined fs-6">edit</span>
-                                                            Edit</a></li>
+                                                                class="material-symbols-outlined fs-6">edit</span>Edit</a>
+                                                    </li>
                                                     <li><a class="dropdown-item d-flex align-items-center gap-2 py-2"
                                                             href="#"><span
-                                                                class="material-symbols-outlined fs-6">person</span>
-                                                            View Profile</a></li>
+                                                                class="material-symbols-outlined fs-6">person</span>View
+                                                            Profile</a></li>
                                                     <li>
                                                         <hr class="dropdown-divider" />
                                                     </li>
                                                     <li><a class="dropdown-item d-flex align-items-center gap-2 py-2 text-warning action-suspend"
                                                             href="#"><span
-                                                                class="material-symbols-outlined fs-6">block</span>
-                                                            Suspend</a></li>
+                                                                class="material-symbols-outlined fs-6">block</span>Suspend</a>
+                                                    </li>
                                                     <li><a class="dropdown-item d-flex align-items-center gap-2 py-2 text-danger action-delete"
                                                             href="#"><span
-                                                                class="material-symbols-outlined fs-6">delete</span>
-                                                            Delete</a></li>
+                                                                class="material-symbols-outlined fs-6">delete</span>Delete</a>
+                                                    </li>
                                                 </ul>
                                             </div>
                                         </td>
@@ -253,31 +190,33 @@
                                         </td>
                                         <td class="py-3 text-secondary small">45 mins ago</td>
                                         <td class="py-3 text-end pe-4">
-                                            <div class="dropdown"><button class="btn btn-link btn-sm text-secondary p-0"
-                                                    data-bs-toggle="dropdown" type="button"><span
-                                                        class="material-symbols-outlined">more_vert</span></button>
+                                            <div class="dropdown">
+                                                <button class="btn btn-link btn-sm text-secondary p-0"
+                                                    data-bs-toggle="dropdown" type="button">
+                                                    <span class="material-symbols-outlined">more_vert</span>
+                                                </button>
                                                 <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
                                                     <li class="small px-3 py-1 text-muted fw-bold uppercase">Actions
                                                     </li>
                                                     <li><a class="dropdown-item d-flex align-items-center gap-2 py-2"
                                                             href="#"><span
-                                                                class="material-symbols-outlined fs-6">edit</span>
-                                                            Edit</a></li>
+                                                                class="material-symbols-outlined fs-6">edit</span>Edit</a>
+                                                    </li>
                                                     <li><a class="dropdown-item d-flex align-items-center gap-2 py-2"
                                                             href="#"><span
-                                                                class="material-symbols-outlined fs-6">person</span>
-                                                            View Profile</a></li>
+                                                                class="material-symbols-outlined fs-6">person</span>View
+                                                            Profile</a></li>
                                                     <li>
                                                         <hr class="dropdown-divider" />
                                                     </li>
                                                     <li><a class="dropdown-item d-flex align-items-center gap-2 py-2 text-warning action-suspend"
                                                             href="#"><span
-                                                                class="material-symbols-outlined fs-6">block</span>
-                                                            Suspend</a></li>
+                                                                class="material-symbols-outlined fs-6">block</span>Suspend</a>
+                                                    </li>
                                                     <li><a class="dropdown-item d-flex align-items-center gap-2 py-2 text-danger action-delete"
                                                             href="#"><span
-                                                                class="material-symbols-outlined fs-6">delete</span>
-                                                            Delete</a></li>
+                                                                class="material-symbols-outlined fs-6">delete</span>Delete</a>
+                                                    </li>
                                                 </ul>
                                             </div>
                                         </td>
@@ -304,31 +243,33 @@
                                         </td>
                                         <td class="py-3 text-secondary small">2 days ago</td>
                                         <td class="py-3 text-end pe-4">
-                                            <div class="dropdown"><button class="btn btn-link btn-sm text-secondary p-0"
-                                                    data-bs-toggle="dropdown" type="button"><span
-                                                        class="material-symbols-outlined">more_vert</span></button>
+                                            <div class="dropdown">
+                                                <button class="btn btn-link btn-sm text-secondary p-0"
+                                                    data-bs-toggle="dropdown" type="button">
+                                                    <span class="material-symbols-outlined">more_vert</span>
+                                                </button>
                                                 <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
                                                     <li class="small px-3 py-1 text-muted fw-bold uppercase">Actions
                                                     </li>
                                                     <li><a class="dropdown-item d-flex align-items-center gap-2 py-2"
                                                             href="#"><span
-                                                                class="material-symbols-outlined fs-6">edit</span>
-                                                            Edit</a></li>
+                                                                class="material-symbols-outlined fs-6">edit</span>Edit</a>
+                                                    </li>
                                                     <li><a class="dropdown-item d-flex align-items-center gap-2 py-2"
                                                             href="#"><span
-                                                                class="material-symbols-outlined fs-6">person</span>
-                                                            View Profile</a></li>
+                                                                class="material-symbols-outlined fs-6">person</span>View
+                                                            Profile</a></li>
                                                     <li>
                                                         <hr class="dropdown-divider" />
                                                     </li>
                                                     <li><a class="dropdown-item d-flex align-items-center gap-2 py-2 text-warning action-suspend"
                                                             href="#"><span
-                                                                class="material-symbols-outlined fs-6">block</span>
-                                                            Suspend</a></li>
+                                                                class="material-symbols-outlined fs-6">block</span>Suspend</a>
+                                                    </li>
                                                     <li><a class="dropdown-item d-flex align-items-center gap-2 py-2 text-danger action-delete"
                                                             href="#"><span
-                                                                class="material-symbols-outlined fs-6">delete</span>
-                                                            Delete</a></li>
+                                                                class="material-symbols-outlined fs-6">delete</span>Delete</a>
+                                                    </li>
                                                 </ul>
                                             </div>
                                         </td>
@@ -355,31 +296,33 @@
                                         </td>
                                         <td class="py-3 text-secondary small">Just now</td>
                                         <td class="py-3 text-end pe-4">
-                                            <div class="dropdown"><button class="btn btn-link btn-sm text-secondary p-0"
-                                                    data-bs-toggle="dropdown" type="button"><span
-                                                        class="material-symbols-outlined">more_vert</span></button>
+                                            <div class="dropdown">
+                                                <button class="btn btn-link btn-sm text-secondary p-0"
+                                                    data-bs-toggle="dropdown" type="button">
+                                                    <span class="material-symbols-outlined">more_vert</span>
+                                                </button>
                                                 <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
                                                     <li class="small px-3 py-1 text-muted fw-bold uppercase">Actions
                                                     </li>
                                                     <li><a class="dropdown-item d-flex align-items-center gap-2 py-2"
                                                             href="#"><span
-                                                                class="material-symbols-outlined fs-6">edit</span>
-                                                            Edit</a></li>
+                                                                class="material-symbols-outlined fs-6">edit</span>Edit</a>
+                                                    </li>
                                                     <li><a class="dropdown-item d-flex align-items-center gap-2 py-2"
                                                             href="#"><span
-                                                                class="material-symbols-outlined fs-6">person</span>
-                                                            View Profile</a></li>
+                                                                class="material-symbols-outlined fs-6">person</span>View
+                                                            Profile</a></li>
                                                     <li>
                                                         <hr class="dropdown-divider" />
                                                     </li>
                                                     <li><a class="dropdown-item d-flex align-items-center gap-2 py-2 text-warning action-suspend"
                                                             href="#"><span
-                                                                class="material-symbols-outlined fs-6">block</span>
-                                                            Suspend</a></li>
+                                                                class="material-symbols-outlined fs-6">block</span>Suspend</a>
+                                                    </li>
                                                     <li><a class="dropdown-item d-flex align-items-center gap-2 py-2 text-danger action-delete"
                                                             href="#"><span
-                                                                class="material-symbols-outlined fs-6">delete</span>
-                                                            Delete</a></li>
+                                                                class="material-symbols-outlined fs-6">delete</span>Delete</a>
+                                                    </li>
                                                 </ul>
                                             </div>
                                         </td>
@@ -387,6 +330,7 @@
                                 </tbody>
                             </table>
                         </div>
+
                         <div
                             class="card-footer bg-light bg-opacity-50 p-3 d-flex justify-content-between align-items-center">
                             <span class="small text-secondary fw-medium">Showing 4 of 1,284 users</span>
@@ -397,11 +341,11 @@
                                     <li class="page-item"><a class="page-link" href="#">2</a></li>
                                     <li class="page-item"><a class="page-link" href="#">Next</a></li>
                                 </ul>
-                            </nav>
+                                </< /nav>
                         </div>
                     </div>
                 </div>
-                <!-- Role Matrix & Sidebar Cards -->
+
                 <div class="col-lg-4">
                     <div class="card mb-4 bg-light border-0 shadow-none p-4"
                         style="background-color: #e9edff !important;">
@@ -447,6 +391,7 @@
                                 class="material-symbols-outlined fs-6 align-middle">north_east</span>
                         </button>
                     </div>
+
                     <div class="card security-alert-card p-4">
                         <div class="position-relative z-1">
                             <h5 class="fw-bold headline-font mb-2">Security Alert</h5>
@@ -458,7 +403,7 @@
                 </div>
             </div>
         </div>
-        <!-- Sticky Footer -->
+
         <footer class="sticky-footer d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center gap-4">
                 <span class="small text-secondary fw-semibold">Bulk Actions:</span>
@@ -483,10 +428,10 @@
             </div>
         </footer>
     </main>
-    <!-- Bootstrap 5 Bundle with Popper -->
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/admin userm.js.js"></script>
-
+    <script src="../js/load-sidebar.js"></script>
 </body>
 
 </html>

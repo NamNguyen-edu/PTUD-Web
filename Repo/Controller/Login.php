@@ -1,8 +1,8 @@
 <?php
 session_start();
 
-// 1. Kết nối Database (Mày vẫn cần cái này để lưu user)
-$conn = new mysqli('localhost', 'root', '', 'newspulse_db');
+// 1. Kết nối Database
+$conn = new mysqli('localhost', 'root', '', 'news_pulse');
 $conn->set_charset("utf8mb4");
 
 if (isset($_POST['credential'])) {
@@ -44,7 +44,7 @@ if (isset($_POST['credential'])) {
     } else {
       // User mới -> Thêm mới
       $role = 'reader';
-      $ins = $conn->prepare("INSERT INTO users (google_id, full_name, email, avatar, role) VALUES (?, ?, ?, ?, ?)");
+      $ins = $conn->prepare("INSERT INTO users (google_id, full_name, email, avatar_url, role) VALUES (?, ?, ?, ?, ?)");
       $ins->bind_param("sssss", $google_id, $name, $email, $avatar, $role);
       $ins->execute();
     }

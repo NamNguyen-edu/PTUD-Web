@@ -77,3 +77,33 @@ document.addEventListener('DOMContentLoaded', () => {
   // Khởi tạo nút Google lần đầu
   setTimeout(renderGoogleButton, 200);
 });
+
+// Kiểm tra và gửi form đăng nhập/đăng ký
+if (isValid) {
+    const formData = new FormData();
+    // Nếu đang ở form đăng ký, mode sẽ là 'register', ngược lại là 'login'
+    const mode = (signupForm.offsetParent !== null) ? 'register' : 'login';
+    
+    formData.append('action', mode);
+    formData.append('email', emailEl.value);
+    formData.append('password', passEl.value);
+    if(mode === 'register') {
+        formData.append('fullname', nameEl.value);
+    }
+
+    fetch('../model/Login.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            // Chuyển hướng sau khi thành công
+            window.location.href = 'index.php?page=home';
+        } else {
+            alert("Thất bại: " + data.message);
+        }
+    })
+    .catch(err => console.error("Lỗi kết nối server:", err));
+}
