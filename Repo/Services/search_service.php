@@ -54,7 +54,8 @@ class SearchService {
                 a.title,
                 a.slug,
                 a.excerpt,
-                a.thumbnail_url
+                a.thumbnail_url,
+                a.view_count
             FROM articles a
             LEFT JOIN article_categories ac ON a.article_id = ac.article_id
             LEFT JOIN categories c ON ac.category_id = c.category_id

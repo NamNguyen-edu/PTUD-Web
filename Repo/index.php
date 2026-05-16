@@ -284,6 +284,22 @@ function renderDbTest()
 
 $page = trim((string)($_GET['page'] ?? 'home'));
 $action = trim((string)($_GET['action'] ?? ''));
+if (isset($_GET['action'])) {
+
+    $action = $_GET['action'];
+
+    switch ($action) {
+
+        case 'home_feed':
+            require_once __DIR__ . '/Controller/home_controller..php';
+
+            $controller = new HomeController();
+
+            $controller->feed();
+
+            exit;
+    }
+}
 
 switch ($action) {
     case 'login':
@@ -319,6 +335,11 @@ switch ($action) {
             case 'dbtest':
                 renderDbTest();
                 break;
+            case 'home_feed':
+                require_once __DIR__ . '/Repo/Controller/HomeController.php';
+                $controller = new HomeController();
+                $controller->feed();
+                exit;
             default:
                 redirect('?page=home');
                 break;
