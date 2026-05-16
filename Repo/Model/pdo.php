@@ -1,9 +1,6 @@
 <?php
 
 
-// Thêm query 2 lần cho search //
-// Lưu bài viết --> tạo bản ghi mới trong DB, cập nhật bản ghi cũ nếu đã tồn tại (dựa vào ID) //
-
 
 /**
  * Mở kết nối đến CSDL NewsPulse sử dụng PDO

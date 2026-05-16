@@ -1,60 +1,64 @@
 <?php
+// auth_handler.php
 session_start();
+require_once 'config.php';
 
-// 1. Kết nối Database
-$conn = new mysqli('localhost', 'root', '', 'news_pulse');
-$conn->set_charset("utf8mb4");
+header('Content-Type: application/json');
 
-if (isset($_POST['credential'])) {
-  $id_token = $_POST['credential'];
+// Lấy action từ request (login hoặc register)
+$action = $_POST['action'] ?? '';
 
-  // 2. GỌI API GOOGLE ĐỂ KIỂM TRA TOKEN 
-  $url = "https://oauth2.googleapis.com/tokeninfo?id_token=" . $id_token;
+if ($action === 'register') {
+  $fullname = trim($_POST['fullname'] ?? '');
+  $email    = trim($_POST['email'] ?? '');
+  $password = $_POST['password'] ?? '';
 
-  $ch = curl_init();
-  curl_setopt($ch, CURLOPT_URL, $url);
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-  curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+  if (empty($fullname) || empty($email) || empty($password)) {
+    echo json_encode(['success' => false, 'message' => 'Vui lòng điền đủ thông tin.']);
+    exit;
+  }
 
-  $response = curl_exec($ch);
-  $info = curl_getinfo($ch);
-  curl_close($ch);
-
-  // 3. Giải mã dữ liệu JSON mà Google trả về
-  $payload = json_decode($response, true);
-
-  if ($info['http_code'] == 200 && isset($payload['email'])) {
-
-    $google_id = $payload['sub'];
-    $email = $payload['email'];
-    $name = $payload['name'];
-    $avatar = $payload['picture'];
-
-    // 4. LƯU VÀO DATABASE (Dùng Prepared Statement cho an toàn)
-    $stmt = $conn->prepare("SELECT * FROM users WHERE google_id = ? OR email = ?");
-    $stmt->bind_param("ss", $google_id, $email);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result->num_rows > 0) {
-      // User cũ -> Cập nhật
-      $upd = $conn->prepare("UPDATE users SET last_login = NOW() WHERE google_id = ?");
-      $upd->bind_param("s", $google_id);
-      $upd->execute();
-    } else {
-      // User mới -> Thêm mới
-      $role = 'reader';
-      $ins = $conn->prepare("INSERT INTO users (google_id, full_name, email, avatar_url, role) VALUES (?, ?, ?, ?, ?)");
-      $ins->bind_param("sssss", $google_id, $name, $email, $avatar, $role);
-      $ins->execute();
+  try {
+    // 1. Kiểm tra email đã tồn tại chưa
+    $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
+    $stmt->execute([$email]);
+    if ($stmt->fetch()) {
+      echo json_encode(['success' => false, 'message' => 'Email này đã được sử dụng.']);
+      exit;
     }
 
-    // 5. Tạo Session
-    $_SESSION['user_id'] = $google_id;
-    $_SESSION['user_name'] = $name;
+    // 2. Mã hóa mật khẩu (Bắt buộc)
+    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-    echo "success";
-  } else {
-    echo "invalid_token_from_google";
+    // 3. Lưu vào Database (Mặc định role_id = 2 là User thường)
+    $stmt = $pdo->prepare("INSERT INTO users (fullname, email, password, role_id) VALUES (?, ?, ?, 2)");
+    $stmt->execute([$fullname, $email, $hashedPassword]);
+
+    echo json_encode(['success' => true, 'message' => 'Đăng ký thành công!']);
+  } catch (PDOException $e) {
+    echo json_encode(['success' => false, 'message' => 'Lỗi hệ thống: ' . $e->getMessage()]);
+  }
+} elseif ($action === 'login') {
+  $email    = trim($_POST['email'] ?? '');
+  $password = $_POST['password'] ?? '';
+
+  try {
+    // 1. Tìm user theo email
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
+    $stmt->execute([$email]);
+    $user = $stmt->fetch();
+
+    if ($user && password_verify($password, $user['password'])) {
+      // 2. Đăng nhập thành công -> Tạo Session
+      $_SESSION['user_id'] = $user['id'];
+      $_SESSION['user_fullname'] = $user['fullname'];
+      $_SESSION['role_id'] = $user['role_id'];
+
+      echo json_encode(['success' => true, 'message' => 'Đăng nhập thành công!']);
+    } else {
+      echo json_encode(['success' => false, 'message' => 'Email hoặc mật khẩu không đúng.']);
+    }
+  } catch (PDOException $e) {
+    echo json_encode(['success' => false, 'message' => 'Lỗi hệ thống: ' . $e->getMessage()]);
   }
 }
