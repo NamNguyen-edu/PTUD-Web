@@ -1,130 +1,173 @@
-document.addEventListener("DOMContentLoaded", function() {
-    const basePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+let feed = document.getElementById("feed");
+let loader = document.getElementById("loader");
+let paginationWrapper = document.getElementById("pagination-wrapper");
+let loadMoreBtn = document.getElementById("load-more-btn");
+let currentCategory = "world";
+let lastScrollTop = 0;
+const navbar = document.querySelector('.navbar-custom');
+const scrollThreshold = 100; // Khoảng cách cuộn tối thiểu để bắt đầu ẩn navbar
+let loading = false;
+let blockCounter = 0;
 
-    // Header Load
-    loadComponent("header-placeholder", basePath + "UI/components/header.html");
-    
-    // Footer Load
-    loadComponent("footer-placeholder", basePath + "UI/components/footer.html");
+// Setting Pagination limit
+let articlesCount = 0; 
+const LIMIT_BEFORE_PAGINATION = 10; // After 10 articles, stop infinite scroll and show "Load More" button
 
-    // Initialize auth UI after components load
-    setTimeout(initAuthUI, 100);
+// Khởi tạo lần đầu
+loadMore();
+loadMoreBtn.addEventListener("click", () => {
+    paginationWrapper.classList.add("d-none"); // Ẩn nút đi
+    articlesCount = 0; // Reset bộ đếm để cho phép cuộn tiếp 10 bài nữa
+    loadMore(); 
 });
+// Hàm loadCategory được gọi khi người dùng chọn một category mới
+// function loadCategory(e, category) {
+//     currentCategory = category;
+//     document.querySelectorAll(".nav-link").forEach(link => link.classList.remove("active"));
+//     if (e) e.target.classList.add("active");
+//     feed.innerHTML = "";
+//     blockCounter = 0;
+//     articlesCount = 0; // Reset đếm khi đổi category
+//     paginationWrapper.classList.add("d-none");
+//     loadMore();
+// }
 
-function loadComponent(id, path) {
-    const placeholder = document.getElementById(id);
-    if (!placeholder) return;
-
-    fetch(path)
-        .then(response => {
-            if (!response.ok) throw new Error("Missing file: " + path);
-            return response.text();
-        })
-        .then(data => {
-            placeholder.innerHTML = data;
-            // Re-initialize auth listeners sau khi load component
-            if (id === "header-placeholder") {
-                setupAuthEventListeners();
-            }
-        })
-        .catch(err => console.warn(err));
-}
-
-// ===== AUTH UI MANAGEMENT =====
-function initAuthUI() {
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    const userName = localStorage.getItem('userName') || 'Người dùng';
+function generateFakeData() {
+    const tags = ["AI", "Business", "Tech", "Global", "Finance"];
+    const randomTag = tags[Math.floor(Math.random() * tags.length)];
+    const id = Math.floor(Math.random() * 1000);
     
-    updateAuthUI(isLoggedIn, userName);
+    // Màu sắc tag theo yêu cầu
+    let tagStyle = "background: #B7D8F7; color: #333;"; // Default
+    if (randomTag === "AI") tagStyle = "background: #1e3a8a; color: white;"; 
+    if (randomTag === "Business") tagStyle = "background: #198754; color: white;";
+
+    return {
+        title: `${randomTag}: Headline number ${id} regarding ${currentCategory} trends`,
+        tag: randomTag,
+        tagStyle: tagStyle,
+        img: `https://picsum.photos/seed/${id}/800/500`,
+        up: Math.floor(Math.random() * 900),
+        down: Math.floor(Math.random() * 100)
+    };
 }
 
-function updateAuthUI(isLoggedIn, userName = 'Người dùng') {
-    const loginSection = document.getElementById('login-section');
-    const profileSection = document.getElementById('profile-section');
-    const profileName = document.getElementById('profile-name');
-    const profileEmail = document.getElementById('profile-email');
-    const profileMenuName = document.getElementById('profile-menu-name');
-    const profileMenuEmail = document.getElementById('profile-menu-email');
+// Layout Block 1: 3 bài viết ngang (Col-md-4)
+function blockGrid3() {
+    const d = [generateFakeData(), generateFakeData(), generateFakeData()];
+    return `
+    <div class="row mb-5">
+        ${d.map(item => `
+            <div class="col-md-4">
+                <div class="article-card h-100 shadow-sm">
+                    <img src="${item.img}" class="img-fluid rounded mb-3" style="height:200px; width:100%; object-fit:cover;">
+                    <span class="tag" style="${item.tagStyle}">${item.tag}</span>
+                    <h5 class="fw-bold mt-2">${item.title}</h5>
+                    <div class="vote-box small">
+                        <span class="vote up">▲ ${item.up}</span>
+                        <span class="vote down">▼ ${item.down}</span>
+                    </div>
+                </div>
+            </div>
+        `).join('')}
+    </div>`;
+}
 
-    if (!loginSection || !profileSection) return;
+// Layout Block 2: 1 bài bự dọc, 2 bài ngang nhỏ bên cạnh
+function blockMixed() {
+    const big = generateFakeData();
+    const s1 = generateFakeData();
+    const s2 = generateFakeData();
+    return `
+    <div class="row mb-5">
+        <div class="col-lg-8">
+            <div class="article-card p-0 overflow-hidden shadow-sm h-100 position-relative">
+                <img src="${big.img}" class="w-100" style="height:450px; object-fit:cover;">
+                <div class="position-absolute bottom-0 p-4 text-white w-100" style="background: linear-gradient(transparent, rgba(0,0,0,0.9));">
+                    <span class="tag" style="${big.tagStyle}">${big.tag}</span>
+                    <h2 class="fw-bold">${big.title}</h2>
+                    <div class="vote-box">▲ ${big.up} ▼ ${big.down}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 d-flex flex-column justify-content-between">
+            <div class="article-card mb-3 shadow-sm">
+                <img src="${s1.img}" class="img-fluid rounded mb-2" style="height:120px; width:100%; object-fit:cover;">
+                <h6 class="fw-bold">${s1.title}</h6>
+                <div class="vote-box small">▲ ${s1.up}</div>
+            </div>
+            <div class="article-card shadow-sm">
+                <img src="${s2.img}" class="img-fluid rounded mb-2" style="height:120px; width:100%; object-fit:cover;">
+                <h6 class="fw-bold">${s2.title}</h6>
+                <div class="vote-box small">▲ ${s2.up}</div>
+            </div>
+        </div>
+    </div>`;
+}
 
-    if (isLoggedIn) {
-        loginSection.classList.add('d-none');
-        profileSection.classList.remove('d-none');
-        if (profileName) profileName.textContent = userName;
-        if (profileEmail) profileEmail.textContent = userName;
-        if (profileMenuName) profileMenuName.textContent = userName;
-        if (profileMenuEmail) profileMenuEmail.textContent = userName;
+// Layout Block 3: Banner ngang (Dùng màu #B7D8F7)
+function blockBanner() {
+    return `
+    <div class="row mb-5">
+        <div class="col-12 p-5 rounded-4 text-center shadow-sm" style="background: #B7D8F7; border: 2px dashed #0d6efd;">
+            <h2 class="fw-bold">Don't miss the latest AI updates!</h2>
+            <p>Join 50,000+ readers and stay ahead of the curve.</p>
+            <button class="btn btn-dark rounded-pill px-4">Subscribe Now</button>
+        </div>
+    </div>`;
+}
+
+function loadMore() {
+    if (articlesCount >= LIMIT_BEFORE_PAGINATION) {
+        paginationWrapper.classList.remove("d-none");
+        return; // Dừng không load nữa cho đến khi nhấn nút
+    }
+
+    let html = "";
+    if (blockCounter % 3 === 0) html = blockGrid3();
+    else if (blockCounter % 3 === 1) html = blockMixed();
+    else html = blockBanner();
+
+    feed.insertAdjacentHTML('beforeend', html);
+    blockCounter++;
+    
+    // Tăng bộ đếm. Lưu ý: 1 block có thể chứa nhiều bài. 
+    // Nếu bạn muốn đếm chính xác 10 bài, hãy tăng theo số bài trong block.
+    articlesCount += 3; 
+}
+
+window.addEventListener("scroll", () => {
+    // Chỉ chạy infinite scroll nếu:
+    // 1. Không đang load
+    // 2. Chưa đạt giới hạn 10 bài
+    // 3. Đã cuộn xuống gần cuối trang
+        let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+    // Kiểm tra hướng cuộn
+    if (scrollTop > lastScrollTop && scrollTop > scrollThreshold) {
+        // Cuộn xuống -> Ẩn
+        navbar.classList.add('navbar-hidden');
     } else {
-        loginSection.classList.remove('d-none');
-        profileSection.classList.add('d-none');
+        // Cuộn lên -> Hiện
+        navbar.classList.remove('navbar-hidden');
     }
-}
 
-function setupAuthEventListeners() {
-    // Remove old listeners to avoid duplicates
-    document.removeEventListener('click', handleProfileMenuClose);
-    
-    // Profile info click to toggle menu (with slight delay to ensure DOM is ready)
-    setTimeout(() => {
-        const profileInfo = document.querySelector('.profile-info');
-        if (profileInfo) {
-            // Remove old click listener
-            profileInfo.replaceWith(profileInfo.cloneNode(true));
-            
-            // Add new click listener
-            const newProfileInfo = document.querySelector('.profile-info');
-            if (newProfileInfo) {
-                newProfileInfo.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const container = this.closest('.profile-container');
-                    if (container) {
-                        container.classList.toggle('show-menu');
-                    }
-                });
+    lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; 
+    if (!loading && articlesCount < LIMIT_BEFORE_PAGINATION && 
+        window.innerHeight + window.scrollY >= document.body.offsetHeight - 400) {
+        
+        loading = true;
+        loader.classList.remove('d-none');
+
+        setTimeout(() => {
+            loadMore();
+            loading = false;
+            loader.classList.add('d-none');
+
+            // Sau khi load xong, kiểm tra lại xem đã chạm mốc 10 chưa để hiện nút
+            if (articlesCount >= LIMIT_BEFORE_PAGINATION) {
+                paginationWrapper.classList.remove("d-none");
             }
-        }
-
-        // Close menu when clicking outside
-        document.addEventListener('click', handleProfileMenuClose);
-
-        // Logout button
-        const logoutBtn = document.getElementById('logout-btn');
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                logout();
-            });
-        }
-    }, 50);
-}
-
-function handleProfileMenuClose(e) {
-    const profileContainer = document.querySelector('.profile-container');
-    const profileInfo = document.querySelector('.profile-info');
-    
-    if (profileContainer && !profileContainer.contains(e.target)) {
-        profileContainer.classList.remove('show-menu');
+        }, 700);
     }
-}
-
-// ===== PUBLIC API FOR BACKEND =====
-// Gọi hàm này khi login thành công từ backend
-function login(userName) {
-    localStorage.setItem('isLoggedIn', 'true');
-    localStorage.setItem('userName', userName);
-    updateAuthUI(true, userName);
-    setupAuthEventListeners();
-}
-
-// Gọi hàm này để logout
-function logout() {
-    const profileContainer = document.querySelector('.profile-container');
-    if (profileContainer) {
-        profileContainer.classList.remove('show-menu');
-    }
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('userName');
-    updateAuthUI(false);
-    alert('Đã đăng xuất!');
-}
+});

@@ -9,7 +9,7 @@ USE news_pulse;
 
 -- 1. ROLES — Phân quyền hệ thống
 
-CREATE TABLE roles (
+CREATE TABLE IF NOT EXISTS roles (
     role_id     INT           NOT NULL AUTO_INCREMENT,
     name        VARCHAR(50)   NOT NULL,   -- admin | editor | contributor | reader | chief editor
     description TEXT,
@@ -19,8 +19,8 @@ CREATE TABLE roles (
     UNIQUE KEY UQ_roles_name (name)
 ) ENGINE=InnoDB;
 
--- Seed dữ liệu mặc định
-INSERT INTO roles (name, description) VALUES
+-- Seed dữ liệu mặc định (chỉ thêm nếu chưa tồn tại)
+INSERT IGNORE INTO roles (name, description) VALUES
     ('admin',        'Quản trị viên toàn quyền hệ thống'),
     ('editor',       'Biên tập viên: duyệt và xuất bản bài viết'),
     ('contributor',  'Tác giả: tạo và quản lý bài viết của mình'),
@@ -30,7 +30,7 @@ INSERT INTO roles (name, description) VALUES
 
 -- 2. USERS — Người dùng
 
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     user_id           INT           NOT NULL AUTO_INCREMENT,
     username          VARCHAR(100)  NOT NULL,
     email             VARCHAR(255)  NOT NULL,
@@ -56,7 +56,7 @@ CREATE INDEX idx_users_status ON users(status);
 
 -- 3. CATEGORIES — Danh mục bài viết
 
-CREATE TABLE categories (
+CREATE TABLE IF NOT EXISTS categories (
     category_id   INT           NOT NULL AUTO_INCREMENT,
     name          VARCHAR(150)  NOT NULL,
     slug          VARCHAR(150)  NOT NULL,
@@ -76,7 +76,7 @@ CREATE TABLE categories (
 
 -- 4. ARTICLES — Bài viết
 
-CREATE TABLE articles (
+CREATE TABLE IF NOT EXISTS articles (
     article_id    INT           NOT NULL AUTO_INCREMENT,
     title         VARCHAR(500)  NOT NULL,
     slug          VARCHAR(255)  NOT NULL,
@@ -106,7 +106,7 @@ CREATE INDEX idx_articles_published ON articles(published_at);
 
 -- 5. TAGS — Thẻ tag
 
-CREATE TABLE tags (
+CREATE TABLE IF NOT EXISTS tags (
     tag_id      INT           NOT NULL AUTO_INCREMENT,
     name        VARCHAR(150)  NOT NULL,
     slug        VARCHAR(150)  NOT NULL,
@@ -120,7 +120,7 @@ CREATE TABLE tags (
 
 -- 6. ARTICLE_CATEGORIES — Trung gian Article <-> Category
 
-CREATE TABLE article_categories (
+CREATE TABLE IF NOT EXISTS article_categories (
     article_id  INT NOT NULL,
     category_id INT NOT NULL,
     is_primary  TINYINT(1) NOT NULL DEFAULT 0,
@@ -135,7 +135,7 @@ CREATE TABLE article_categories (
 
 -- 7. ARTICLE_TAGS — Trung gian Article <-> Tag
 
-CREATE TABLE article_tags (
+CREATE TABLE IF NOT EXISTS article_tags (
     article_id INT NOT NULL,
     tag_id     INT NOT NULL,
 
@@ -149,7 +149,7 @@ CREATE TABLE article_tags (
 
 -- 8. COMMENTS — Bình luận
 
-CREATE TABLE comments (
+CREATE TABLE IF NOT EXISTS comments (
     comment_id INT           NOT NULL AUTO_INCREMENT,
     article_id INT           NOT NULL,
     user_id    INT           NOT NULL,
@@ -170,7 +170,7 @@ CREATE TABLE comments (
 
 -- 9. MEDIA — Quản lý file
 
-CREATE TABLE media (
+CREATE TABLE IF NOT EXISTS media (
     media_id    INT           NOT NULL AUTO_INCREMENT,
     uploaded_by INT           NOT NULL,
     filename    VARCHAR(255)  NOT NULL,
