@@ -13,6 +13,93 @@ let blockCounter = 0;
 let articlesCount = 0; 
 const LIMIT_BEFORE_PAGINATION = 10; // After 10 articles, stop infinite scroll and show "Load More" button
 
+function bindSearchDropdown() {
+    const searchInput = document.getElementById('search-box');
+    const dropdown = document.getElementById('search-dropdown');
+    const searchForm = searchInput ? searchInput.closest('form') : null;
+    if (!searchInput || !dropdown || !searchForm) return;
+
+    let debounceTimer = null;
+
+    const hideDropdown = () => {
+        dropdown.classList.add('d-none');
+        dropdown.innerHTML = '';
+    };
+
+    const escapeHtml = (str) => String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+
+    const renderSuggestions = (items) => {
+        if (items.length === 0) {
+            dropdown.innerHTML = '<div class="search-empty">Không có kết quả phù hợp.</div>';
+            dropdown.classList.remove('d-none');
+            return;
+        }
+
+        dropdown.innerHTML = items.map(item => {
+            const excerpt = item.excerpt ? item.excerpt.replace(/\s+/g, ' ').trim() : '';
+            return `
+                <div class="search-item" data-keyword="${encodeURIComponent(item.title)}">
+                    <div class="search-item-title">${escapeHtml(item.title)}</div>
+                    <div class="search-item-meta">${escapeHtml(excerpt.substring(0, 80))}${excerpt.length > 80 ? '...' : ''}</div>
+                </div>
+            `;
+        }).join('');
+        dropdown.classList.remove('d-none');
+    };
+
+    const fetchSuggestions = (query) => {
+        const trimmed = query.trim();
+        if (trimmed.length < 2) {
+            hideDropdown();
+            return;
+        }
+
+        fetch(`?action=search_suggestions&keyword=${encodeURIComponent(trimmed)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data && Array.isArray(data.items)) {
+                    renderSuggestions(data.items);
+                } else {
+                    hideDropdown();
+                }
+            })
+            .catch(() => {
+                hideDropdown();
+            });
+    };
+
+    searchInput.addEventListener('input', (event) => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => fetchSuggestions(searchInput.value), 220);
+    });
+
+    dropdown.addEventListener('click', (event) => {
+        const item = event.target.closest('.search-item');
+        if (!item) return;
+        const keyword = decodeURIComponent(item.dataset.keyword || '');
+        if (keyword) {
+            window.location.href = `?page=search&keyword=${encodeURIComponent(keyword)}`;
+        }
+    });
+
+    document.addEventListener('click', (event) => {
+        if (!searchForm.contains(event.target)) {
+            hideDropdown();
+        }
+    });
+
+    searchInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            hideDropdown();
+        }
+    });
+}
+
 function loadPageComponents() {
     const headerPlaceholder = document.getElementById('header-placeholder');
     const footerPlaceholder = document.getElementById('footer-placeholder');
@@ -28,6 +115,7 @@ function loadPageComponents() {
             html = html.replace(/href="\.\.\/html\/SignUp\.html"/g, 'href="?page=signup"');
             html = html.replace(/href="\.\.\/html\/profile\.html"/g, 'href="?page=profile"');
             headerPlaceholder.innerHTML = html;
+            bindSearchDropdown();
         })
         .catch(err => console.error(err));
 

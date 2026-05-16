@@ -9,8 +9,8 @@ $host = 'newspulsedb-newspulseg5.h.aivencloud.com';
 $port = 18427;
 $user = 'avnadmin';
 $pass = 'AVNS_5kpa6shKuuTPQ13VEIo';
-$dbname = 'defaultdb';
-$sslCaFile = realpath(__DIR__ . '/../ca.perm');
+$dbname = 'news_db';
+$sslCaFile = realpath(__DIR__ . '/../ca.pem');
 
 // CHECK: Xem database đã được khởi tạo lần nào chưa (kiểm tra bảng users)
 try {

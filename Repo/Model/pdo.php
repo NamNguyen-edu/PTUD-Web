@@ -2,6 +2,29 @@
 
 
 // Thêm query 2 lần cho search //
+function pdo_query_search($sql, $keyword){
+
+    try {
+
+        $conn = pdo_get_connection();
+
+        $stmt = $conn->prepare($sql);
+
+        $searchTerm = "%" . $keyword . "%";
+
+        $stmt->bindValue(1, $searchTerm);
+
+        $stmt->bindValue(2, $searchTerm);
+
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+
+    } catch(PDOException $e){
+
+        throw $e;
+    }
+}
 // Lưu bài viết --> tạo bản ghi mới trong DB, cập nhật bản ghi cũ nếu đã tồn tại (dựa vào ID) //
 
 
@@ -12,10 +35,10 @@
 function pdo_get_connection(){
     $host = 'newspulsedb-newspulseg5.h.aivencloud.com';
     $port = 18427;
-    $dbname = 'defaultdb';
+    $dbname = 'news_db';
     $username = 'avnadmin';
     $password = 'AVNS_5kpa6shKuuTPQ13VEIo';
-    $sslCaFile = realpath(__DIR__ . '/../ca.perm');
+    $sslCaFile = realpath(__DIR__ . '/../ca.pem');
 
     try {
         $dburl = "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4";
