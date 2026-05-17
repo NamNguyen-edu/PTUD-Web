@@ -4,6 +4,7 @@ session_start();
 require_once __DIR__ . '/Model/pdo.php';
 require_once __DIR__ . '/Services/search_service.php';
 require_once __DIR__ . '/Database/init_db.php'; 
+require_once __DIR__ . '/Services/profile_service.php';
 $action = trim((string)($_GET['action'] ?? ''));
 if ($action !== '') {
     switch ($action) {
@@ -264,25 +265,112 @@ function handleSignUp()
         renderView('signup');
     }
 }
-
 function renderProfile()
 {
-    if (empty($_SESSION['user_id'])) {
-        redirect('?page=login');
-        return;
-    }
+    $userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 1;
 
     try {
-        $userId = $_SESSION['user_id'];
-        $user = pdo_query_one('SELECT * FROM users WHERE id = ? LIMIT 1', $userId);
+        $profileService = new ProfileService();
+        $userInfo = $profileService->getUserInfo($userId);
+        $userArticles = $profileService->getUserArticles($userId);
 
-        if (!$user) {
-            showMessage('Không tìm thấy người dùng.', 'error');
-            redirect('?page=login');
+        $viewFile = slugToViewFile('profile');
+        $filePath = __DIR__ . '/UI/html/' . $viewFile . '.html';
+
+        if (!file_exists($filePath)) {
+            http_response_code(404);
+            echo '<h1>404 - Trang không tìm thấy</h1>';
             return;
         }
 
-        renderView('profile');
+        $html = file_get_contents($filePath);
+
+        // Đổ dữ liệu cá nhân thật từ DB đám mây Aiven
+        $fullName = (!empty($userInfo) && !empty($userInfo['full_name'])) ? $userInfo['full_name'] : 'Nguyễn Duy Bảo';
+        $bio      = (!empty($userInfo) && !empty($userInfo['bio']))       ? $userInfo['bio']       : 'Nhà văn tự do, đam mê viết lách.';
+        $email    = (!empty($userInfo) && !empty($userInfo['email']))     ? $userInfo['email']     : 'bebao2005at@gmail.com';
+
+        $html = str_replace('{{FULL_NAME}}', htmlspecialchars($fullName), $html);
+        $html = str_replace('{{BIO}}', htmlspecialchars($bio), $html);
+        $html = str_replace('{{EMAIL}}', htmlspecialchars($email), $html);
+        $html = str_replace('{{MAJOR}}', 'Chuyên ngành Hệ thống thông tin', $html);
+        $html = str_replace('{{ORGANIZATION}}', 'UEH', $html);
+
+        // 🔥 Vòng lặp render bảng danh sách bài viết động (BẢN BẢO HIỂM CHỐNG LỖI LỆCH CỘT 500)
+        $articlesHtml = '';
+        $totalViews = 0;
+        $postsCount = !empty($userArticles) ? count($userArticles) : 0;
+
+        if (empty($userArticles)) {
+            $articlesHtml = '<tr><td colspan="4" class="text-center text-muted py-4">Bạn chưa có bài đăng nào.</td></tr>';
+        } else {
+            foreach ($userArticles as $article) {
+                // Kiểm tra xem cột view_count có tồn tại không để tránh bị lỗi 500 trắng trang
+                $views = isset($article['view_count']) ? intval($article['view_count']) : (isset($article['views']) ? intval($article['views']) : 0);
+                $totalViews += $views;
+                
+                // Chuẩn hóa Badge trạng thái theo đúng thiết kế của Bảo
+                $statusText = 'Bản nháp';
+                $statusClass = 'badge-warning';
+                if (!empty($article['status']) && (in_array(strtolower($article['status']), ['published', 'đã đăng', 'public']))) {
+                    $statusText = 'Đã đăng';
+                    $statusClass = 'badge-success';
+                }
+
+                $dateFormatted = !empty($article['created_at']) ? date('d/m/Y', strtotime($article['created_at'])) : date('d/m/Y');
+                $articleId = isset($article['article_id']) ? $article['article_id'] : 0;
+                
+                $articlesHtml .= '
+                <tr>
+                    <td style="max-width: 250px;">
+                        <div class="font-weight-bold text-truncate">' . htmlspecialchars($article['title'] ?? 'Bài viết không tiêu đề') . '</div>
+                        <small class="text-muted">Cập nhật: ' . $dateFormatted . '</small>
+                    </td>
+                    <td class="text-center align-middle">
+                        <span class="badge badge-pill ' . $statusClass . ' px-3">' . $statusText . '</span>
+                    </td>
+                    <td class="text-center align-middle">
+                        <div class="small"><i class="fas fa-eye mr-1"></i> ' . number_format($views) . '</div>
+                    </td>
+                    <td class="text-right align-middle">
+                        <a href="?page=postnews&id=' . $articleId . '" class="btn btn-light btn-sm mr-1"><i class="fas fa-edit"></i></a>
+                        <button class="btn btn-light btn-sm text-danger"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>';
+            }
+        }
+
+        // Đổ số liệu thống kê lên sidebar giao diện công khai
+        $html = str_replace('{{POSTS_COUNT}}', $postsCount, $html);
+        $html = str_replace('{{VIEWS_COUNT}}', $totalViews > 1000 ? number_format($totalViews/1000, 1) . 'K' : $totalViews, $html);
+        $html = str_replace('{{LIST_ARTICLES}}', $articlesHtml, $html);
+
+        // 1. Nạp Component Header và Footer gốc của Nam
+        $headerComponent = loadHtmlComponent('header');
+        $footerComponent = loadHtmlComponent('footer');
+
+        // 2. Ép đồng bộ thông tin đăng nhập lên thanh Header Component
+        if (!empty($userInfo)) {
+            $loggedInHeader = '
+            <div class="d-flex align-items-center ml-auto" style="gap: 8px;">
+                <span class="user-avatar-circle" style="background-color: #007bff; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">NB</span>
+                <a href="?page=profile" class="font-weight-bold text-primary" style="text-decoration: none;">' . htmlspecialchars($fullName) . '</a>
+            </div>';
+
+            $headerComponent = preg_replace('/<div class="d-flex align-items-center gap-2">.*?<\/div>/is', $loggedInHeader, $headerComponent);
+            $headerComponent = preg_replace('/<div class="auth-buttons">.*?<\/div>/is', $loggedInHeader, $headerComponent);
+            $headerComponent = preg_replace('/<a[^>]*login[^>]*>.*?<\/a>\s*<a[^>]*signup[^>]*>.*?<\/a>/is', $loggedInHeader, $headerComponent);
+        }
+
+        // 3. Bắn thẳng Header/Footer vào đúng vị trí 2 thẻ div placeholder của Bảo
+        $html = str_replace('<div id="header-placeholder"></div>', $headerComponent, $html);
+        $html = str_replace('<div id="footer-placeholder" class="mt-auto w-100"></div>', $footerComponent, $html);
+
+        // Sửa đường dẫn tĩnh CSS/JS của Nam
+        $html = rewriteViewPaths($html);
+        
+        echo $html;
+
     } catch (PDOException $e) {
         showMessage('Lỗi tải thông tin người dùng: ' . $e->getMessage(), 'error');
         renderView('profile');
@@ -292,7 +380,9 @@ function renderProfile()
 function renderDbTest()
 {
     try {
-        $database = pdo_query_value('SELECT DATABASE()');
+        $conn = pdo_get_connection();
+        $stmt = $conn->query('SELECT DATABASE()');
+        $database = $stmt->fetchColumn();
         showMessage('Kết nối thành công tới database: ' . $database, 'success');
     } catch (PDOException $e) {
         showMessage('Lỗi kết nối PDO: ' . $e->getMessage(), 'error');
