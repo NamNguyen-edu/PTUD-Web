@@ -4,15 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NewsPulse Professional | Hồ sơ cá nhân - Nguyễn Duy Bảo</title>
+    <title>NewsPulse Professional | Hồ sơ cá nhân</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
 
-    <link rel="stylesheet" href="../css/header.css">
-    <link rel="stylesheet" href="../css/footer.css">
-    <link rel="stylesheet" href="../css/profile.css">
+<link rel="stylesheet" href="/PTUD-Web/Repo/UI/css/header.css">
+<link rel="stylesheet" href="/PTUD-Web/Repo/UI/css/footer.css">
+<link rel="stylesheet" href="/PTUD-Web/Repo/UI/css/profile.css">
 </head>
 
 <body class="bg-light-custom d-flex flex-column min-vh-100">
@@ -37,12 +37,17 @@
                                 </button>
                             </div>
 
-                            <h4 class="font-weight-bold mt-3 mb-1">Nguyễn Duy Bảo</h4>
-                            <p class="text-muted small mb-3">Chuyên ngành Hệ thống thông tin | UEH</p>
-
+<h4 class="font-weight-bold">
+    <?php echo isset($user['name']) ? $user['name'] : (isset($user['full_name']) ? $user['full_name'] : 'Nguyễn Duy Bảo'); ?>
+</h4>
+<p class="text-muted">
+    <?php echo isset($user['major']) ? $user['major'] : 'Business Information Systems'; ?> 
+    | 
+    <?php echo isset($user['organization']) ? $user['organization'] : 'UEH'; ?>
+</p>
                             <div class="d-flex justify-content-around border-top border-bottom py-3 mb-3">
                                 <div class="stat-item text-center">
-                                    <span class="d-block font-weight-bold h5 mb-0" id="statPosts">24</span>
+                                    <span class="d-block font-weight-bold h5 mb-0" id="statPosts">--</span>
                                     <small class="text-muted">Bài viết</small>
                                 </div>
                                 <div class="stat-item border-left border-right px-3 text-center">
@@ -50,14 +55,14 @@
                                     <small class="text-muted">Đã lưu</small>
                                 </div>
                                 <div class="stat-item text-center">
-                                    <span class="d-block font-weight-bold h5 mb-0" id="statViews">8.2K</span>
+                                    <span class="d-block font-weight-bold h5 mb-0" id="statViews">--</span>
                                     <small class="text-muted">Lượt đọc</small>
                                 </div>
                             </div>
 
                             <div class="profile-bio px-2 mb-4">
                                 <p class="small text-secondary italic">
-                                    "Nhà văn tự do, đam mê viết lách."
+                                    "{{BIO}}"
                                 </p>
                             </div>
 
@@ -196,7 +201,7 @@
                             <div class="tab-pane fade" id="myposts" role="tabpanel">
                                 <div class="d-flex justify-content-between align-items-center mb-4">
                                     <h5 class="font-weight-bold mb-0">Quản lý bài đăng của tôi</h5>
-                                    <a href="postnews.html" class="btn btn-pulse-primary btn-sm"><i
+                                    <a href="?page=postnews" class="btn btn-pulse-primary btn-sm"><i
                                             class="fas fa-plus mr-1"></i> Tạo bài mới</a>
                                 </div>
 
@@ -214,75 +219,36 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td style="max-width: 250px;">
-                                                    <div class="font-weight-bold text-truncate">Dự án NightOwl Market: Giải
-                                                        pháp cho sinh viên thức khuya</div>
-                                                    <small class="text-muted">Cập nhật: 02/03/2026</small>
-                                                </td>
-                                                <td class="text-center align-middle">
-                                                    <span class="badge badge-pill badge-success px-3">Đã đăng</span>
-                                                </td>
-                                                <td class="text-center align-middle">
-                                                    <div class="small"><i class="fas fa-eye mr-1"></i> 1.2K</div>
-                                                    <div class="small text-primary"><i class="fas fa-comment mr-1"></i> 45
-                                                    </div>
-                                                </td>
-                                                <td class="text-right align-middle">
-                                                    <button class="btn btn-light btn-sm mr-1"><i
-                                                            class="fas fa-edit"></i></button>
-                                                    <button class="btn btn-light btn-sm text-danger"><i
-                                                            class="fas fa-trash"></i></button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <div class="font-weight-bold text-truncate">Phân tích hệ thống ERP tại
-                                                        doanh nghiệp bán lẻ Việt Nam</div>
-                                                    <small class="text-muted">Lưu nháp: 15/04/2026</small>
-                                                </td>
-                                                <td class="text-center align-middle">
-                                                    <span class="badge badge-pill badge-warning px-3">Bản nháp</span>
-                                                </td>
-                                                <td class="text-center align-middle">
-                                                    <span class="text-muted">--</span>
-                                                </td>
-                                                <td class="text-right align-middle">
-                                                    <button class="btn btn-light btn-sm mr-1"><i
-                                                            class="fas fa-edit"></i></button>
-                                                    <button class="btn btn-light btn-sm text-danger"><i
-                                                            class="fas fa-trash"></i></button>
-                                                </td>
-                                            </tr>
+                                            {{LIST_ARTICLES}}
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
+                            
                             <div class="tab-pane fade" id="settings" role="tabpanel">
                                 <h5 class="font-weight-bold mb-4">Thiết lập tài khoản chuyên sâu</h5>
                                 <form id="profileUpdateForm">
                                     <div class="row">
                                         <div class="col-md-6 form-group">
                                             <label class="small font-weight-bold text-uppercase">Họ và tên</label>
-                                            <input type="text" class="form-control bg-light border-0" value="Nguyễn Duy Bảo"
+                                            <input type="text" class="form-control bg-light border-0" value="{{FULL_NAME}}"
                                                 id="fullName">
                                         </div>
                                         <div class="col-md-6 form-group">
                                             <label class="small font-weight-bold text-uppercase">Email liên hệ</label>
                                             <input type="email" class="form-control bg-light border-0"
-                                                value="bebao2005at@gmail.com" readonly>
+                                                value="{{EMAIL}}" readonly>
                                         </div>
                                     </div>
                                     <div class="form-group mt-2">
-                                        <label class="small font-weight-bold text-uppercase">Chuyên môn / Nghề
-                                            nghiệp</label>
+                                        <label class="small font-weight-bold text-uppercase">Chuyên môn / Nghề nghiệp</label>
                                         <input type="text" class="form-control bg-light border-0"
                                             value="Độc giả">
                                     </div>
                                     <div class="form-group mt-2">
                                         <label class="small font-weight-bold text-uppercase">Giới thiệu ngắn (Bio)</label>
                                         <textarea class="form-control bg-light border-0"
-                                            rows="4">Nhà văn tự do, đam mê viết lách</textarea>
+                                            rows="4">{{BIO}}</textarea>
                                     </div>
 
                                     <hr class="my-4">
@@ -346,7 +312,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../js/profile.js"></script>
-</body>
+<script src="/PTUD-Web/Repo/UI/js/profile.js"></script></body>
 
 </html>
