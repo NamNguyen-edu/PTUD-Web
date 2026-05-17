@@ -1,9 +1,11 @@
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="UI/css/header.css">
 <div class="row topbar align-items-center">
     <div class="col-3 logo">NewsPulse</div>
     <div class="col-6 p-0">
-        <input type="text" class="search-box" placeholder="Search news, topics...">
+        <form action="?page=search" method="get" class="d-flex search-form">
+            <input id="search-box" type="text" name="keyword" class="search-box" placeholder="Search news, topics..." autocomplete="off">
+            <button type="submit" class="btn btn-search">Search</button>
+            <div id="search-dropdown" class="search-dropdown d-none" aria-live="polite" aria-label="Search suggestions"></div>
+        </form>
     </div>
     <div class="col-3 text-end actions" id="user-actions">
         <!-- Login Section -->
@@ -39,7 +41,7 @@
                     </div>
                 </div>
                 <div class="profile-menu-divider"></div>
-                <a href="?page=profile" class="profile-menu-item">
+                <a href="../html/profile.html" class="profile-menu-item">
                     <span class="menu-icon"></span>
                     <div class="menu-content">
                         <div class="menu-title">Hồ sơ</div>

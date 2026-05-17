@@ -19,8 +19,8 @@ CREATE TABLE IF NOT EXISTS roles (
     UNIQUE KEY UQ_roles_name (name)
 ) ENGINE=InnoDB;
 
--- Seed dữ liệu mặc định
-INSERT INTO roles (name, description) VALUES
+-- Seed dữ liệu mặc định (chỉ thêm nếu chưa tồn tại)
+INSERT IGNORE INTO roles (name, description) VALUES
     ('admin',        'Quản trị viên toàn quyền hệ thống'),
     ('editor',       'Biên tập viên: duyệt và xuất bản bài viết'),
     ('contributor',  'Tác giả: tạo và quản lý bài viết của mình'),
