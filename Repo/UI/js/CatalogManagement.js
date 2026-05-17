@@ -14,14 +14,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const selectType = document.getElementById('modal-type');
     const btnSave = document.getElementById('btn-save-item');
 
-    // Thêm các biến xử lý modal Chỉnh sửa xịn bằng UI thay vì dùng lệnh prompt
+    // Thêm các biến xử lý modal Chỉnh sửa xịn bằng UI
     const editItemModalEl = document.getElementById('editItemModal');
     const editItemModal = editItemModalEl ? new bootstrap.Modal(editItemModalEl) : null;
     const inputEditName = document.getElementById('edit-modal-name');
     const inputEditSlug = document.getElementById('edit-modal-slug');
     const btnUpdate = document.getElementById('btn-update-item');
 
-    let rowToDelete = null; 
+    let rowToDelete = null;
     let rowToEdit = null;
     const deleteModalEl = document.getElementById('deleteModal');
     const deleteModal = deleteModalEl ? new bootstrap.Modal(deleteModalEl) : null;
@@ -30,8 +30,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const createSlug = (text) => {
         if (!text) return "";
         return text.toString().toLowerCase().trim()
-            .normalize('NFD').replace(/[\u0300-\u036f]/g, '') 
-            .replace(/[đĐ]/g, 'd').replace(/[^\w\s-]/g, '') 
+            .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+            .replace(/[đĐ]/g, 'd').replace(/[^\w\s-]/g, '')
             .replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '');
     };
 
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function () {
     inputName?.addEventListener('input', updateSlugPreview);
     selectType?.addEventListener('change', updateSlugPreview);
 
-    inputEditName?.addEventListener('input', function() {
+    inputEditName?.addEventListener('input', function () {
         const isTag = inputEditSlug.value.includes('/tag/');
         inputEditSlug.value = (isTag ? '/tag/' : '/') + createSlug(inputEditName.value);
     });
@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <button class="btn-action btn-delete text-danger" title="Xóa"><i class="fas fa-trash"></i></button>
             </td>
         `;
-        
+
         if (isPrepend) {
             targetTableBody.prepend(newRow);
         } else {
@@ -104,7 +104,20 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('tag-list-container').innerHTML = '';
 
         fetch(API_URL)
-            .then(res => res.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Lỗi Network hệ thống: Status ${response.status}`);
+                }
+                // Đọc phản hồi dưới dạng chữ (text) trước để bẫy lỗi
+                return response.text().then(text => {
+                    try {
+                        return JSON.parse(text); // Nếu là JSON chuẩn thì parse bình thường
+                    } catch (err) {
+                        // Nếu là chữ "Lỗi kết nối..." thì ném thẳng text đó vào catch bên dưới
+                        throw new Error(`PHP trả về text lỗi, không phải JSON! Nguyên văn: \n"${text}"`);
+                    }
+                });
+            })
             .then(data => {
                 if (data.status === "success") {
                     data.categories.forEach(cat => appendRowToTable('Category', cat.category_id, cat.name, cat.slug, cat.count));
@@ -113,19 +126,23 @@ document.addEventListener('DOMContentLoaded', function () {
                     console.error("Lỗi lấy dữ liệu:", data.message);
                 }
             })
-            .catch(err => console.error("Không kết nối được API PHP:", err));
+            .catch(err => {
+                // In trực tiếp nguyên nhân chí mạng ra Console để đọc cho dễ
+                console.error("=== CHI TIẾT LỖI TỪ SERVER ===");
+                console.error(err.message);
+            });
     };
 
     // Chạy tải dữ liệu ngay khi mở trang
     loadCatalogData();
 
     // === 7. XỬ LÝ LƯU DỮ LIỆU MỚI (POST) ===
-   btnSave?.addEventListener('click', () => {
-        console.log("Đã kích hoạt sự kiện bấm nút Lưu!"); 
+    btnSave?.addEventListener('click', () => {
+        console.log("Đã kích hoạt sự kiện bấm nút Lưu!");
 
         const name = inputName.value.trim();
         const slug = inputSlug.value.trim();
-        const type = selectType.value; 
+        const type = selectType.value;
 
         if (!name) {
             alert('Vui lòng nhập tên hiển thị!');
@@ -134,7 +151,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const tbodyId = (type === 'Category') ? 'category-list-container' : 'tag-list-container';
         const targetTableBody = document.getElementById(tbodyId);
-        
+
         if (!targetTableBody) {
             console.error("Không tìm thấy bảng hiển thị có ID là: " + tbodyId);
             return;
@@ -146,23 +163,23 @@ document.addEventListener('DOMContentLoaded', function () {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ type, name, slug })
         })
-        .then(res => res.json())
-        .then(data => {
-            console.log("Kết quả PHP trả về:", data); // Kiểm tra xem PHP có báo success không
+            .then(res => res.json())
+            .then(data => {
+                console.log("Kết quả PHP trả về:", data); // Kiểm tra xem PHP có báo success không
 
-            if (data.status === "success") {
-                // Tạo hàng mới đẩy lên đầu danh sách tương ứng
-                const newRow = document.createElement('tr');
-                
-                // Bổ sung các attribute để tí nữa bấm Sửa/Xóa trực tiếp không bị lỗi
-                newRow.setAttribute('data-id', data.id);
-                newRow.setAttribute('data-type', type);
+                if (data.status === "success") {
+                    // Tạo hàng mới đẩy lên đầu danh sách tương ứng
+                    const newRow = document.createElement('tr');
 
-                const iconHtml = type === 'Category'
-                    ? `<div class="cat-icon bg-tech me-3"><i class="fas fa-folder-open"></i></div>`
-                    : `<span class="text-muted fw-bold me-2">#</span>`;
+                    // Bổ sung các attribute để tí nữa bấm Sửa/Xóa trực tiếp không bị lỗi
+                    newRow.setAttribute('data-id', data.id);
+                    newRow.setAttribute('data-type', type);
 
-                newRow.innerHTML = `
+                    const iconHtml = type === 'Category'
+                        ? `<div class="cat-icon bg-tech me-3"><i class="fas fa-folder-open"></i></div>`
+                        : `<span class="text-muted fw-bold me-2">#</span>`;
+
+                    newRow.innerHTML = `
                     <td class="ps-4">
                         <div class="d-flex align-items-center">
                             ${iconHtml}
@@ -176,21 +193,21 @@ document.addEventListener('DOMContentLoaded', function () {
                         <button class="btn-action btn-delete text-danger" title="Xóa"><i class="fas fa-trash"></i></button>
                     </td>
                 `;
-                
-                targetTableBody.prepend(newRow);
 
-                // Reset form và đóng modal
-                inputName.value = '';
-                inputSlug.value = '';
-                if (addItemModal) addItemModal.hide();
-            } else {
-                alert("Lỗi lưu từ DB đám mây: " + data.message);
-            }
-        })
-        .catch(err => {
-            console.error("Lỗi nghẽn đường truyền Fetch:", err);
-            alert("Không thể gửi dữ liệu tới file PHP. Hãy kiểm tra lại đường dẫn API_URL!");
-        });
+                    targetTableBody.prepend(newRow);
+
+                    // Reset form và đóng modal
+                    inputName.value = '';
+                    inputSlug.value = '';
+                    if (addItemModal) addItemModal.hide();
+                } else {
+                    alert("Lỗi lưu từ DB đám mây: " + data.message);
+                }
+            })
+            .catch(err => {
+                console.error("Lỗi nghẽn đường truyền Fetch:", err);
+                alert("Không thể gửi dữ liệu tới file PHP. Hãy kiểm tra lại đường dẫn API_URL!");
+            });
     });
 
     // === 8. SỬA & XÓA BIẾN ĐỘNG (EVENT DELEGATION) ===
@@ -218,7 +235,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // === 9. THỰC THI SỬA GỬI LÊN PHP (PUT) ===
-    btnUpdate?.addEventListener('click', function() {
+    btnUpdate?.addEventListener('click', function () {
         if (!rowToEdit || inputEditName.value.trim() === "") {
             alert("Tên phân loại không được để trống!");
             return;
@@ -234,20 +251,20 @@ document.addEventListener('DOMContentLoaded', function () {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id, type, name, slug })
         })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === "success") {
-                rowToEdit.querySelector('.item-name').innerText = name;
-                rowToEdit.querySelector('.item-slug').innerText = slug;
-                if (editItemModal) editItemModal.hide();
-            } else {
-                alert("Lỗi cập nhật: " + data.message);
-            }
-        });
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "success") {
+                    rowToEdit.querySelector('.item-name').innerText = name;
+                    rowToEdit.querySelector('.item-slug').innerText = slug;
+                    if (editItemModal) editItemModal.hide();
+                } else {
+                    alert("Lỗi cập nhật: " + data.message);
+                }
+            });
     });
 
     // === 10. THỰC THI XÓA GỬI LÊN PHP (DELETE) ===
-    window.executeDelete = function() {
+    window.executeDelete = function () {
         if (!rowToDelete) return;
 
         const id = rowToDelete.getAttribute('data-id');
@@ -258,20 +275,20 @@ document.addEventListener('DOMContentLoaded', function () {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id, type })
         })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === "success") {
-                rowToDelete.style.transition = "0.3s";
-                rowToDelete.style.opacity = "0"; 
-                setTimeout(() => {
-                    rowToDelete.remove();
-                    rowToDelete = null;
-                }, 300);
-            } else {
-                alert("Lỗi xóa phân loại: " + data.message);
-            }
-            if (deleteModal) deleteModal.hide();
-        });
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "success") {
+                    rowToDelete.style.transition = "0.3s";
+                    rowToDelete.style.opacity = "0";
+                    setTimeout(() => {
+                        rowToDelete.remove();
+                        rowToDelete = null;
+                    }, 300);
+                } else {
+                    alert("Lỗi xóa phân loại: " + data.message);
+                }
+                if (deleteModal) deleteModal.hide();
+            });
     };
 
     // === 11. BỘ LỌC TÌM KIẾM NHANH ===
@@ -279,7 +296,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const term = this.value.toLowerCase().trim();
         const activePane = document.querySelector('.tab-pane.show.active');
         if (!activePane) return;
-        
+
         const rows = activePane.querySelectorAll('tbody tr');
         rows.forEach(row => {
             const name = row.querySelector('.item-name')?.innerText.toLowerCase() || "";

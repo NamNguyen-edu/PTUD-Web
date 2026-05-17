@@ -1,7 +1,7 @@
 <?php
 // auth_handler.php
 session_start();
-require_once 'config.php';
+require_once '../PTUD-WEB/Repo/Model/pdo.php';
 
 header('Content-Type: application/json');
 

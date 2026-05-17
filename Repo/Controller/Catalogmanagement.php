@@ -10,7 +10,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit(0);
 }
 
-
 require_once '../Model/pdo.php'; 
 
 $method = $_SERVER['REQUEST_METHOD'];
