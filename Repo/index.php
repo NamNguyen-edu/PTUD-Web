@@ -2,8 +2,26 @@
 session_start();
 
 require_once __DIR__ . '/Model/pdo.php';
-require_once __DIR__ . '/Database/init_db.php';
-
+require_once __DIR__ . '/Services/search_service.php';
+require_once __DIR__ . '/Database/init_db.php'; 
+$action = trim((string)($_GET['action'] ?? ''));
+if ($action !== '') {
+    switch ($action) {
+        case 'home_feed':
+            require_once __DIR__ . '/Controller/home_controller.php';
+            $controller = new HomeController();
+            $controller->feed();
+            exit;
+        case 'article_detail':
+            require_once __DIR__ . '/Controller/load_articles_controller.php';
+            $controller = new ArticleController();
+            $controller->detail();
+            exit;
+        case 'search_suggestions':
+            handleSearchSuggestions();
+            exit;
+    }
+}
 function redirect($url)
 {
     header('Location: ' . $url);
@@ -69,6 +87,95 @@ function rewriteFormForSignUp(string $html): string
     $html = str_replace('id="signupUser"', 'id="signupUser" name="email_or_phone"', $html);
     $html = str_replace('id="signupPass"', 'id="signupPass" name="password"', $html);
     return $html;
+}
+
+function loadHtmlComponent(string $name): string
+{
+    $componentPath = __DIR__ . '/UI/components/' . $name . '.html';
+    return file_exists($componentPath) ? file_get_contents($componentPath) : '';
+}
+
+function renderSearchPage(string $keyword)
+{
+    $viewFile = 'search';
+    $filePath = __DIR__ . '/UI/html/' . $viewFile . '.html';
+
+    if (!file_exists($filePath)) {
+        http_response_code(404);
+        echo '<h1>404 - Trang không tìm thấy</h1>';
+        echo '<p>Không tìm thấy view: ' . htmlentities($viewFile) . '</p>';
+        return;
+    }
+
+    $html = file_get_contents($filePath);
+    $keyword = trim($keyword);
+    $resultsHtml = '';
+    $resultCount = 0;
+
+    if ($keyword !== '') {
+        try {
+            $searchService = new SearchService();
+            $articles = $searchService->searchArticles($keyword);
+            $resultCount = count($articles);
+
+            if ($resultCount === 0) {
+                $resultsHtml = '<div class="alert alert-info">Không tìm thấy bài viết nào phù hợp với từ khóa.</div>';
+            } else {
+                foreach ($articles as $article) {
+                    $title = htmlspecialchars($article['title']);
+                    $excerpt = htmlspecialchars($article['excerpt']);
+                    $slug = htmlspecialchars($article['slug']);
+                    $thumbnail = htmlspecialchars($article['thumbnail_url'] ?: 'https://via.placeholder.com/320x180?text=No+Image');
+                    $resultsHtml .= '<div class="col-12"><div class="card mb-3 shadow-sm"><div class="row g-0"><div class="col-md-4"><img src="' . $thumbnail . '" class="img-fluid rounded-start" style="height:180px; object-fit:cover; width:100%;"></div><div class="col-md-8"><div class="card-body"><h5 class="card-title">' . $title . '</h5><p class="card-text text-muted">' . $excerpt . '</p><p class="card-text"><small class="text-secondary">Lượt xem: ' . intval($article['view_count']) . '</small></p><a href="?page=article" class="btn btn-primary btn-sm">Xem bài viết</a></div></div></div></div></div>';
+                }
+            }
+        } catch (PDOException $e) {
+            $resultsHtml = '<div class="alert alert-danger">Lỗi tìm kiếm: ' . htmlspecialchars($e->getMessage()) . '</div>';
+        }
+    } else {
+        $resultsHtml = '<div class="alert alert-secondary">Vui lòng nhập từ khóa để tìm kiếm.</div>';
+    }
+
+    $html = str_replace('{{keyword}}', htmlspecialchars($keyword), $html);
+    $html = str_replace('{{count}}', $resultCount, $html);
+    $html = str_replace('{{results}}', $resultsHtml, $html);
+
+    $html = str_replace('{{header}}', loadHtmlComponent('header'), $html);
+    $html = str_replace('{{footer}}', loadHtmlComponent('footer'), $html);
+    $html = rewriteViewPaths($html);
+
+    echo $html;
+}
+
+function handleSearchSuggestions()
+{
+    $keyword = trim((string)($_GET['keyword'] ?? ''));
+    header('Content-Type: application/json; charset=utf-8');
+
+    if ($keyword === '') {
+        echo json_encode(['items' => []]);
+        exit;
+    }
+
+    try {
+        $searchService = new SearchService();
+        $articles = $searchService->searchSuggestions($keyword, 8);
+        $payload = array_map(function ($article) {
+            return [
+                'id' => isset($article['article_id']) ? intval($article['article_id']) : null,
+                'title' => $article['title'] ?? '',
+                'excerpt' => $article['excerpt'] ?? '',
+                'slug' => $article['slug'] ?? '',
+                'thumbnail' => $article['thumbnail_url'] ?? '',
+            ];
+        }, $articles);
+
+        echo json_encode(['items' => $payload]);
+    } catch (PDOException $e) {
+        echo json_encode(['items' => [], 'error' => $e->getMessage()]);
+    }
+
+    exit;
 }
 
 function renderView(string $page)
@@ -193,7 +300,8 @@ function renderDbTest()
 }
 
 $page = trim((string)($_GET['page'] ?? 'home'));
-$action = trim((string)($_GET['action'] ?? ''));
+
+
 
 switch ($action) {
     case 'login':
@@ -201,6 +309,9 @@ switch ($action) {
         break;
     case 'signup':
         handleSignUp();
+        break;
+    case 'search_suggestions':
+        handleSearchSuggestions();
         break;
     default:
         switch ($page) {
@@ -216,15 +327,21 @@ switch ($action) {
             case 'admin1':
                 renderView($page);
                 break;
+            case 'search':
+                $keyword = trim((string)($_GET['keyword'] ?? ''));
+                renderSearchPage($keyword);
+                break;
             case 'profile':
                 renderProfile();
                 break;
             case 'dbtest':
                 renderDbTest();
-                break;
+                break;  
             default:
+            
                 redirect('?page=home');
                 break;
+
         }
         break;
 }
