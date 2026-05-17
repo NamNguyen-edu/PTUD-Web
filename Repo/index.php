@@ -323,7 +323,7 @@ switch ($action) {
             case 'postnews':
             case 'technology':
             case 'admin_dashboard':
-            case 'admin_userm':
+            case 'AccountManagement':
             case 'admin1':
                 renderView($page);
                 break;
