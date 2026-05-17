@@ -1,6 +1,6 @@
 <?php
 
-require_once "../model/pdo.php";
+require_once __DIR__ . "/../Model/pdo.php";
 
 function getPDO(): PDO {
     // static $pdo = null;

@@ -24,6 +24,19 @@ if ($action !== '') {
         case 'search_suggestions':
             handleSearchSuggestions();
             exit;
+            case 'get_dashboard_data': 
+            require_once __DIR__ . '/Services/dashboard_admin_service.php'; 
+            header('Content-Type: application/json; charset=utf-8'); 
+            try 
+            { 
+            $service = new DashboardAdminService(); 
+            $data = $service->getDashboardData(); 
+            echo json_encode($data); } 
+            catch (Throwable $e) 
+            { 
+                http_response_code(500); 
+            echo json_encode([ 'error' => true, 'message' => $e->getMessage() ]); } 
+            exit;
     }
 }
 function redirect($url)
