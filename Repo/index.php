@@ -3,8 +3,25 @@ session_start();
 
 require_once __DIR__ . '/Model/pdo.php';
 require_once __DIR__ . '/Services/search_service.php';
-require_once __DIR__ . '/Database/init_db.php';
-
+require_once __DIR__ . '/Database/init_db.php'; 
+$action = trim((string)($_GET['action'] ?? ''));
+if ($action !== '') {
+    switch ($action) {
+        case 'home_feed':
+            require_once __DIR__ . '/Controller/home_controller.php';
+            $controller = new HomeController();
+            $controller->feed();
+            exit;
+        case 'article_detail':
+            require_once __DIR__ . '/Controller/load_articles_controller.php';
+            $controller = new ArticleController();
+            $controller->detail();
+            exit;
+        case 'search_suggestions':
+            handleSearchSuggestions();
+            exit;
+    }
+}
 function redirect($url)
 {
     header('Location: ' . $url);
@@ -283,23 +300,8 @@ function renderDbTest()
 }
 
 $page = trim((string)($_GET['page'] ?? 'home'));
-$action = trim((string)($_GET['action'] ?? ''));
-if (isset($_GET['action'])) {
 
-    $action = $_GET['action'];
 
-    switch ($action) {
-
-        case 'home_feed':
-            require_once __DIR__ . '/Controller/home_controller..php';
-
-            $controller = new HomeController();
-
-            $controller->feed();
-
-            exit;
-    }
-}
 
 switch ($action) {
     case 'login':
@@ -334,15 +336,12 @@ switch ($action) {
                 break;
             case 'dbtest':
                 renderDbTest();
-                break;
-            case 'home_feed':
-                require_once __DIR__ . '/Repo/Controller/HomeController.php';
-                $controller = new HomeController();
-                $controller->feed();
-                exit;
+                break;  
             default:
+            
                 redirect('?page=home');
                 break;
+
         }
         break;
 }
