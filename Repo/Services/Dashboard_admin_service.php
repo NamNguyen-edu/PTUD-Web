@@ -1,17 +1,19 @@
 <?php
+
 require_once "../model/pdo.php";
 
 function getPDO(): PDO {
-    static $pdo = null;
-    if ($pdo === null) {
-        $pdo = new PDO(
-            'mysql:host=localhost;dbname=news_db;charset=utf8mb4',
-            'root',      // username
-            '123456',          // password
-            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-        );
+    // static $pdo = null;
+    // if ($pdo === null) {
+    //     $pdo = new PDO(
+    //         'mysql:host=localhost;dbname=news_pulse;charset=utf8mb4',
+    //         'root',      // username
+    //         '123456',          // password
+    //         [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+    //     );
+    return pdo_get_connection();
     }
-    return $pdo;
+    //return $pdo;
 /**
  * Dashboard Admin Service
  * Trả về toàn bộ dữ liệu cần thiết cho trang Admin Dashboard

@@ -5,6 +5,10 @@ require_once __DIR__ . '/Model/pdo.php';
 require_once __DIR__ . '/Services/search_service.php';
 require_once __DIR__ . '/Database/init_db.php'; 
 $action = trim((string)($_GET['action'] ?? ''));
+if ($action === 'get_dashboard_data') {
+    require_once __DIR__ . '/Services/dashboard_admin_service.php';
+    exit;
+}
 if ($action !== '') {
     switch ($action) {
         case 'home_feed':
@@ -323,6 +327,9 @@ switch ($action) {
             case 'postnews':
             case 'technology':
             case 'admin_dashboard':
+                include __DIR__ . '/UI/html/admin_dashboard.html';
+                renderView($page);
+                break;
             case 'admin_userm':
             case 'admin1':
                 renderView($page);
