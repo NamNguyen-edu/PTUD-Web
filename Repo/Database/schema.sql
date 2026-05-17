@@ -5,7 +5,7 @@ CREATE DATABASE IF NOT EXISTS news_db
 CHARACTER SET utf8mb4 
 COLLATE utf8mb4_unicode_ci;
 
-USE news_pulse;
+USE news_db;
 
 -- 1. ROLES — Phân quyền hệ thống
 
