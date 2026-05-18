@@ -5,6 +5,9 @@
     --text-main: #143161;
     --text-muted: #455f90;
     --np-border: #e8eaed;
+    --np-sidebar-bg: #dae5ff;
+    /* Khai báo bù các biến thiếu */
+    --np-bg-content: #f9f9ff;
 }
 
 body {
@@ -28,21 +31,21 @@ body {
     flex-direction: column;
 }
 
-/* ================= KHUNG NỘI DUNG CHÍNH ================= */
+/* ================= KHUNG NỘI DUNG CHÍNH (Đồng bộ chuẩn) ================= */
 .main-wrapper {
     margin-left: 260px;
+    /* Đẩy lề sang phải bằng đúng độ rộng sidebar */
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    transition: margin-left 0.3s ease;
 }
 
 .content-area {
-    margin-top: 70px;
-    padding: 40px;
+    padding: 40px 20px;
     background-color: var(--np-bg-content);
     flex-grow: 1;
 }
-
 
 /* Components */
 .workflow-header-card {
@@ -55,8 +58,8 @@ body {
 .pipeline-line {
     position: absolute;
     top: 20px;
-    left: 0;
-    right: 0;
+    left: 10px;
+    right: 10px;
     height: 2px;
     background: #d8e2ff;
     z-index: 1;
@@ -98,7 +101,8 @@ body {
     border-radius: 24px;
     padding: 24px;
     position: sticky;
-    top: 84px;
+    top: 24px;
+    /* Tối ưu khoảng cách khi cuộn trang */
 }
 
 /* Comments */
@@ -141,16 +145,11 @@ body {
     justify-content: center;
     gap: 8px;
     margin-bottom: 12px;
+    transition: background 0.2s;
 }
 
-.step-rejected .step-box{
-    background:#dc2626 !important;
-    color:#fff !important;
-    box-shadow:0 0 0 6px rgba(220,38,38,.15);
-}
-
-.step-rejected p{
-    color:#dc2626 !important;
+.btn-approve:hover {
+    background: #0943a4;
 }
 
 .btn-revision {
@@ -165,24 +164,35 @@ body {
     align-items: center;
     justify-content: center;
     gap: 8px;
+    cursor: pointer;
 }
 
-/* Content */
+.bg-warning-subtle-theme {
+    background-color: #fff3cd;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+/* Content Text */
 .article-body p {
     line-height: 1.7;
     margin-bottom: 1.5rem;
     color: var(--text-muted);
 }
 
-/* Responsive */
+/* Responsive (Chống bể giao diện trên mobile) */
 @media (max-width: 991px) {
     .sidebar {
         transform: translateX(-100%);
     }
 
-    .topbar,
-    .main-content {
-        left: 0;
-        margin-left: 0;
+    .main-wrapper {
+        margin-left: 0 !important;
+    }
+
+    .content-area {
+        padding: 20px 10px;
     }
 }

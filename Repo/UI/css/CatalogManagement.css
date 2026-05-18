@@ -30,7 +30,6 @@ body {
 }
 
 /* ================= KHUNG NỘI DUNG CHÍNH ================= */
-
 .main-wrapper {
   margin-left: 260px;
   min-height: 100vh;
@@ -71,7 +70,7 @@ body {
   overflow: hidden;
 }
 
-.table> :not(caption)>*>* {
+.table > :not(caption) > * > * {
   padding: 16px 24px;
   border-bottom-color: #f1f3f4;
 }
@@ -118,6 +117,7 @@ body {
   color: #f9ab00;
 }
 
+/* Custom Nút thao tác trong bảng */
 .btn-action {
   color: var(--np-text-muted);
   background: transparent;

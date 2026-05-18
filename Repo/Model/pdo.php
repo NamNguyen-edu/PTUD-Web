@@ -2,7 +2,8 @@
 
 
 // Thêm query 2 lần cho search //
-function pdo_query_search($sql, $keyword){
+function pdo_query_search($sql, $keyword)
+{
 
     try {
 
@@ -19,8 +20,7 @@ function pdo_query_search($sql, $keyword){
         $stmt->execute();
 
         return $stmt->fetchAll();
-
-    } catch(PDOException $e){
+    } catch (PDOException $e) {
 
         throw $e;
     }
@@ -32,7 +32,8 @@ function pdo_query_search($sql, $keyword){
  * Mở kết nối đến CSDL NewsPulse sử dụng PDO
  */
 
-function pdo_get_connection(){
+function pdo_get_connection()
+{
 
     static $conn = null;
 
@@ -77,7 +78,6 @@ function pdo_get_connection(){
         );
 
         return $conn;
-
     } catch (PDOException $e) {
 
         die('Lỗi kết nối CSDL: ' . $e->getMessage());
@@ -88,58 +88,70 @@ function pdo_get_connection(){
 /**
  * Thực thi các lệnh INSERT, UPDATE, DELETE
  */
-function pdo_execute($sql){
+function pdo_execute($sql)
+{
     $sql_args = array_slice(func_get_args(), 1);
-    try{
+    try {
         $conn = pdo_get_connection();
         $stmt = $conn->prepare($sql);
         $stmt->execute($sql_args);
+    } catch (PDOException $e) {
+        throw $e;
+    } finally {
+        unset($conn);
     }
-    catch(PDOException $e){ throw $e; }
-    finally{ unset($conn); }
 }
 
 /**
  * Truy vấn danh sách bản ghi (SELECT nhiều dòng)
  */
-function pdo_query($sql){
+function pdo_query($sql)
+{
     $sql_args = array_slice(func_get_args(), 1);
-    try{
+    try {
         $conn = pdo_get_connection();
         $stmt = $conn->prepare($sql);
         $stmt->execute($sql_args);
         return $stmt->fetchAll();
+    } catch (PDOException $e) {
+        throw $e;
+    } finally {
+        unset($conn);
     }
-    catch(PDOException $e){ throw $e; }
-    finally{ unset($conn); }
 }
 
 /**
  * Truy vấn 1 bản ghi (SELECT một dòng)
  */
-function pdo_query_one($sql){
+function pdo_query_one($sql)
+{
     $sql_args = array_slice(func_get_args(), 1);
-    try{
+    try {
         $conn = pdo_get_connection();
         $stmt = $conn->prepare($sql);
         $stmt->execute($sql_args);
         return $stmt->fetch();
+    } catch (PDOException $e) {
+        throw $e;
+    } finally {
+        unset($conn);
     }
-    catch(PDOException $e){ throw $e; }
-    finally{ unset($conn); }
 }
 
 /**
  * Thực thi lệnh INSERT và lấy về ID vừa tạo
  */
-function pdo_execute_return_last_id($sql){
+function pdo_execute_return_last_id($sql)
+{
     $sql_args = array_slice(func_get_args(), 1);
     try {
         $conn = pdo_get_connection();
         $stmt = $conn->prepare($sql);
         $stmt->execute($sql_args);
         return $conn->lastInsertId();
-    } 
-    catch (PDOException $e) { throw $e; } 
-    finally { unset($conn); }
+    } catch (PDOException $e) {
+        throw $e;
+    } finally {
+        unset($conn);
+    }
 }
