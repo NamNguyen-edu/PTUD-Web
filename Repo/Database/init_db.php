@@ -39,17 +39,8 @@ try {
 
 try {
     // Kết nối MySQL Server (không chọn DB để tạo mới nếu cần)
-    $dsn = "mysql:host=$host;port=$port;charset=utf8mb4";
-    $options = [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-    ];
-    if ($sslCaFile && file_exists($sslCaFile) && defined('PDO::MYSQL_ATTR_SSL_CA')) {
-        $options[PDO::MYSQL_ATTR_SSL_CA] = $sslCaFile;
-        if (defined('PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT')) {
-            $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false;
-        }
-    }
-    $pdo = new PDO($dsn, $user, $pass, $options);
+    $pdo = new PDO("mysql:host=$host", $user, $pass);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     echo "<h2>Hệ thống khởi tạo Database NewsPulse (Lần đầu tiên)</h2>";
 
@@ -109,7 +100,7 @@ try {
                 // Lưu lại vào bảng migration
                 $ins = $pdo->prepare("INSERT INTO migrations (title) VALUES (?)");
                 $ins->execute([$fileName]);
-                echo " Đã chạy migration thành công: <b>$fileName</b><br>";
+                echo "🚀 Đã chạy migration thành công: <b>$fileName</b><br>";
             }
         }
     }

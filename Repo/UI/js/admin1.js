@@ -1,3 +1,42 @@
+function disableAllActions() {
+
+    // approve
+    const approveBtn = document.querySelector('.btn-approve');
+
+    // revision
+    const revisionBtn = document.querySelector('.btn-revision');
+
+    // reject
+    const rejectBtn = document.querySelector('.cursor-pointer');
+
+    // disable approve
+    if (approveBtn) {
+        approveBtn.disabled = true;
+        approveBtn.style.opacity = '0.5';
+        approveBtn.style.pointerEvents = 'none';
+    }
+
+    // disable revision
+    if (revisionBtn) {
+        revisionBtn.disabled = true;
+        revisionBtn.style.opacity = '0.5';
+        revisionBtn.style.pointerEvents = 'none';
+    }
+
+    // disable reject
+    if (rejectBtn) {
+        rejectBtn.style.opacity = '0.5';
+        rejectBtn.style.pointerEvents = 'none';
+        rejectBtn.style.cursor = 'not-allowed';
+    }
+
+    // disable textarea revision nếu có
+    const revisionTextarea = document.getElementById('revisionText');
+
+    if (revisionTextarea) {
+        revisionTextarea.disabled = true;
+    }
+}
 
 
 function addComment() {
@@ -87,9 +126,7 @@ function approveArticle() {
     }
 
     // Disable nút
-    const btn = document.querySelector('.btn-approve');
-    btn.disabled = true;
-    btn.style.opacity = '0.7';
+   disableAllActions();
 
     showToast('Bài viết đã được duyệt và chuyển sang xuất bản');
 
@@ -160,12 +197,7 @@ function submitRevision() {
     `;
 
     // disable nút
-    document.querySelector('.btn-approve').disabled = true;
-    document.querySelector('.btn-revision').disabled = true;
-
-    document.querySelector('.btn-approve').style.opacity = '0.5';
-    document.querySelector('.btn-revision').style.opacity = '0.5';
-
+   disableAllActions();
     showToast(
         'Đã gửi yêu cầu chỉnh sửa',
         'warn'
@@ -212,11 +244,7 @@ function rejectArticle() {
     `;
 
     // Disable các nút action
-    document.querySelector('.btn-approve').disabled = true;
-    document.querySelector('.btn-revision').disabled = true;
-
-    document.querySelector('.btn-approve').style.opacity = '0.5';
-    document.querySelector('.btn-revision').style.opacity = '0.5';
+    disableAllActions();
 
     showToast(
         'Bài viết đã bị từ chối',
