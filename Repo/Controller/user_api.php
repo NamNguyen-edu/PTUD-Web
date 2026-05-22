@@ -10,7 +10,7 @@ header("Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
 // Nhúng file kết nối CSDL của bạn vào đây (Sửa lại đường dẫn cho đúng)
-require_once __DIR__ . '/Model/pdo.php';
+require_once __DIR__ . '/../Model/pdo.php';
 
 // Nhận phương thức HTTP (GET, POST, DELETE)
 $method = $_SERVER['REQUEST_METHOD'];

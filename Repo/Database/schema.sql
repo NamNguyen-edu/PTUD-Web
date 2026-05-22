@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS users (
     email_verified_at DATETIME      NULL,
     created_at        DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at        DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    last_active       TIMESTAMP     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY (user_id),
     UNIQUE KEY UQ_users_username (username),
