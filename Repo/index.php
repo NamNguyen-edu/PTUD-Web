@@ -76,6 +76,7 @@ $action = trim((string)($_GET['action'] ?? ''));
 if ($action !== '') {
     switch ($action) {
         case 'login':
+            require_once __DIR__ . '/Controller/Login_controller.php';
             exit;
         case 'category_api':
             require_once __DIR__ . '/Controller/CategoryManagement_controller.php';
@@ -86,7 +87,6 @@ if ($action !== '') {
         case 'logout':
             session_destroy();
             redirect('?page=login');
-
             exit;
     }
     exit;
