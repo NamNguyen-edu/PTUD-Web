@@ -1,5 +1,5 @@
 
-const API_URL = "../Controller/AccountManagement.php";
+const API_URL = "/PTUD-WEB/Repo/Controller/Controller/User_controller.php";
 
 let currentUsersList = [];
 let filteredData = [];
@@ -57,6 +57,27 @@ function updateKPIs() {
 // =========================================================================
 // ĐOẠN 2: DỰNG GIAO DIỆN BẢNG HTML VÀ PHÂN TRANG ĐỘNG
 // =========================================================================
+function formatTimeAgo(dateString) {
+    if (!dateString || dateString === 'Never') return 'Never';
+    const date = new Date(dateString.replace(/-/g, "/"));
+    const now = new Date();
+    const secondsPast = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    if (secondsPast < 0 || secondsPast < 60) return 'Just now';
+    if (secondsPast < 3600) {
+        const minutes = Math.floor(secondsPast / 60);
+        return `${minutes} min${minutes > 1 ? 's' : ''} ago`;
+    }
+    if (secondsPast < 86400) {
+        const hours = Math.floor(secondsPast / 3600);
+        return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+    }
+    if (secondsPast < 2592000) {
+        const days = Math.floor(secondsPast / 86400);
+        return `${days} day${days > 1 ? 's' : ''} ago`;
+    }
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+}
 
 function renderTable() {
     const tbody = document.getElementById("account-list");
@@ -68,12 +89,12 @@ function renderTable() {
     const paginatedItems = filteredData.slice(startIndex, endIndex);
 
     if (paginatedItems.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">Không tìm thấy thành viên nào.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted">Không tìm thấy thành viên nào.</td></tr>`;
         updatePaginationControls(0);
         return;
     }
 
-    // Vẽ từng dòng <tr> dựa trên mảng cắt ra
+    // Vẽ từng dòng <tr> dựa trên mảng cắt ra (Đã khớp hoàn toàn với 7 cột ở HTML)
     paginatedItems.forEach(user => {
         let statusBadge = "";
         if (user.status === "Active") {
@@ -87,28 +108,30 @@ function renderTable() {
         const tr = document.createElement("tr");
         tr.innerHTML = `
             <td class="ps-4 align-middle">
-                <!-- Thêm class user-checkbox để xử lý chọn hàng loạt -->
                 <input class="form-check-input user-checkbox" type="checkbox" value="${user.id}" onchange="evaluateCheckedCount()"/>
             </td>
+            
             <td class="align-middle">
                 <div class="d-flex align-items-center gap-3">
-                    <img src="${user.avatar}" class="rounded-circle" width="36" height="36" alt="avatar" onerror="this.src='https://i.pravatar.cc/150'">
-                    <div>
-                        <div class="fw-bold text-dark mb-0">${user.name}</div>
-                        <div class="text-muted small" style="font-size: 11px;">${user.email}</div>
-                    </div>
+                    <img src="${user.avatar || 'https://i.pravatar.cc/150'}" class="rounded-circle" width="36" height="36" alt="avatar" onerror="this.src='https://i.pravatar.cc/150'">
+                    <div class="fw-bold text-dark mb-0">${user.name}</div>
                 </div>
             </td>
+            
+            <td class="align-middle text-secondary small">${user.email}</td>
+            
             <td class="align-middle fw-medium text-dark">${user.role}</td>
+            
             <td class="align-middle">${statusBadge}</td>
-            <td class="align-middle text-secondary small">${user.lastActive}</td>
+            
+            <td class="align-middle text-secondary small">${formatTimeAgo(user.lastActive)}</td>
+            
             <td class="text-end pe-4 align-middle">
                 <div class="dropdown">
                     <button class="btn btn-light btn-sm border-0 bg-transparent" data-bs-toggle="dropdown">
                         <span class="material-symbols-outlined fs-5">more_vert</span>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <!-- Tách nút xóa và nút đình bản ra xử lý trực tiếp bằng ID qua CSDL -->
                         <li><a class="dropdown-item small fw-bold" href="#" onclick="updateSingleStatus(${user.id}, 'Suspended')">Suspend</a></li>
                         <li><a class="dropdown-item small text-danger fw-bold" href="#" onclick="deleteSingleUser(${user.id})">Delete</a></li>
                     </ul>
