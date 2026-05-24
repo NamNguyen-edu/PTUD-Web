@@ -1,5 +1,5 @@
 <?php
-require_once '../Model/pdo.php'; // Đảm bảo đường dẫn đúng
+require_once '../Model/pdo.php';
 
 class UserService
 {
