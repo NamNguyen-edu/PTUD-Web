@@ -33,7 +33,28 @@ function toggleAuth(mode) {
     loginSec.style.display = 'block';
     signupSec.style.display = 'none';
   }
+    renderGoogleButton();
 }
+
+function renderGoogleButton() {
+  if (window.google && google.accounts) {
+    google.accounts.id.initialize({
+      client_id: "124352835901-jqh4f03ga43s57qpi10pcbhatlj2pj8k.apps.googleusercontent.com",
+      callback: (res) => console.log("Google User:", res.credential)
+    });
+
+    // Kiểm tra xem section nào đang hiện thì vẽ vào đó
+    const loginBtn = document.getElementById('google-login-btn');
+    const signupBtn = document.getElementById('google-signup-btn');
+
+    if (document.getElementById('login-section').style.display !== 'none') {
+      google.accounts.id.renderButton(loginBtn, { theme: "outline", size: "large", width: "350" });
+    } else {
+      google.accounts.id.renderButton(signupBtn, { theme: "outline", size: "large", width: "350" });
+    }
+  }
+}
+
 
 
 function applyLanguage(lang) {
