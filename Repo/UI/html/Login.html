@@ -24,10 +24,11 @@
 
         <div id="login-section">
           <h4 class="fw-bold mb-4" data-key="welcome">Welcome back</h4>
+          <div id="google-login-btn" class="mb-3"></div>
           <div class="divider text-center my-3 position-relative">
             <hr><span class="bg-white px-2 position-absolute top-50 start-50 translate-middle" data-key="or">Or</span>
           </div>
-
+          <div id="google-login-btn" class="my-3 text-center"></div>
           <form id="loginForm" novalidate>
             <div class="mb-3">
               <label class="form-label small fw-bold" data-key="email_or_phone">Email</label>
@@ -50,9 +51,11 @@
 
         <div id="signup-section" style="display: none;">
           <h4 class="fw-bold mb-4" data-key="create_account">Create your account</h4>
+           <div id="google-signup-btn" class="mb-3"></div>
           <div class="divider text-center my-3 position-relative">
             <hr><span class="bg-white px-2 position-absolute top-50 start-50 translate-middle" data-key="or">Or</span>
           </div>
+          <div id="google-signup-btn" class="my-3 text-center"></div>
 
           <form id="signupForm" novalidate>
             <div class="mb-3">
@@ -90,8 +93,20 @@
       </div>
     </div>
   </div>
-
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="../js/Login.js"></script>
+  <!-- Google Identity Services -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script>
+    // Try to render the Google button when the page loads (Login.js will also call renderGoogleButton on toggles)
+    window.addEventListener('load', function () {
+      setTimeout(function () {
+        if (typeof renderGoogleButton === 'function') {
+          renderGoogleButton();
+        }
+      }, 400);
+    });
+  </script>
 </body>
 
 </html>
