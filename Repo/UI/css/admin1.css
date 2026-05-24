@@ -1,6 +1,7 @@
 :root {
     --primary: #0c56d0;
     --sidebar-blue: #dae5ff;
+    --sidebar-width: 260px;
     --bg-body: #f9f9ff;
     --text-main: #143161;
     --text-muted: #455f90;
@@ -39,10 +40,12 @@ body {
     display: flex;
     flex-direction: column;
     transition: margin-left 0.3s ease;
+    padding-top: 70px;
+    box-sizing: border-box;
 }
 
 .content-area {
-    padding: 40px 20px;
+    padding: 40px 20px 20px;
     background-color: var(--np-bg-content);
     flex-grow: 1;
 }
@@ -183,13 +186,37 @@ body {
 }
 
 /* Responsive (Chống bể giao diện trên mobile) */
-@media (max-width: 991px) {
+@media (max-width: 991.98px) {
     .sidebar {
         transform: translateX(-100%);
+        position: fixed;
+        width: 260px;
+        z-index: 1050;
+    }
+
+    .sidebar.show,
+    body.sidebar-open .sidebar {
+        transform: translateX(0);
+    }
+
+    .top-header {
+        left: 0;
+        width: 100%;
+        z-index: 1100;
+    }
+
+    body.sidebar-open .top-header {
+        left: 260px;
+        width: calc(100% - 260px);
     }
 
     .main-wrapper {
         margin-left: 0 !important;
+        transition: margin-left 0.3s ease;
+    }
+
+    body.sidebar-open .main-wrapper {
+        margin-left: 260px !important;
     }
 
     .content-area {

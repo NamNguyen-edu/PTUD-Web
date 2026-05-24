@@ -17,8 +17,22 @@
   right: 0;
   left: 260px;
   /* Bắt đầu từ sau Sidebar */
-  z-index: 999;
+  z-index: 1060;
   transition: all 0.3s ease;
+}
+
+@media (max-width: 991.98px) {
+  .top-header {
+    left: 0;
+    width: 100%;
+    z-index: 1100;
+  }
+
+  body.sidebar-open .top-header {
+    left: var(--sidebar-width);
+    width: calc(100% - var(--sidebar-width));
+    z-index: 1100;
+  }
 }
 
 .header-left {

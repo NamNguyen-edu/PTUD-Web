@@ -82,7 +82,7 @@
 
   /* ── Sidebar ── */
   .sidebar {
-    width: 256px;
+    width: var(--sidebar-width);
     position: fixed;
     left: 0;
     top: 0;
@@ -214,13 +214,68 @@
 
   .sidebar-footer a:hover { background-color: rgba(255,255,255,0.4); }
 
+  @media (max-width: 991.98px) {
+    .sidebar {
+      transform: translateX(-100%);
+      transition: transform 0.3s ease-in-out;
+      z-index: 1100;
+    }
+
+    .sidebar.show,
+    body.sidebar-open .sidebar {
+      transform: translateX(0);
+    }
+
+    .main-content {
+      margin-left: 0 !important;
+    }
+
+    body.sidebar-open .main-content {
+      margin-left: var(--sidebar-width) !important;
+    }
+
+    .topbar,
+    .top-header {
+      left: 0 !important;
+      width: 100% !important;
+    }
+
+    body.sidebar-open .topbar,
+    body.sidebar-open .top-header {
+      left: var(--sidebar-width) !important;
+      width: calc(100% - var(--sidebar-width)) !important;
+    }
+
+    .floating-bar {
+      left: 50%;
+      width: min(95vw, 38rem);
+      transform: translateX(-50%);
+      padding: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      white-space: normal;
+      gap: 0.75rem;
+    }
+
+    body.sidebar-open .floating-bar {
+      left: calc(50% + var(--sidebar-width) / 2);
+      width: min(calc(100vw - var(--sidebar-width) - 2rem), 38rem);
+    }
+
+    .floating-btn {
+      flex: 1 1 10rem;
+      min-width: 8rem;
+      justify-content: center;
+    }
+  }
+
   /* ── Topbar ── */
   .topbar {
     height: 4rem;
     position: fixed;
     top: 0;
     right: 0;
-    left: 256px;
+    left: var(--sidebar-width);
     z-index: 50;
     background-color: rgba(255,255,255,0.8);
     backdrop-filter: blur(20px);
@@ -311,7 +366,7 @@
 
   /* ── Main Content ── */
   .main-content {
-    margin-left: 256px;
+    margin-left: var(--sidebar-width);
     padding-top: 4rem;
     min-height: 100vh;
     background-color: var(--color-background);
@@ -646,7 +701,7 @@
   .floating-bar {
     position: fixed;
     bottom: 2rem;
-    left: 50%;
+    left: calc(50% + var(--sidebar-width) / 2);
     transform: translateX(-50%);
     display: flex;
     align-items: center;
@@ -656,7 +711,7 @@
     border-radius: var(--radius-full);
     gap: 1.5rem;
     box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-    z-index: 50;
+    z-index: 1100;
     white-space: nowrap;
   }
 
