@@ -1,5 +1,5 @@
 
-const API_URL = "../Controller/user_api.php";
+const API_URL = "../Controller/Account_controller.php";
 
 let currentUsersList = [];
 let filteredData = [];
