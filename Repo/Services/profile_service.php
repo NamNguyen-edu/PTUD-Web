@@ -59,4 +59,52 @@ class ProfileService {
             return [];
         }
     }
+    /**
+     * Lấy chi tiết thông tin một bài viết dựa vào ID và User sở hữu (Dùng khi bấm Sửa bài)
+     */
+    public function getArticleById(int $articleId, int $userId): ?array {
+        $db = pdo_get_connection();
+        $sql = "SELECT * FROM articles WHERE article_id = :article_id AND user_id = :user_id LIMIT 1";
+        try {
+            $stmt = $db->prepare($sql);
+            $stmt->bindValue(':article_id', $articleId, PDO::PARAM_INT);
+            $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+            $stmt->execute();
+            $article = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $article ? $article : null;
+        } catch (PDOException $e) { 
+            return null; 
+        }
+    }
+
+    /**
+     * Tự động nhận diện để INSERT bài viết mới hoặc UPDATE bài viết cũ
+     */
+    public function saveArticle(int $userId, array $data): int {
+        $db = pdo_get_connection();
+        $articleId = !empty($data['article_id']) ? intval($data['article_id']) : null;
+        
+        $title   = $data['title'] ?? 'Bài viết không tiêu đề';
+        $content = $data['content'] ?? '';
+        $slug    = $data['slug'] ?? '';
+        $excerpt = $data['excerpt'] ?? '';
+        $status  = $data['status'] ?? 'draft'; // Mặc định nhận trạng thái nháp hoặc đăng bài
+
+        if ($articleId) {
+            // Chế độ: UPDATE (Sửa bài dang dở)
+            $sql = "UPDATE articles 
+                    SET title = ?, slug = ?, excerpt = ?, content = ?, status = ?, updated_at = NOW() 
+                    WHERE article_id = ? AND user_id = ?";
+            $stmt = $db->prepare($sql);
+            $stmt->execute([$title, $slug, $excerpt, $content, $status, $articleId, $userId]);
+            return $articleId;
+        } else {
+            // Chế độ: INSERT (Tạo bài mới tinh)
+            $sql = "INSERT INTO articles (title, slug, excerpt, content, status, user_id, created_at, updated_at, view_count) 
+                    VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW(), 0)";
+            $stmt = $db->prepare($sql);
+            $stmt->execute([$title, $slug, $excerpt, $content, $status, $userId]);
+            return (int)$db->lastInsertId();
+        }
+    }
 }
