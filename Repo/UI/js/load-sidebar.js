@@ -36,6 +36,30 @@ document.addEventListener("DOMContentLoaded", function () {
     })
   ]).then(() => {
     console.log("Hệ thống UI đã nạp xong, bắt đầu đổ dữ liệu Dashboard...");
+    const sidebar = document.querySelector('.sidebar');
+    const toggleBtn = document.querySelector('#sidebarToggle');
+
+    if (toggleBtn && sidebar) {
+      toggleBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('show');
+        document.body.classList.toggle('sidebar-open');
+      });
+
+      document.addEventListener('click', (event) => {
+        if (sidebar.classList.contains('show') && !sidebar.contains(event.target) && !toggleBtn.contains(event.target) && window.innerWidth <= 992) {
+          sidebar.classList.remove('show');
+          document.body.classList.remove('sidebar-open');
+        }
+      });
+
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 992) {
+          sidebar.classList.remove('show');
+          document.body.classList.remove('sidebar-open');
+        }
+      });
+    }
+
     document.dispatchEvent(new Event('appReady'));
   });
 });

@@ -172,7 +172,53 @@
                             </div>
                         </div>
                     </div>
-            </div>
+                    <div class="col-lg-4">
+                        <div class="right-panel shadow-sm">
+                            <!-- Người duyệt -->
+                            <div class="white-card mb-4">
+                                <div class="d-flex align-items-center gap-3 mb-3">
+                                    <img src="https://i.pravatar.cc/150?u=chief"
+                                         class="rounded-circle"
+                                         width="52"
+                                         height="52"
+                                         alt="Chief">
+                                    <div>
+                                        <h6 class="fw-bold mb-0">Julian Vane</h6>
+                                        <small class="text-muted">Tổng biên tập</small>
+                                    </div>
+                                </div>
+                                <div class="bg-light rounded-4 p-3 small text-muted">
+                                    Bài viết đang chờ phê duyệt cuối cùng trước khi xuất bản.
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="white-card mb-4">
+                                <h5 class="fw-bold mb-4">Hành động biên tập</h5>
+                                <button class="btn-approve">
+                                    <span class="material-symbols-outlined">check_circle</span>
+                                    Duyệt bài viết
+                                </button>
+                                <button class="btn-revision mb-3">
+                                    <span class="material-symbols-outlined">edit_note</span>
+                                    Yêu cầu chỉnh sửa
+                                </button>
+                                <div class="text-danger fw-bold small text-center cursor-pointer">
+                                    Từ chối bài viết
+                                </div>
+                            </div>
+
+                            <!-- Revision Form -->
+                            <div class="white-card" id="revisionForm" style="display:none;">
+                                <h6 class="fw-bold mb-3">Nội dung yêu cầu chỉnh sửa</h6>
+                                <textarea id="revisionText" class="form-control rounded-4 border-0 bg-light p-3 mb-3" rows="5" placeholder="Nhập nội dung cần chỉnh sửa..."></textarea>
+                                <button onclick="submitRevision()" class="btn btn-warning w-100 rounded-pill fw-bold text-dark">
+                                    Gửi yêu cầu chỉnh sửa
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
         </main>
     </div>
 
