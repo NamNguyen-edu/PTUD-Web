@@ -13,7 +13,7 @@ class ProfileView
 
     public function render(?array $userInfo, ?array $userArticles): void
     {
-        $fullName = (!empvty($userInfo) && !empty($userInfo['full_name'])) ? $userInfo['full_name'] : 'Nguyễn Duy Bảo';
+        $fullName = (!empty($userInfo) && !empty($userInfo['full_name'])) ? $userInfo['full_name'] : 'Nguyễn Duy Bảo';
         $bio      = (!empty($userInfo) && !empty($userInfo['bio']))       ? $userInfo['bio']       : 'Nhà văn tự do, đam mê viết lách.';
         $email    = (!empty($userInfo) && !empty($userInfo['email']))     ? $userInfo['email']     : 'bebao2005at@gmail.com';
 
