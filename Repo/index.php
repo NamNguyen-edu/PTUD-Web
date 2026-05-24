@@ -129,6 +129,9 @@ if ($action !== '') {
             session_destroy();
             redirect('?page=home');
             break;
+        case "AccountManagement":
+            require_once __DIR__ . '/Controller/Account_controller.php';
+            break;
         case 'search_suggestions':
             handleSearchSuggestions();
             break;
@@ -183,7 +186,9 @@ switch ($page) {
     case 'admin_dashboard':
     case 'admin_userm':
     case 'admin1':
-    case 'accountmanagement':
+    case 'AccountManagement':
+        require_once __DIR__ . '/Controller/Account_controller.php';
+        break;
     case 'catalogmanagement':
     case 'version-control':
         require_once __DIR__ . '/Controller/PageController.php';
