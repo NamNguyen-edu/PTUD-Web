@@ -1,9 +1,11 @@
 <?php
-require_once '../Model/pdo.php';
+require_once(__DIR__ . '/../Model/pdo.php');
 
-class CategoryTagModel {
+class CategoryTagModel
+{
     // --- Lấy dữ liệu ---
-    public function getAllCategories() {
+    public function getAllCategories()
+    {
         $sql = "SELECT c.category_id, c.name, c.slug, COUNT(ac.article_id) as count 
                 FROM categories c 
                 LEFT JOIN article_categories ac ON c.category_id = ac.category_id 
@@ -12,7 +14,8 @@ class CategoryTagModel {
         return pdo_query($sql);
     }
 
-    public function getAllTags() {
+    public function getAllTags()
+    {
         $sql = "SELECT t.tag_id, t.name, t.slug, COUNT(at.article_id) as count 
                 FROM tags t 
                 LEFT JOIN article_tags at ON t.tag_id = at.tag_id 
@@ -22,7 +25,8 @@ class CategoryTagModel {
     }
 
     // --- Thêm mới ---
-    public function insert($type, $name, $slug) {
+    public function insert($type, $name, $slug)
+    {
         if ($type === 'Category') {
             return pdo_execute_return_last_id("INSERT INTO categories (name, slug) VALUES (?, ?)", $name, $slug);
         } else {
@@ -31,7 +35,8 @@ class CategoryTagModel {
     }
 
     // --- Cập nhật ---
-    public function update($type, $id, $name, $slug) {
+    public function update($type, $id, $name, $slug)
+    {
         if ($type === 'Category') {
             pdo_execute("UPDATE categories SET name = ?, slug = ? WHERE category_id = ?", $name, $slug, $id);
         } else {
@@ -40,7 +45,8 @@ class CategoryTagModel {
     }
 
     // --- Xóa ---
-    public function delete($type, $id) {
+    public function delete($type, $id)
+    {
         if ($type === 'Category') {
             pdo_execute("DELETE FROM categories WHERE category_id = ?", $id);
         } else {

@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Hàm bổ trợ để fetch HTML
   const loadComponent = (id, url, callback) => {
     const el = document.getElementById(id);
-    if (!el) return Promise.resolve(); 
+    if (!el) return Promise.resolve();
 
     return fetch(url)
       .then(response => {
@@ -18,20 +18,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Chạy nạp cả hai cùng lúc
   Promise.all([
-    loadComponent('sidebar-placeholder', '../html/sidebar_nav.html', (el) => {
-      // Xử lý Active Link
-      const currentPath = window.location.pathname.split("/").pop() || "../html/admin_dashboard.html";
+    // SỬA LẦN 1: Đường dẫn Sidebar
+    loadComponent('sidebar-placeholder', 'UI/html/sidebar_nav.html', (el) => {
+      // NÂNG CẤP: Xử lý Active Link cho chuẩn Router
+      const urlParams = new URLSearchParams(window.location.search);
+      const currentPage = urlParams.get('page') || 'admin_dashboard';
       const navLinks = el.querySelectorAll('.nav-link-custom, .nav-link');
 
       navLinks.forEach(link => {
         link.classList.remove('active'); // Dọn dẹp trước khi add
         const href = link.getAttribute('href');
-        if (href && (href.includes(currentPath) || (currentPath === "" && href.includes("index")))) {
+        // Quét xem cái link trong menu có trùng với cái ?page= hiện tại không
+        if (href && href.includes(currentPage)) {
           link.classList.add('active');
         }
       });
     }),
-    loadComponent('header_admin', '../html/header_admin.html', (el) => {
+    // SỬA LẦN 2: Đường dẫn Header
+    loadComponent('header_admin', 'UI/html/header_admin.html', (el) => {
       el.className = "top-header";
     })
   ]).then(() => {
