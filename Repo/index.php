@@ -5,41 +5,8 @@ require_once __DIR__ . '/Model/pdo.php';
 require_once __DIR__ . '/Services/search_service.php';
 require_once __DIR__ . '/Database/init_db.php'; 
 require_once __DIR__ . '/Services/profile_service.php';
+require_once __DIR__ . '/Services/Dashboard_admin_service.php';
 $action = trim((string)($_GET['action'] ?? ''));
-if ($action === 'get_dashboard_data') {
-    require_once __DIR__ . '/Services/dashboard_admin_service.php';
-    exit;
-}
-if ($action !== '') {
-    switch ($action) {
-        case 'home_feed':
-            require_once __DIR__ . '/Controller/home_controller.php';
-            $controller = new HomeController();
-            $controller->feed();
-            exit;
-        case 'article_detail':
-            require_once __DIR__ . '/Controller/load_articles_controller.php';
-            $controller = new ArticleController();
-            $controller->detail();
-            exit;
-        case 'search_suggestions':
-            handleSearchSuggestions();
-            exit;
-            case 'get_dashboard_data': 
-            require_once __DIR__ . '/Services/dashboard_admin_service.php'; 
-            header('Content-Type: application/json; charset=utf-8'); 
-            try 
-            { 
-            $service = new DashboardAdminService(); 
-            $data = $service->getDashboardData(); 
-            echo json_encode($data); } 
-            catch (Throwable $e) 
-            { 
-                http_response_code(500); 
-            echo json_encode([ 'error' => true, 'message' => $e->getMessage() ]); } 
-            exit;
-    }
-}
 function redirect($url)
 {
     header('Location: ' . $url);
@@ -51,15 +18,19 @@ function slugToViewFile(string $page): string
     $map = [
         'home' => 'home',
         'login' => 'Login',
-        'signup' => 'SignUp',
+        // signup view not present; reuse Login
+        'signup' => 'Login',
         'article' => 'article',
         'post' => 'post',
         'postnews' => 'postnews',
         'profile' => 'profile',
         'technology' => 'technology',
-        'admin_dashboard' => 'admin dashboard',
-        'admin_userm' => 'admin userm',
+        'admin_dashboard' => 'admin_dashboard',
+        'admin_userm' => 'admin1',
         'admin1' => 'admin1',
+        'accountmanagement' => 'AccountManagement',
+        'catalogmanagement' => 'CatalogManagement',
+        'version-control' => 'version-control',
     ];
 
     return $map[$page] ?? $page;
@@ -209,13 +180,18 @@ function renderView(string $page)
     }
 
     $html = file_get_contents($filePath);
-    $html = rewriteViewPaths($html);
 
     if ($page === 'login') {
         $html = rewriteFormForLogin($html);
     } elseif ($page === 'signup') {
         $html = rewriteFormForSignUp($html);
     }
+
+    $html = str_replace('<div id="header-placeholder"></div>', loadHtmlComponent('header'), $html);
+    $html = str_replace('<div id="footer-placeholder" class="mt-auto w-100"></div>', loadHtmlComponent('footer'), $html);
+    $html = str_replace('<div id="footer-placeholder"></div>', loadHtmlComponent('footer'), $html);
+
+    $html = rewriteViewPaths($html);
 
     echo $html;
 }
@@ -252,7 +228,7 @@ function handleLogin()
     if ($username === 'user' && $password === 'admin123') {
         $_SESSION['user_id'] = 1;
         $_SESSION['user_name'] = 'Admin Test';
-        redirect('?page=home'); // Chuyển về home qua PHP
+        redirect('?page=home&login_success=1'); // Chuyển về home và báo login success
         return;
     }
 
@@ -362,7 +338,7 @@ function renderProfile()
         $html = str_replace('{{VIEWS_COUNT}}', $totalViews > 1000 ? number_format($totalViews/1000, 1) . 'K' : $totalViews, $html);
         $html = str_replace('{{LIST_ARTICLES}}', $articlesHtml, $html);
 
-        // 1. Nạp Component Header và Footer gốc của Nam
+        // 1. Nạp Component Header và Footer 
         $headerComponent = loadHtmlComponent('header');
         $footerComponent = loadHtmlComponent('footer');
 
@@ -408,50 +384,85 @@ function renderDbTest()
 
 $page = trim((string)($_GET['page'] ?? 'home'));
 
+// Handle action-based endpoints first
+if ($action !== '') {
+    switch ($action) {
+        case 'login':
+            handleLogin();
+            break;
+        case 'signup':
+            handleSignUp();
+            break;
+        case 'logout':
+            session_unset();
+            session_destroy();
+            redirect('?page=home');
+            break;
+        case 'search_suggestions':
+            handleSearchSuggestions();
+            break;
+        case 'get_dashboard_data':
+            header('Content-Type: application/json; charset=utf-8');
+            try {
+                $service = new DashboardAdminService();
+                $data = $service->getDashboardData();
+                echo json_encode($data);
+            } catch (Throwable $e) {
+                http_response_code(500);
+                echo json_encode(['error' => true, 'message' => $e->getMessage()]);
+            }
+            break;
+        case 'get_current_user':
+            header('Content-Type: application/json; charset=utf-8');
+            $logged = isset($_SESSION['user_id']) && $_SESSION['user_id'];
+            $user = [
+                'id' => $logged ? ($_SESSION['user_id'] ?? null) : null,
+                'name' => $logged ? ($_SESSION['user_name'] ?? ($_SESSION['user_fullname'] ?? '')) : null,
+                'email' => $logged ? ($_SESSION['user_email'] ?? null) : null,
+            ];
+            echo json_encode(['logged' => $logged, 'user' => $user]);
+            break;
+        case 'home_feed':
+            require_once __DIR__ . '/Controller/home_controller.php';
+            (new HomeController())->feed();
+            break;
+        case 'article_detail':
+            require_once __DIR__ . '/Controller/load_articles_controller.php';
+            (new ArticleController())->detail();
+            break;
+        default:
+            redirect('?page=home');
+    }
+    exit;
+}
 
-
-switch ($action) {
+// Page rendering
+switch ($page) {
+    case 'home':
     case 'login':
-        handleLogin();
-        break;
     case 'signup':
-        handleSignUp();
+    case 'article':
+    case 'post':
+    case 'postnews':
+    case 'technology':
+    case 'admin_dashboard':
+    case 'admin_userm':
+    case 'admin1':
+    case 'accountmanagement':
+    case 'catalogmanagement':
+    case 'version-control':
+        renderView($page);
         break;
-    case 'search_suggestions':
-        handleSearchSuggestions();
+    case 'search':
+        $keyword = trim((string)($_GET['keyword'] ?? ''));
+        renderSearchPage($keyword);
+        break;
+    case 'profile':
+        renderProfile();
+        break;
+    case 'dbtest':
+        renderDbTest();
         break;
     default:
-        switch ($page) {
-            case 'home':
-            case 'login':
-            case 'signup':
-            case 'article':
-            case 'post':
-            case 'postnews':
-            case 'technology':
-            case 'admin_dashboard':
-                include __DIR__ . '/UI/html/admin_dashboard.html';
-                renderView($page);
-                break;
-            case 'admin_userm':
-            case 'admin1':
-                renderView($page);
-                break;
-            case 'search':
-                $keyword = trim((string)($_GET['keyword'] ?? ''));
-                renderSearchPage($keyword);
-                break;
-            case 'profile':
-                renderProfile();
-                break;
-            case 'dbtest':
-                renderDbTest();
-                break;  
-            default:
-            
-                redirect('?page=home');
-                break;
-
-        }
-        break;
+        redirect('?page=home');
 }

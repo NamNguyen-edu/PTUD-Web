@@ -33,28 +33,8 @@ function toggleAuth(mode) {
     loginSec.style.display = 'block';
     signupSec.style.display = 'none';
   }
-  // Render lại nút Google cho section đang hiển thị
-  renderGoogleButton();
 }
 
-function renderGoogleButton() {
-  if (window.google && google.accounts) {
-    google.accounts.id.initialize({
-      client_id: "124352835901-jqh4f03ga43s57qpi10pcbhatlj2pj8k.apps.googleusercontent.com",
-      callback: (res) => console.log("Google User:", res.credential)
-    });
-
-    // Kiểm tra xem section nào đang hiện thì vẽ vào đó
-    const loginBtn = document.getElementById('google-login-btn');
-    const signupBtn = document.getElementById('google-signup-btn');
-
-    if (document.getElementById('login-section').style.display !== 'none') {
-      google.accounts.id.renderButton(loginBtn, { theme: "outline", size: "large", width: "350" });
-    } else {
-      google.accounts.id.renderButton(signupBtn, { theme: "outline", size: "large", width: "350" });
-    }
-  }
-}
 
 function applyLanguage(lang) {
   localStorage.setItem('newsPulseLang', lang);
@@ -74,36 +54,58 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-vi').onclick = () => applyLanguage('vi');
   document.getElementById('btn-en').onclick = () => applyLanguage('en');
 
-  // Khởi tạo nút Google lần đầu
-  setTimeout(renderGoogleButton, 200);
 });
 
 // Kiểm tra và gửi form đăng nhập/đăng ký
-if (isValid) {
-    const formData = new FormData();
-    // Nếu đang ở form đăng ký, mode sẽ là 'register', ngược lại là 'login'
-    const mode = (signupForm.offsetParent !== null) ? 'register' : 'login';
-    
-    formData.append('action', mode);
-    formData.append('email', emailEl.value);
-    formData.append('password', passEl.value);
-    if(mode === 'register') {
-        formData.append('fullname', nameEl.value);
-    }
+document.addEventListener('DOMContentLoaded', () => {
+  const loginForm = document.getElementById('loginForm');
+  const signupForm = document.getElementById('signupForm');
 
-    fetch('../model/Login.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            alert(data.message);
-            // Chuyển hướng sau khi thành công
-            window.location.href = 'index.php?page=home';
-        } else {
-            alert("Thất bại: " + data.message);
-        }
-    })
-    .catch(err => console.error("Lỗi kết nối server:", err));
-}
+  function validateLogin(email, password) {
+    if (!email || !password) return { ok: false, msg: 'Vui lòng nhập email và mật khẩu.' };
+    if (password.length < 6) return { ok: false, msg: 'Mật khẩu tối thiểu 6 ký tự.' };
+    return { ok: true };
+  }
+
+  function validateSignup(name, email, password) {
+    if (!name || !email || !password) return { ok: false, msg: 'Vui lòng điền đầy đủ thông tin.' };
+    if (password.length < 6) return { ok: false, msg: 'Mật khẩu tối thiểu 6 ký tự.' };
+    return { ok: true };
+  }
+
+  if (loginForm) {
+    loginForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const emailEl = document.getElementById('loginUser');
+      const passEl = document.getElementById('loginPass');
+      const email = emailEl?.value?.trim() ?? '';
+      const password = passEl?.value ?? '';
+      const v = validateLogin(email, password);
+      if (!v.ok) { alert(v.msg); return; }
+
+      // Submit the form to server so PHP can redirect on success
+      loginForm.action = '?action=login';
+      loginForm.method = 'POST';
+      loginForm.submit();
+    });
+  }
+
+  if (signupForm) {
+    signupForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const nameEl = document.getElementById('fullName');
+      const emailEl = document.getElementById('signupUser');
+      const passEl = document.getElementById('signupPass');
+      const name = nameEl?.value?.trim() ?? '';
+      const email = emailEl?.value?.trim() ?? '';
+      const password = passEl?.value ?? '';
+      const v = validateSignup(name, email, password);
+      if (!v.ok) { alert(v.msg); return; }
+
+      // Submit the signup form to server
+      signupForm.action = '?action=signup';
+      signupForm.method = 'POST';
+      signupForm.submit();
+    });
+  }
+});
