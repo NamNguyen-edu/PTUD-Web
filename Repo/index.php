@@ -53,37 +53,67 @@ function showMessage(string $message, string $type = 'info')
 
 function safePasswordCheck(array $user, string $password): bool
 {
-    if (empty($user['password'])) {
+$dbPassword = $user['password_hash'] ?? $user['password'] ?? ''; 
+
+    if (empty($dbPassword)) {
         return false;
     }
 
-    if (password_verify($password, $user['password'])) {
+    if (password_verify($password, $dbPassword)) {
         return true;
     }
 
-    if (md5($password) === $user['password']) {
+    if (md5($password) === $dbPassword) {
         return true;
     }
 
-    return $password === $user['password'];
+    return $password === $dbPassword;
 }
 
 function handleLogin()
 {
-    $username = trim($_POST['username'] ?? '');
+    $username = trim($_POST['username'] ?? ''); // Tên đăng nhập hoặc Email
     $password = trim($_POST['password'] ?? '');
 
-    // Giả lập không cần DB
-    if ($username === 'user' && $password === 'admin123') {
-        $_SESSION['user_id'] = 1;
-        $_SESSION['user_name'] = 'Admin Test';
-        redirect('?page=home&login_success=1'); // Chuyển về home và báo login success
+    if (empty($username) || empty($password)) {
+        showMessage('Vui lòng nhập đầy đủ tài khoản và mật khẩu.', 'error');
+        require_once __DIR__ . '/Controller/PageController.php';
+        (new PageController())->render('login');
         return;
     }
 
-    showMessage('Tài khoản test là user/admin123', 'error');
-    require_once __DIR__ . '/Controller/PageController.php';
-    (new PageController())->render('login');
+    try {
+        // Mở kết nối Database
+        $db = pdo_get_connection();
+        
+        // Tìm user theo Email hoặc Name (để người dùng nhập cái nào cũng được)
+$stmt = $db->prepare('SELECT * FROM users WHERE email = ? OR username = ? LIMIT 1');
+        $stmt->execute([$username, $username]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Kiểm tra xem user có tồn tại và password có khớp không
+        if ($user && safePasswordCheck($user, $password)) {
+            
+            // Đăng nhập thành công -> Lưu thông tin vào Session
+            $_SESSION['user_id'] = $user['user_id'] ?? ($user['id'] ?? 1);
+            $_SESSION['user_name'] = $user['full_name'] ?? ($user['name'] ?? 'Thành viên');
+            $_SESSION['user_email'] = $user['email'] ?? '';
+            
+            // Đá về trang chủ kèm cờ hiệu thành công
+            redirect('?page=home&login_success=1');
+            return;
+        } else {
+            // Thất bại -> Báo lỗi
+            showMessage('Tài khoản hoặc mật khẩu không chính xác! Hãy kiểm tra lại.', 'error');
+            require_once __DIR__ . '/Controller/PageController.php';
+            (new PageController())->render('login');
+        }
+    } catch (PDOException $e) {
+        // Lỗi sập Database thì báo lỗi hệ thống
+        showMessage('Hệ thống đang bảo trì hoặc mất kết nối Database.', 'error');
+        require_once __DIR__ . '/Controller/PageController.php';
+        (new PageController())->render('login');
+    }
 }
 
 function handleSignUp()
@@ -118,6 +148,12 @@ $page = trim((string)($_GET['page'] ?? 'home'));
 // Handle action-based endpoints first
 if ($action !== '') {
     switch ($action) {
+        // 🔥 ĐOẠN THÊM MỚI 1: Xử lý Lưu Nháp/Đăng bài
+        case 'save_post':
+            require_once __DIR__ . '/Controller/PostnewsController.php';
+            (new PostnewsController())->savePost();
+            break;
+            
         case 'login':
             handleLogin();
             break;
@@ -128,9 +164,6 @@ if ($action !== '') {
             session_unset();
             session_destroy();
             redirect('?page=home');
-            break;
-        case "AccountManagement":
-            require_once __DIR__ . '/Controller/Account_controller.php';
             break;
         case 'search_suggestions':
             handleSearchSuggestions();
@@ -172,6 +205,12 @@ if ($action !== '') {
 
 // Page rendering
 switch ($page) {
+    // 🔥 ĐOẠN THÊM MỚI 2: Đẩy luồng postnews cho Controller xử lý
+    case 'postnews':
+        require_once __DIR__ . '/Controller/PostnewsController.php';
+        (new PostnewsController())->show();
+        break;
+        
     case 'home':
         // Delegate home rendering to a dedicated controller to keep index.php thin
         require_once __DIR__ . '/Controller/home_page_controller.php';
@@ -181,14 +220,12 @@ switch ($page) {
     case 'signup':
     case 'article':
     case 'post':
-    case 'postnews':
+    // case 'postnews': (Đã xóa ở đây để nó không gọi hàm cũ)
     case 'technology':
     case 'admin_dashboard':
     case 'admin_userm':
     case 'admin1':
-    case 'AccountManagement':
-        require_once __DIR__ . '/Controller/Account_controller.php';
-        break;
+    case 'accountmanagement':
     case 'catalogmanagement':
     case 'version-control':
         require_once __DIR__ . '/Controller/PageController.php';

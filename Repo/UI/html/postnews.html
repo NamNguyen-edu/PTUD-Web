@@ -40,6 +40,8 @@
         </div>
 
         <form id="postNewsForm" novalidate>
+            <input type="hidden" id="articleId" value="{{ARTICLE_ID}}">
+
             <div class="step-box active" id="step-1">
                 <div class="row">
                     <div class="col-12 p-1">
@@ -77,7 +79,7 @@
                             <h5 class="section-title"><i class="fas fa-edit mr-2"></i>Trình soạn thảo tin tức</h5>
                             <div class="form-group mb-4">
                                 <label class="font-weight-bold small text-uppercase">Tiêu đề Headline <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control form-control-lg" id="postTitle" placeholder="Nhập tiêu đề bài viết tại đây..." required>
+                                <input type="text" class="form-control form-control-lg" id="postTitle" value="{{TITLE}}" placeholder="Nhập tiêu đề bài viết tại đây..." required>
                                 <small class="error-msg text-danger d-none">Headline không được để trống.</small>
                             </div>
 
@@ -90,7 +92,7 @@
                                 <button type="button" class="btn btn-primary btn-sm ml-auto" onclick="triggerContentImage()"><i class="fas fa-image mr-1"></i> Chèn ảnh vào bài</button>
                             </div>
                             
-                            <div id="richEditor" contenteditable="true" class="form-control" style="min-height: 450px; overflow-y: auto;" placeholder="Bắt đầu viết nội dung bài báo của bạn..."></div>
+                            <div id="richEditor" contenteditable="true" class="form-control" style="min-height: 450px; overflow-y: auto;" placeholder="Bắt đầu viết nội dung bài báo của bạn...">{{CONTENT}}</div>
                             <input type="hidden" id="postContent" required>
                             <small class="error-msg text-danger d-none">Nội dung bài viết chưa có.</small>
                         </div>
@@ -125,12 +127,12 @@
                                         <label class="font-weight-bold small">Đường dẫn thân thiện (Slug)</label>
                                         <div class="input-group">
                                             <div class="input-group-prepend"><span class="input-group-text bg-light">/</span></div>
-                                            <input type="text" class="form-control" id="postSlug" placeholder="tu-dong-tao-slug">
+                                            <input type="text" class="form-control" id="postSlug" value="{{SLUG}}" placeholder="tu-dong-tao-slug">
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="font-weight-bold small">Mô tả Meta (Meta Description) <span class="text-info" id="metaDescCount">0/160</span></label>
-                                        <textarea class="form-control" id="metaDesc" rows="4" placeholder="Nhập đoạn mô tả ngắn để hấp dẫn người đọc từ Google..." oninput="syncSeoPreview()"></textarea>
+                                        <textarea class="form-control" id="metaDesc" rows="4" placeholder="Nhập đoạn mô tả ngắn để hấp dẫn người đọc từ Google..." oninput="syncSeoPreview()">{{EXCERPT}}</textarea>
                                     </div>
                                 </div>
                                 
