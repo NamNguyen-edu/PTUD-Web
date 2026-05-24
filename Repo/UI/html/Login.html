@@ -24,7 +24,6 @@
 
         <div id="login-section">
           <h4 class="fw-bold mb-4" data-key="welcome">Welcome back</h4>
-          <div id="google-login-btn" class="mb-3"></div>
           <div class="divider text-center my-3 position-relative">
             <hr><span class="bg-white px-2 position-absolute top-50 start-50 translate-middle" data-key="or">Or</span>
           </div>
@@ -32,11 +31,11 @@
           <form id="loginForm" novalidate>
             <div class="mb-3">
               <label class="form-label small fw-bold" data-key="email_or_phone">Email</label>
-              <input type="email" id="loginUser" class="form-control" data-placeholder="placeholder_user">
+              <input type="email" id="loginUser" name="username" class="form-control" data-placeholder="placeholder_user">
             </div>
             <div class="mb-3">
               <label class="form-label small fw-bold" data-key="password">Password</label>
-              <input type="password" id="loginPass" class="form-control" data-placeholder="placeholder_pass">
+              <input type="password" id="loginPass" name="password" class="form-control" data-placeholder="placeholder_pass">
             </div>
             <button type="submit" class="btn btn-primary w-100 py-2 fw-bold" data-key="log_in">Log in</button>
           </form>
@@ -49,7 +48,6 @@
 
         <div id="signup-section" style="display: none;">
           <h4 class="fw-bold mb-4" data-key="create_account">Create your account</h4>
-          <div id="google-signup-btn" class="mb-3"></div>
           <div class="divider text-center my-3 position-relative">
             <hr><span class="bg-white px-2 position-absolute top-50 start-50 translate-middle" data-key="or">Or</span>
           </div>
@@ -57,15 +55,15 @@
           <form id="signupForm" novalidate>
             <div class="mb-3">
               <label class="form-label small fw-bold" data-key="full_name">Full Name</label>
-              <input type="text" id="fullName" class="form-control" data-placeholder="placeholder_full_name">
+              <input type="text" id="fullName" name="fullname" class="form-control" data-placeholder="placeholder_full_name">
             </div>
             <div class="mb-3">
               <label class="form-label small fw-bold" data-key="email_or_phone">Email</label>
-              <input type="email" id="signupUser" class="form-control" data-placeholder="placeholder_user">
+              <input type="email" id="signupUser" name="email_or_phone" class="form-control" data-placeholder="placeholder_user">
             </div>
             <div class="mb-3">
               <label class="form-label small fw-bold" data-key="password">Password</label>
-              <input type="password" id="signupPass" class="form-control" data-placeholder="placeholder_pass">
+              <input type="password" id="signupPass" name="password" class="form-control" data-placeholder="placeholder_pass">
             </div>
             <button type="submit" class="btn btn-primary w-100 py-2 fw-bold" data-key="sign_up">Sign Up</button>
           </form>
@@ -88,7 +86,6 @@
     </div>
   </div>
 
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="../js/Login.js"></script>
 </body>
 
