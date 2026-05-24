@@ -1,4 +1,4 @@
-let feed = document.getElementById("feed");
+let mainFeed = document.getElementById("feed");
 let loader = document.getElementById("loader");
 let paginationWrapper = document.getElementById("pagination-wrapper");
 let loadMoreBtn = document.getElementById("load-more-btn");
@@ -128,7 +128,7 @@ function loadMore() {
     else if (blockCounter % 3 === 1) html = blockMixed();
     else html = blockBanner();
 
-    feed.insertAdjacentHTML('beforeend', html);
+    mainFeed.insertAdjacentHTML('beforeend', html);
     blockCounter++;
     
     // Tăng bộ đếm. Lưu ý: 1 block có thể chứa nhiều bài. 

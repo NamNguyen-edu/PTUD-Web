@@ -1,7 +1,7 @@
 <?php
 // auth_handler.php
 session_start();
-require_once '../PTUD-WEB/Repo/Model/pdo.php';
+require_once __DIR__ . '/../Model/pdo.php';
 
 header('Content-Type: application/json');
 
