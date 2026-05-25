@@ -1,22 +1,23 @@
 <?php
-require_once __DIR__ . '/../ViewEngine.php';
+require_once __DIR__ . '/ViewEngine.php';
 
 class LoginView
 {
   private ViewEngine $engine;
 
-  public function __construct(ViewEngine $engine)
+  public function __construct(ViewEngine $engine = null)
   {
-    $this->engine = $engine;
+    $this->engine = $engine ?? new ViewEngine();
   }
 
-  public function render(string $error = '', string $success = ''): void
+  public function render(string $error = ''): void
   {
+    // Chuẩn bị dữ liệu để map vào template
     $data = [
-      'TITLE' => 'NewsPulse - Authenticate',
-      'ERROR' => $error ? '<div class="alert alert-danger">' . $error . '</div>' : '',
-      'SUCCESS' => $success ? '<div class="alert alert-success">' . $success . '</div>' : ''
+      'ERROR_MESSAGE' => !empty($error) ? '<div class="alert alert-danger">' . $error . '</div>' : ''
     ];
-    echo $this->engine->render('Login', $data);
+
+    // ViewEngine sẽ tìm file login.html, thay thế {{ERROR_MESSAGE}} bằng HTML bên trên
+    echo $this->engine->render('login', $data);
   }
 }

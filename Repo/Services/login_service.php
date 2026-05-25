@@ -1,77 +1,33 @@
 <?php
+require_once __DIR__ . '/../Model/pdo.php';
 
 class AuthService
 {
-  private PDO $db;
-
-  public function __construct(PDO $dbConnection)
-  {
-    $this->db = $dbConnection;
-  }
-
   /**
-   * Xử lý Đăng nhập truyền thống (Nhận cả Email hoặc Số điện thoại)
+   * Xác thực thông tin đăng nhập
    */
-  public function login($loginId, $password)
+  public function authenticate($identifier, $password)
   {
-    // Tìm user theo email hoặc phone (giả sử bảng users có 2 cột này)
-    $sql = "SELECT id, full_name, email, role, password 
-                FROM users 
-                WHERE email = :loginId OR phone = :loginId 
-                LIMIT 1";
+    // Tìm user theo username HOẶC email
+    $sql = "SELECT * FROM users WHERE username = ? OR email = ? LIMIT 1";
+    $user = pdo_query_one($sql, $identifier, $identifier);
 
-    $stmt = $this->db->prepare($sql);
-    $stmt->bindParam(':loginId', $loginId);
-    $stmt->execute();
-
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    // Kiểm tra mật khẩu (đã được băm bằng password_hash lúc đăng ký)
-    if ($user && password_verify($password, $user['password'])) {
-      unset($user['password']); // Xóa pass khỏi mảng trước khi ném vào Session cho an toàn
+    if ($user && password_verify($password, $user['password_hash'])) {
       return $user;
     }
-
     return false;
   }
 
-  /**
-   * Xử lý Đăng ký tài khoản mới
-   */
-  public function register($fullName, $email, $password)
+  /** tạo tài khoản mới */
+  public function createAccount($fullname, $email, $password)
   {
-    // 1. Kiểm tra xem email đã tồn tại chưa
-    $stmt = $this->db->prepare("SELECT id FROM users WHERE email = :email LIMIT 1");
-    $stmt->bindParam(':email', $email);
-    $stmt->execute();
+    $hash = password_hash($password, PASSWORD_DEFAULT);
+    // Lấy username tạm từ email (bỏ phần sau @)
+    $username = explode('@', $email)[0] . rand(1000, 9999);
 
-    if ($stmt->fetch()) {
-      return ['success' => false, 'message' => 'Email này đã được đăng ký!'];
-    }
+    $sql = "INSERT INTO users (username, email, password_hash, full_name, role_id, status) 
+                VALUES (?, ?, ?, ?, 5, 'active')";
 
-    // 2. Băm mật khẩu (Mã hóa một chiều)
-    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
-    // 3. Insert vào Database (mặc định cho role là 'Contributor' hoặc 'User')
-    $insertSql = "INSERT INTO users (full_name, email, password, role, status) 
-                      VALUES (:name, :email, :pass, 'Contributor', 'Active')";
-    $insertStmt = $this->db->prepare($insertSql);
-    $insertStmt->bindParam(':name', $fullName);
-    $insertStmt->bindParam(':email', $email);
-    $insertStmt->bindParam(':pass', $hashedPassword);
-
-    if ($insertStmt->execute()) {
-      return ['success' => true, 'message' => 'Đăng ký thành công!'];
-    }
-
-    return ['success' => false, 'message' => 'Có lỗi xảy ra, vui lòng thử lại!'];
-  }
-
-  /**
-   * (Chuẩn bị sẵn) Xử lý Đăng nhập bằng Google
-   */
-  public function loginWithGoogle($googleEmail, $googleName)
-  {
-    // Code kiểm tra xem email google này có trong DB chưa, nếu chưa thì tự động tạo tài khoản...
+    return pdo_execute($sql, $username, $email, $hash, $fullname);
   }
 }
