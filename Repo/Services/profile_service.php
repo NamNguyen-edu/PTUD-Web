@@ -6,11 +6,19 @@ class ProfileService {
 
     /**
      * 1. Hàm lấy thông tin chi tiết của một User từ bảng `users`
+<<<<<<< HEAD
+=======
+     * (Trả về mảng dữ liệu thật nếu có, hoặc null nếu không tìm thấy/lỗi)
+>>>>>>> main
      */
     public function getUserInfo(int $userId): ?array {
         $db = pdo_get_connection();
         
+<<<<<<< HEAD
         // Sửa chính xác theo các cột thực tế của nhóm: user_id, username, email, full_name, avatar_url, bio
+=======
+        // Sửa chính xác theo các cột thực tế: user_id, username, email, full_name, avatar_url, bio
+>>>>>>> main
         $sql = "SELECT user_id, username, email, full_name, avatar_url, bio 
                 FROM users 
                 WHERE user_id = :user_id 
@@ -59,6 +67,7 @@ class ProfileService {
             return [];
         }
     }
+<<<<<<< HEAD
     /**
      * Lấy chi tiết thông tin một bài viết dựa vào ID và User sở hữu (Dùng khi bấm Sửa bài)
      */
@@ -81,4 +90,6 @@ class ProfileService {
      * Tự động nhận diện để INSERT bài viết mới hoặc UPDATE bài viết cũ
      */
 
+=======
+>>>>>>> main
 }
