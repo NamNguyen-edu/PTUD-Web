@@ -83,9 +83,4 @@
 
     window.initHeaderUser = initHeaderUser;
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initHeaderUser);
-    } else {
-        initHeaderUser();
-    }
 })();

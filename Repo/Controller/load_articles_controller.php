@@ -1,14 +1,17 @@
 <?php
 
 require_once __DIR__ . '/../Services/load_articles.php';
+require_once __DIR__ . '/../Services/Comment_service.php';
 
 class ArticleController {
 
     private ArticleService $articleService;
+    private CommentService $commentService;
 
     public function __construct() {
 
         $this->articleService = new ArticleService();
+        $this->commentService = new CommentService();
     }
 
     public function detail(): void {
@@ -53,11 +56,24 @@ class ArticleController {
                     $article['article_id']
                 );
 
+            $comments = $this->commentService
+                ->getCommentsByArticleId(
+                    $article['article_id']
+                );
+
+            $currentUser = [
+                'logged' => !empty($_SESSION['user_id']),
+                'id' => $_SESSION['user_id'] ?? null,
+                'name' => $_SESSION['user_name'] ?? ($_SESSION['user_fullname'] ?? null),
+            ];
+
             echo json_encode([
                 'success' => true,
                 'data' => [
                     'article' => $article,
-                    'related_articles' => $relatedArticles
+                    'related_articles' => $relatedArticles,
+                    'comments' => $comments,
+                    'current_user' => $currentUser
                 ]
             ]);
 
