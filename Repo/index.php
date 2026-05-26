@@ -85,7 +85,7 @@ switch ($page) {
     case 'technology':
     case 'admin_dashboard':
     case 'admin_userm':
-    
+    case 'admin1':
     case 'accountmanagement':
     case 'catalogmanagement':
     case 'version-control':
