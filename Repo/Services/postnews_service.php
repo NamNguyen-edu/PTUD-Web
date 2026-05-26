@@ -1,99 +1,46 @@
 <?php
-
 require_once __DIR__ . '/../Model/pdo.php';
 
 class PostnewsService
 {
-    public function saveArticle($userId, $data)
+    public function saveArticle(int $userId, array $data): int
     {
-        $conn = pdo_get_connection();
+        $articleId = isset($data['article_id']) 
+            ? intval($data['article_id']) 
+            : 0;
 
-        $articleId = $data['article_id'] ?? null;
+        $title   = $data['title']   ?? '';
+        $content = $data['content'] ?? '';
+        $slug    = $data['slug']    ?? '';
+        $excerpt = $data['excerpt'] ?? '';
+        $status  = $data['status']  ?? 'draft';
 
-        // ======================================================
-        // UPDATE EXISTING ARTICLE
-        // ======================================================
-
-        if (!empty($articleId)) {
-
-            $sql = "
-                UPDATE articles
-                SET
-                    title = :title,
-                    content = :content,
-                    slug = :slug,
-                    excerpt = :excerpt,
-                    status = :status,
-                    updated_at = NOW()
-                WHERE article_id = :article_id
-                AND user_id = :user_id
-            ";
-
-            $stmt = $conn->prepare($sql);
-
-            $stmt->execute([
-                ':title'      => $data['title'] ?? '',
-                ':content'    => $data['content'] ?? '',
-                ':slug'       => $data['slug'] ?? '',
-                ':excerpt'    => $data['excerpt'] ?? '',
-                ':status'     => $data['status'] ?? 'draft',
-                ':article_id' => $articleId,
-                ':user_id'    => $userId
-            ]);
-
+        if ($articleId > 0) {
+            // UPDATE
+            pdo_execute(
+                "UPDATE articles
+                 SET title=?, content=?, slug=?, excerpt=?, status=?, updated_at=NOW()
+                 WHERE article_id=? AND user_id=?",
+                $title, $content, $slug, $excerpt, $status,
+                $articleId, $userId
+            );
             return $articleId;
         }
 
-        // ======================================================
-        // INSERT NEW ARTICLE
-        // ======================================================
-
-        $sql = "
-            INSERT INTO articles
-            (
-                user_id,
-                title,
-                content,
-                slug,
-                excerpt,
-                status,
-                created_at
-            )
-            VALUES
-            (
-                :user_id,
-                :title,
-                :content,
-                :slug,
-                :excerpt,
-                :status,
-                NOW()
-            )
-        ";
-
-        $stmt = $conn->prepare($sql);
-
-        $stmt->execute([
-            ':user_id' => $userId,
-            ':title'   => $data['title'] ?? '',
-            ':content' => $data['content'] ?? '',
-            ':slug'    => $data['slug'] ?? '',
-            ':excerpt' => $data['excerpt'] ?? '',
-            ':status'  => $data['status'] ?? 'draft'
-        ]);
-
-        return $conn->lastInsertId();
+        // INSERT
+        return (int) pdo_execute_return_last_id(
+            "INSERT INTO articles (user_id, title, content, slug, excerpt, status, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, NOW())",
+            $userId, $title, $content, $slug, $excerpt, $status
+        );
     }
 
-    public function getArticleById($articleId, $userId)
+    public function getArticleById(int $articleId, int $userId): ?array
     {
-        $sql = "
-            SELECT *
-            FROM articles
-            WHERE article_id = ?
-            AND user_id = ?
-        ";
-
-        return pdo_query_one($sql, $articleId, $userId);
+        $row = pdo_query_one(
+            "SELECT * FROM articles WHERE article_id=? AND user_id=? LIMIT 1",
+            $articleId, $userId
+        );
+        return $row ?: null;
     }
 }

@@ -41,11 +41,11 @@ class PageController
         $html = file_get_contents($filePath);
 
         if ($pageName === 'login') {
-            $html = preg_replace('/<form([^>]*)>/i', '<form$1 method="post" action="?action=login">', $html, 1);
+            $html = preg_replace('/<form([^>]*)>/i', '<form$1 method="post" action="?page=login">', $html, 1);
             $html = str_replace('id="loginUser"', 'id="loginUser" name="username"', $html);
             $html = str_replace('id="loginPass"', 'id="loginPass" name="password"', $html);
         } elseif ($pageName === 'signup') {
-            $html = preg_replace('/<form([^>]*)>/i', '<form$1 method="post" action="?action=signup">', $html, 1);
+            $html = preg_replace('/<form([^>]*)>/i', '<form$1 method="post" action="?page=signup">', $html, 1);
             $html = str_replace('id="fullName"', 'id="fullName" name="fullname"', $html);
             $html = str_replace('id="signupUser"', 'id="signupUser" name="email_or_phone"', $html);
             $html = str_replace('id="signupPass"', 'id="signupPass" name="password"', $html);

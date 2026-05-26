@@ -108,7 +108,7 @@ async function loadArticle() {
         }
 
         const response = await fetch(
-            `?action=article_detail&slug=${encodeURIComponent(slug)}`
+            `?page=article_detail&slug=${encodeURIComponent(slug)}`
         );
 
         const result = await response.json();

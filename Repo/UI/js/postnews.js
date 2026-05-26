@@ -218,7 +218,6 @@ function togglePublishTime(show) {
     }
 }
 function handleQuickAction(action, event) {
-alert('FUNCTION RUNNING');
 
     if (event) {
         event.preventDefault();
@@ -310,7 +309,7 @@ alert('FUNCTION RUNNING');
         // FETCH
         // ==================================================
 
-        fetch('?action=save_post', {
+        fetch('?page=save_post', {
 
             method: 'POST',
 
