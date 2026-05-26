@@ -9,6 +9,11 @@ document.addEventListener("DOMContentLoaded", function() {
         .then(data => {
             document.getElementById("header-placeholder").innerHTML = data;
 
+            const headerScript = document.createElement('script');
+            headerScript.src = '../js/header_user.js';
+            headerScript.defer = true;
+            document.head.appendChild(headerScript);
+
             // 1. Ẩn nút Đăng nhập / Đăng ký
             document.getElementById("login-section").classList.add("d-none");
             

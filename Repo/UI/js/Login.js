@@ -56,7 +56,6 @@ function renderGoogleButton() {
 }
 
 
-
 function applyLanguage(lang) {
   localStorage.setItem('newsPulseLang', lang);
   document.querySelectorAll('[data-key]').forEach(el => {
@@ -105,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!v.ok) { alert(v.msg); return; }
 
       // Submit the form to server so PHP can redirect on success
-      loginForm.action = '?action=login';
+      loginForm.action = '?page=login';
       loginForm.method = 'POST';
       loginForm.submit();
     });
@@ -124,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!v.ok) { alert(v.msg); return; }
 
       // Submit the signup form to server
-      signupForm.action = '?action=signup';
+      signupForm.action = '?page=signup';
       signupForm.method = 'POST';
       signupForm.submit();
     });

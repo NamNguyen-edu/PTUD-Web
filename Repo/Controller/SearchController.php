@@ -72,6 +72,29 @@ class SearchController
         echo $html;
     }
 
+    public function suggestions(string $keyword): void
+    {
+        header('Content-Type: application/json; charset=utf-8');
+
+        try {
+            $searchService = new SearchService();
+            $articles = $searchService->searchSuggestions($keyword, 8);
+            $payload = array_map(function ($article) {
+                return [
+                    'id' => isset($article['article_id']) ? intval($article['article_id']) : null,
+                    'title' => $article['title'] ?? '',
+                    'excerpt' => $article['excerpt'] ?? '',
+                    'slug' => $article['slug'] ?? '',
+                    'thumbnail' => $article['thumbnail_url'] ?? '',
+                ];
+            }, $articles);
+
+            echo json_encode(['items' => $payload]);
+        } catch (PDOException $e) {
+            echo json_encode(['items' => [], 'error' => $e->getMessage()]);
+        }
+    }
+
     private function loadComponent(string $name): string
     {
         $componentPath = $this->basePath . '/UI/components/' . $name . '.html';

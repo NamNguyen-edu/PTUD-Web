@@ -3,7 +3,7 @@
  * Admin Dashboard — FIXED VERSION
  */
 
-const API_URL = '?action=get_dashboard_data';
+const API_URL = '/PTUD-Web/Repo/?page=get_dashboard_data';
 
 let initialized = false;
 

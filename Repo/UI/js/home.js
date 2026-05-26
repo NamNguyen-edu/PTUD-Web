@@ -140,7 +140,7 @@ function bindSearchDropdown() {
         }
 
         fetch(
-            `?action=search_suggestions&keyword=${encodeURIComponent(trimmed)}`
+            `?page=search_suggestions&keyword=${encodeURIComponent(trimmed)}`
         )
             .then(response => response.json())
             .then(data => {
@@ -207,65 +207,9 @@ function bindSearchDropdown() {
 ========================================================= */
 
 function loadPageComponents() {
-
-    const headerPlaceholder =
-        document.getElementById('header-placeholder');
-
-    const footerPlaceholder =
-        document.getElementById('footer-placeholder');
-
-    if (!headerPlaceholder || !footerPlaceholder) {
-        return;
-    }
-
-    fetch('UI/components/header.html')
-        .then(response => {
-
-            if (!response.ok) {
-
-                throw new Error('Không thể load header');
-            }
-
-            return response.text();
-        })
-        .then(html => {
-
-            html = html.replace(
-                /href="\.\.\/html\/Login\.html"/g,
-                'href="?page=login"'
-            );
-
-            html = html.replace(
-                /href="\.\.\/html\/SignUp\.html"/g,
-                'href="?page=signup"'
-            );
-
-            html = html.replace(
-                /href="\.\.\/html\/profile\.html"/g,
-                'href="?page=profile"'
-            );
-
-            headerPlaceholder.innerHTML = html;
-
-            bindSearchDropdown();
-        })
-        .catch(err => console.error(err));
-
-    fetch('UI/components/footer.html')
-        .then(response => {
-
-            if (!response.ok) {
-
-                throw new Error('Không thể load footer');
-            }
-
-            return response.text();
-        })
-        .then(html => {
-
-            footerPlaceholder.innerHTML = html;
-        })
-        .catch(err => console.error(err));
+    // Server (ViewEngine) already rendered header and footer into placeholders.
+    // Just activate search dropdown on the pre-rendered header.
+    bindSearchDropdown();
 }
 
 /* =========================================================
@@ -294,6 +238,7 @@ function renderArticleCard(article) {
 
                 <img
                     src="${getImage(article)}"
+                    loading="lazy"
                     class="img-fluid rounded mb-3"
                     style="height:220px;width:100%;object-fit:cover;"
                 >
@@ -346,6 +291,7 @@ function renderHeroBlock(article) {
 
                     <img
                         src="${getImage(article, 1200, 600)}"
+                        loading="lazy"
                         class="w-100"
                         style="height:520px;object-fit:cover;"
                     >
@@ -393,6 +339,7 @@ function renderMixedBlock(bigArticle, sideArticles) {
 
                     <img
                         src="${getImage(bigArticle, 1000, 600)}"
+                        loading="lazy"
                         class="w-100"
                         style="height:430px;object-fit:cover;"
                     >
@@ -539,7 +486,7 @@ async function loadMore() {
     try {
 
         const response = await fetch(
-            `?action=home_feed&page=${currentPage}&category=${encodeURIComponent(currentCategory)}`
+            `?page=home_feed&page_num=${currentPage}&category=${encodeURIComponent(currentCategory)}`
         );
 
         const result = await response.json();
