@@ -14,29 +14,39 @@ class PostnewsController
 
     public function show(): void
     {
-        $articleId = isset($_GET['id']) ? intval($_GET['id']) : 0;
+        $articleId = isset($_GET['id'])
+            ? intval($_GET['id'])
+            : 0;
 
         $userId = $_SESSION['user_id'] ?? 1;
 
         $article = null;
 
         if ($articleId > 0) {
-            $article = $this->service->getArticleById($articleId, $userId);
+
+            $article =
+                $this->service
+                ->getArticleById($articleId, $userId);
         }
 
         $view = new PostnewsView();
+
         $view->render($article);
     }
 
     public function savePost(): void
     {
-        header('Content-Type: application/json; charset=utf-8');
+        header(
+            'Content-Type: application/json; charset=utf-8'
+        );
 
         $userId = $_SESSION['user_id'] ?? 1;
 
         try {
 
-            $articleId = $this->service->saveArticle($userId, $_POST);
+            $articleId =
+                $this->service
+                ->saveArticle($userId, $_POST);
 
             echo json_encode([
                 'success'   => true,
@@ -44,6 +54,8 @@ class PostnewsController
             ]);
 
         } catch (Exception $e) {
+
+            http_response_code(500);
 
             echo json_encode([
                 'success' => false,

@@ -217,66 +217,172 @@ function togglePublishTime(show) {
         picker.classList.add('d-none');
     }
 }
+function handleQuickAction(action, event) {
+alert('FUNCTION RUNNING');
 
-// 9. XỬ LÝ CÁC HÀNH ĐỘNG NHANH
-  function handleQuickAction(action) {
-    const title = document.getElementById('postTitle').value;
-    const content = document.getElementById('richEditor').innerHTML;
-    const slug = document.getElementById('postSlug').value;
-    const excerpt = document.getElementById('metaDesc').value;
-    
-    // Lấy ID bài viết
-    const articleIdInput = document.getElementById('articleId');
-    const articleId = articleIdInput ? articleIdInput.value : '';
-
-    if (!title.trim() || !content.trim() || content === '<br>') {
-        alert("Vui lòng điền Tiêu đề và Nội dung bài viết trước khi lưu!");
-        return;
+    if (event) {
+        event.preventDefault();
     }
 
-    const formData = new FormData();
-    formData.append('title', title);
-    formData.append('content', content);
-    formData.append('slug', slug);
-    formData.append('excerpt', excerpt);
-    formData.append('status', action === 'draft' ? 'draft' : 'published');
-    
-    // Nếu đã có ID (đang sửa hoặc vừa mới lưu nháp xong) thì gửi lên
-    if (articleId) {
-        formData.append('article_id', articleId);
-    }
+    try {
 
-    // Gửi ngầm qua API
-    fetch('?action=save_post', {
-        method: 'POST',
-        body: formData
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            if (action === 'draft') {
-                // CHẾ ĐỘ LƯU NHÁP: Ở LẠI TRANG VÀ CẬP NHẬT ID
-                alert("✔️ Đã lưu bản nháp thành công!");
-                
-                // 1. Nhét ID server vừa trả về vào thẻ ẩn để lần sau bấm lưu nó hiểu là UPDATE
-                if (articleIdInput) {
-                    articleIdInput.value = data.article_id;
-                }
-                
-                // 2. Đổi luôn cái URL trên trình duyệt để lỡ user có F5 thì nó vẫn vào chế độ Sửa bài
-                window.history.pushState({}, '', '?page=postnews&id=' + data.article_id);
-                
-            } else {
-                // CHẾ ĐỘ XUẤT BẢN: ĐÁ VỀ TRANG PROFILE
-                alert("🎉 Bài viết đã xuất bản!");
-                window.location.href = '?page=profile';
-            }
-        } else {
-            alert("Lỗi từ máy chủ: " + data.message);
+        // ==================================================
+        // GET DATA
+        // ==================================================
+
+        const title =
+            document.getElementById('postTitle')?.value || '';
+
+        const editor =
+            document.getElementById('richEditor');
+
+        const content =
+            editor ? editor.innerHTML : '';
+
+        const slug =
+            document.getElementById('seoSlug')?.value || '';
+
+        const excerpt =
+            document.getElementById('seoDescription')?.value || '';
+
+        // ==================================================
+        // ARTICLE ID
+        // ==================================================
+
+        const articleIdInput =
+            document.getElementById('articleId');
+
+        const articleId =
+            articleIdInput
+                ? articleIdInput.value
+                : '';
+
+        // ==================================================
+        // VALIDATE
+        // ==================================================
+
+        if (
+            !title.trim() ||
+            !content.trim() ||
+            content === '<br>'
+        ) {
+
+            alert(
+                'Vui lòng nhập tiêu đề và nội dung!'
+            );
+
+            return;
         }
-    })
-    .catch(err => {
-        console.error(err);
-        alert("Lỗi kết nối Server.");
-    });
+
+        // ==================================================
+        // FORM DATA
+        // ==================================================
+
+        const formData = new FormData();
+
+        formData.append('title', title);
+
+        formData.append('content', content);
+
+        formData.append('slug', slug);
+
+        formData.append('excerpt', excerpt);
+
+        formData.append(
+            'status',
+            action === 'draft'
+                ? 'draft'
+                : 'published'
+        );
+
+        // update mode
+        if (articleId) {
+
+            formData.append(
+                'article_id',
+                articleId
+            );
+        }
+
+        console.log('FETCH START');
+
+        // ==================================================
+        // FETCH
+        // ==================================================
+
+        fetch('?action=save_post', {
+
+            method: 'POST',
+
+            body: formData
+        })
+
+        .then(res => {
+
+            console.log(res);
+
+            return res.json();
+        })
+
+        .then(data => {
+
+            console.log(data);
+
+            if (data.success) {
+
+                if (action === 'draft') {
+
+                    alert(
+                        '✔️ Đã lưu bản nháp!'
+                    );
+
+                    if (articleIdInput) {
+
+                        articleIdInput.value =
+                            data.article_id;
+                    }
+
+                    window.history.pushState(
+                        {},
+                        '',
+                        '?page=postnews&id=' +
+                        data.article_id
+                    );
+
+                } else {
+
+                    alert(
+                        '🎉 Xuất bản thành công!'
+                    );
+
+                    window.location.href =
+                        '?page=profile';
+                }
+
+            } else {
+
+                alert(
+                    data.message ||
+                    'Lỗi save bài viết'
+                );
+            }
+        })
+
+        .catch(err => {
+
+            console.error(err);
+
+            alert(
+                'Lỗi kết nối server'
+            );
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            'JS ERROR: ' + error.message
+        );
+    }
 }

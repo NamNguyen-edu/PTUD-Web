@@ -1,7 +1,6 @@
 <?php
 
 require_once __DIR__ . '/../Services/profile_service.php';
-require_once __DIR__ . '/../View/ProfileView.php';
 
 class ProfileController
 {

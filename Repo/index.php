@@ -149,9 +149,15 @@ $page = trim((string)($_GET['page'] ?? 'home'));
 if ($action !== '') {
     switch ($action) {
         // 🔥 ĐOẠN THÊM MỚI 1: Xử lý Lưu Nháp/Đăng bài
-        case 'save_post':
-            require_once __DIR__ . '/Controller/PostnewsController.php';
-            (new PostnewsController())->savePost();
+case 'save_post':
+
+    require_once __DIR__ . '/Controller/PostnewsController.php';
+
+    $controller = new PostnewsController();
+
+    $controller->savePost();
+
+    exit;
             break;
             
         case 'login':

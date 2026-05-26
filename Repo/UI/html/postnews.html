@@ -193,8 +193,14 @@
                     </button>
                 </div>
                 <div class="col-md-8 p-1 text-right">
-                    <button type="button" class="btn btn-outline-info mr-2 px-4 font-weight-bold" onclick="handleQuickAction('draft')">
-                        <i class="fas fa-save mr-2"></i> LƯU BẢN NHÁP
+<button 
+    type="button"
+    class="btn btn-outline-info mr-2 px-4 font-weight-bold"
+    onclick="handleQuickAction('draft', event)"
+>
+    <i class="fas fa-save mr-2"></i>
+    LƯU BẢN NHÁP
+</button>
                     </button>
                     <button type="button" class="btn btn-pulse-action py-3 px-5 shadow" id="btnNext" onclick="handleMoveStep(1)">
                         TIẾP THEO <i class="fas fa-arrow-right ml-2"></i>
@@ -209,6 +215,5 @@
 
 <input type="file" id="contentImageInput" hidden accept="image/*" onchange="processContentImage(event)">
 
-<script src="../js/postnews.js"></script>
-</body>
+<script src="UI/js/postnews.js"></script></body>
 </html>
