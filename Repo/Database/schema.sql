@@ -86,7 +86,7 @@ CREATE TABLE IF NOT EXISTS articles (
     thumbnail_url TEXT,
     user_id       INT           NOT NULL,
     approved_by   INT           NULL,
-    status        ENUM('draft', 'pending', 'published', 'archived') NOT NULL DEFAULT 'draft',
+    status        ENUM('draft', 'pending', 'published', 'revision', 'rejected') NOT NULL DEFAULT 'draft',
     is_featured   TINYINT(1)    NOT NULL DEFAULT 0,
     view_count    INT           NOT NULL DEFAULT 0,
     published_at  DATETIME      NULL,
