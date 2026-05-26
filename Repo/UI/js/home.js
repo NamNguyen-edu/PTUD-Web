@@ -140,7 +140,7 @@ function bindSearchDropdown() {
         }
 
         fetch(
-            `?action=search_suggestions&keyword=${encodeURIComponent(trimmed)}`
+            `?page=search_suggestions&keyword=${encodeURIComponent(trimmed)}`
         )
             .then(response => response.json())
             .then(data => {
@@ -486,7 +486,7 @@ async function loadMore() {
     try {
 
         const response = await fetch(
-            `?action=home_feed&page=${currentPage}&category=${encodeURIComponent(currentCategory)}`
+            `?page=home_feed&page_num=${currentPage}&category=${encodeURIComponent(currentCategory)}`
         );
 
         const result = await response.json();

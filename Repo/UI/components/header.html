@@ -73,4 +73,12 @@
         </div>
     </div>
 </div>
-<script src="UI/js/header_user.js"></script>
+<script>
+(function(){
+    const script = document.createElement('script');
+    const path = window.location.pathname.includes('/UI/html/') ? '../js/header_user.js' : 'UI/js/header_user.js';
+    script.src = path;
+    script.defer = true;
+    document.head.appendChild(script);
+})();
+</script>
