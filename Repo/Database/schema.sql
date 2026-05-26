@@ -39,6 +39,8 @@ CREATE TABLE IF NOT EXISTS users (
     avatar_url        TEXT,
     bio               TEXT,
     role_id           INT           NOT NULL DEFAULT 5,  
+    -- [UPDATE] Cột mới thêm: Lưu danh sách kỹ năng chuyên môn dưới dạng chuỗi JSON
+    skills            TEXT          NULL,
     status            ENUM('active', 'banned', 'pending') NOT NULL DEFAULT 'pending',
     email_verified_at DATETIME      NULL,
     created_at        DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,

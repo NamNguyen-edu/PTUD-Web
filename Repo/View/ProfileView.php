@@ -16,6 +16,9 @@ class ProfileView
         $fullName = (!empty($userInfo) && !empty($userInfo['full_name'])) ? $userInfo['full_name'] : 'Nguyễn Duy Bảo';
         $bio      = (!empty($userInfo) && !empty($userInfo['bio']))       ? $userInfo['bio']       : 'Nhà văn tự do, đam mê viết lách.';
         $email    = (!empty($userInfo) && !empty($userInfo['email']))     ? $userInfo['email']     : 'bebao2005at@gmail.com';
+        $avatarUrl = (!empty($userInfo) && !empty($userInfo['avatar_url'])) 
+                     ? $userInfo['avatar_url'] 
+                     : 'https://ui-avatars.com/api/?name=' . urlencode($fullName) . '&size=150';
 
         // Build articles list HTML
         $articlesHtml = '';
@@ -59,7 +62,8 @@ class ProfileView
             }
         }
 
-        $data = [
+$data = [
+            'AVATAR_URL' => $avatarUrl,
             'FULL_NAME' => htmlspecialchars($fullName),
             'BIO' => htmlspecialchars($bio),
             'EMAIL' => htmlspecialchars($email),
@@ -68,14 +72,10 @@ class ProfileView
             'POSTS_COUNT' => $postsCount,
             'VIEWS_COUNT' => $totalViews > 1000 ? number_format($totalViews/1000, 1) . 'K' : $totalViews,
             'LIST_ARTICLES' => $articlesHtml,
-        ];
+            // THÊM DÒNG NÀY VÀO: Lấy chuỗi JSON kỹ năng từ DB (Nếu trống thì gán là mảng rỗng '[]')
+'SKILLS_JSON' => (!empty($userInfo) && !empty($userInfo['skills'])) ? htmlspecialchars($userInfo['skills'], ENT_QUOTES, 'UTF-8') : '[]',        ];
 
-        // Note: ViewEngine expects keys without braces and will uppercase them when replacing
-        $renderData = [];
-        foreach ($data as $k => $v) {
-            $renderData[$k] = $v;
-        }
+echo $this->engine->render('profile', $data);
 
-        echo $this->engine->render('profile', $renderData);
     }
 }

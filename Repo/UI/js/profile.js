@@ -22,10 +22,9 @@ document.addEventListener("DOMContentLoaded", function() {
             document.getElementById("profile-section").classList.add("d-flex"); 
             
             // 3. Đổi tên và email cho trang cá nhân
-            document.getElementById("profile-name").innerText = userData.fullName;
-            document.getElementById("profile-menu-name").innerText = userData.fullName;
-            document.getElementById("profile-email").innerText = userData.major;
-            document.getElementById("profile-menu-email").innerText = userData.email;
+const realName = document.querySelector('.profile-sidebar h4')?.innerText || 'Biên tập viên';
+document.getElementById("profile-name").innerText = realName;
+document.getElementById("profile-menu-name").innerText = realName;
 
             // 4. Xử lý click xổ menu mượt mà
             const profileBtn = document.querySelector('.profile-info');
@@ -54,24 +53,21 @@ document.addEventListener("DOMContentLoaded", function() {
             document.getElementById("footer-placeholder").innerHTML = data;
         })
         .catch(err => console.error(err));
+        const hiddenSkillsInput = document.getElementById('hiddenSkills');
+    if (hiddenSkillsInput && hiddenSkillsInput.value) {
+        // Rào điều kiện để tránh lỗi nếu biến chưa được PHP thay thế
+        if (hiddenSkillsInput.value !== '{{SKILLS_JSON}}') {
+            try {
+                userSkills = JSON.parse(hiddenSkillsInput.value);
+                renderSkills(); // Gọi hàm vẽ tag ra màn hình
+            } catch(e) {
+                console.error("Lỗi parse JSON kỹ năng:", e);
+            }
+        }
+    }
 });
 
 
-// 1. GIẢ LẬP DỮ LIỆU NGƯỜI DÙNG CÓ LƯU TRỮ LOCALSTORAGE
-const defaultUserData = {
-    fullName: "Nguyễn Duy Bảo",
-    email: "bebao2005at@gmail.com",
-    major: "Business Information Systems",
-    bio: "Nhà văn tự do, đam mê viết lách",
-    stats: {
-        posts: 24,
-        bookmarks: 15,
-        views: "8.2K"
-    }
-};
-
-// Kiểm tra xem trong máy đã lưu thông tin sửa đổi chưa, nếu chưa thì xài mặc định
-let userData = JSON.parse(localStorage.getItem('newsPulse_UserData')) || defaultUserData;
 // 2. KHỞI TẠO KHI TRANG LOAD XONG (Phần logic cũ của Profile)
 document.addEventListener('DOMContentLoaded', function() {
     console.log("⚡ NewsPulse Profile System Ready!");
@@ -79,9 +75,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Kiểm tra xem có phải lần đầu đăng nhập không để hiện Popup Preference
     checkFirstTimeLogin();
     
-    // Load dữ liệu lên giao diện
-    loadUserProfile();
-    
+    // Load dữ liệu lên giao diện    
     // Khởi tạo các tooltips của Bootstrap nếu cần
     $('[data-toggle="tooltip"]').tooltip();
 });
@@ -104,35 +98,6 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
     }
 });
 
-// 4. LOAD DỮ LIỆU HỒ SƠ LÊN UI (Phủ dữ liệu lên mọi ngóc ngách)
-function loadUserProfile() {
-    // 1. Cập nhật thống kê
-    document.getElementById('statPosts').innerText = userData.stats.posts;
-    document.getElementById('statBookmarks').innerText = userData.stats.bookmarks;
-    document.getElementById('statViews').innerText = userData.stats.views;
-    
-    // 2. Đổ dữ liệu vào Form Chỉnh sửa
-    const nameInput = document.getElementById('fullName');
-    const majorInput = document.getElementById('majorInput');
-    const bioInput = document.getElementById('bioInput');
-    
-    if (nameInput) nameInput.value = userData.fullName;
-    if (majorInput) majorInput.value = userData.major;
-    if (bioInput) bioInput.value = userData.bio;
-
-    // 3. Đổ dữ liệu ra Cột Sidebar bên trái
-    const sidebarName = document.querySelector('.profile-sidebar h4');
-    const sidebarBio = document.querySelector('.profile-bio p');
-    const sidebarMajor = document.querySelector('.profile-sidebar p.text-muted');
-
-    if (sidebarName) sidebarName.innerText = userData.fullName;
-    if (sidebarBio) sidebarBio.innerText = `"${userData.bio}"`;
-    if (sidebarMajor) sidebarMajor.innerText = userData.major;
-
-    // 4. Đổ dữ liệu lên tên ở thanh Navbar riêng của trang Profile
-    const profileNavName = document.querySelector('.navbar-nav .nav-item.active .text-white.small');
-    if (profileNavName) profileNavName.innerText = userData.fullName;
-}
 
 // 5. KIỂM TRA TRẠNG THÁI ĐĂNG NHẬP LẦN ĐẦU
 function checkFirstTimeLogin() {
@@ -183,29 +148,71 @@ function saveUserPreferences() {
 }
 
 // 7. XỬ LÝ LƯU THAY ĐỔI HỒ SƠ (TAB SETTINGS)
+
 function saveProfileChanges() {
-    // Lấy dữ liệu mới từ các ô input
-    const newName = document.getElementById('fullName').value;
-    const newMajor = document.getElementById('majorInput').value;
-    const newBio = document.getElementById('bioInput').value;
+    const fullNameInput = document.getElementById('fullName');
+    const bioInput = document.getElementById('bioInput');
     
-    if (!newName.trim()) {
-        alert("Tên không được để trống bạn nhé!");
+    const newName = fullNameInput.value.trim();
+    const newBio = bioInput ? bioInput.value.trim() : '';
+    
+    // Ràng buộc (Validation) Frontend
+    if (!newName) {
+        fullNameInput.classList.add('is-invalid'); // Hiện viền đỏ của Bootstrap
+        alert("Họ và tên không được để trống bạn nhé!");
+        fullNameInput.focus();
         return;
+    } else {
+        fullNameInput.classList.remove('is-invalid');
     }
 
-    // Cập nhật dữ liệu vào biến
-    userData.fullName = newName;
-    userData.major = newMajor;
-    userData.bio = newBio;
+    // Đổi trạng thái nút bấm tránh user spam click
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> ĐANG LƯU...';
+    btn.disabled = true;
 
-    // LƯU CHẶT VÀO Ổ CỨNG TRÌNH DUYỆT
-    localStorage.setItem('newsPulse_UserData', JSON.stringify(userData));
+    // Chuẩn bị dữ liệu gửi đi
+    const formData = new FormData();
+    formData.append('full_name', newName);
+    formData.append('bio', newBio);
+    formData.append('skills', JSON.stringify(userSkills));
 
-    alert("✔️ Hồ sơ của bạn đã được cập nhật thành công!");
-    
-    // Ép trình duyệt tự động F5 lại trang để hàm loadUserProfile() chạy và đắp giao diện mới lên
-    window.location.reload(); 
+    // Bắn AJAX qua Fetch API
+    fetch('?page=update_profile', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        // Phục hồi nút bấm
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+
+        if (data.success) {
+            alert("✔️ Hồ sơ của bạn đã được cập nhật thành công!");
+            
+            // Cập nhật ngay lập tức các UI khác trên trang (Real-time DOM update)
+            const sidebarName = document.querySelector('.profile-sidebar h4');
+            const sidebarBio = document.querySelector('.profile-bio p');
+            const headerName1 = document.getElementById('profile-name');
+            const headerName2 = document.getElementById('profile-menu-name');
+
+            if (sidebarName) sidebarName.innerText = newName;
+            if (sidebarBio) sidebarBio.innerText = `"${newBio}"`;
+            if (headerName1) headerName1.innerText = newName;
+            if (headerName2) headerName2.innerText = newName;
+            
+        } else {
+            alert(data.message || "Có lỗi xảy ra khi lưu!");
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        alert("Lỗi kết nối đến máy chủ.");
+    });
 }
 
 // 8. RENDER DANH SÁCH BÀI VIẾT TRONG TAB BOOKMARK
@@ -249,18 +256,7 @@ function handleQuickAction(action) {
 }
 
 // 9. LOGIC ĐỔI ẢNH ĐẠI DIỆN (AVATAR)
-document.querySelector('.btn-edit-avatar').addEventListener('click', function() {
-    const newUrl = prompt("Nhập URL ảnh đại diện mới của bạn:", "https://ui-avatars.com/api/?name=Nguyen+Duy+Bao");
-    if (newUrl) {
-        document.querySelector('.avatar-wrapper img').src = newUrl;
-        
-        // Thay đổi avatar trên header component
-        const headerAvatars = document.querySelectorAll('.profile-avatar img, .profile-menu-avatar img');
-        headerAvatars.forEach(img => img.src = newUrl);
-        
-        alert("Cập nhật ảnh đại diện thành công!");
-    }
-});
+
 
 function generateSlug(text) {
     return text.toLowerCase()
@@ -270,4 +266,93 @@ function generateSlug(text) {
         .replace(/(\s+)/g, '-')
         .replace(/-+/g, '-')
         .replace(/^-+|-+$/g, '');
+}
+// Biến toàn cục lưu danh sách kỹ năng
+let userSkills = []; 
+
+// Hàm render kỹ năng ra UI
+function renderSkills() {
+    const container = document.getElementById('skillsContainer');
+    container.innerHTML = '';
+    userSkills.forEach((skill, index) => {
+        container.innerHTML += `
+            <span class="badge badge-pulse p-2 m-1">
+                ${skill} <i class="fas fa-times ml-1" style="cursor:pointer;" onclick="removeSkill(${index})"></i>
+            </span>`;
+    });
+}
+
+// Thêm kỹ năng
+function addSkill() {
+    const input = document.getElementById('newSkillInput');
+    const val = input.value.trim();
+    if (val && !userSkills.includes(val)) {
+        userSkills.push(val);
+        renderSkills();
+        input.value = '';
+    }
+}
+
+// Xóa kỹ năng
+function removeSkill(index) {
+    userSkills.splice(index, 1);
+    renderSkills();
+}
+let cropper;
+
+function openCropModal(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const image = document.getElementById('imageToCrop');
+            image.src = e.target.result;
+            
+            $('#cropModal').modal('show');
+            
+            // Xóa cropper cũ nếu có và tạo cái mới chuẩn tỷ lệ 1:1 (Hình vuông/Tròn)
+            if (cropper) cropper.destroy();
+            setTimeout(() => {
+                cropper = new Cropper(image, {
+                    aspectRatio: 1,
+                    viewMode: 1,
+                });
+            }, 200); // Đợi modal mở hẳn
+        };
+        reader.readAsDataURL(file);
+    }
+    event.target.value = ''; // Reset input
+}
+
+function uploadAvatar() {
+    if (!cropper) return;
+    
+    // Lấy ảnh đã cắt dạng Base64
+    const canvas = cropper.getCroppedCanvas({ width: 300, height: 300 });
+    const base64Image = canvas.toDataURL('image/png');
+
+    const btn = event.target;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ĐANG TẢI LÊN...';
+
+    // Bắn thẳng base64 lên server
+    fetch('?page=upload_avatar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: base64Image })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            // Cập nhật tất cả các ảnh đại diện trên giao diện
+            document.querySelectorAll('.avatar-wrapper img, .profile-avatar img, .profile-menu-avatar img').forEach(img => {
+                img.src = data.url;
+            });
+            $('#cropModal').modal('hide');
+        } else {
+            alert("Lỗi tải ảnh!");
+        }
+    })
+    .finally(() => {
+        btn.innerHTML = 'CẬP NHẬT ẢNH';
+    });
 }

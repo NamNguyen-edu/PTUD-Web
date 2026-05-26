@@ -223,153 +223,123 @@ function togglePublishTime(show) {
         picker.classList.add('d-none');
     }
 }
+// 9. CORE ACTION: GỬI DỮ LIỆU LÊN SERVER (ĐÃ GỘP TẤT CẢ)
 function handleQuickAction(action, event) {
-
     if (event) {
         event.preventDefault();
     }
 
     try {
+        // ==================================================
+        // 1. LẤY DỮ LIỆU TEXT
+        // ==================================================
+        const title = document.getElementById('postTitle')?.value || '';
+        const editor = document.getElementById('richEditor');
+        const content = editor ? editor.innerHTML : '';
+        const slug = document.getElementById('postSlug')?.value || '';
+        const excerpt = document.getElementById('metaDesc')?.value || '';
+        const category = document.getElementById('postCategory')?.value || '';
+        const tags = document.getElementById('postTags')?.value || '';
+        
+        const articleIdInput = document.getElementById('articleId');
+        const articleId = articleIdInput ? articleIdInput.value : '';
 
         // ==================================================
-        // GET DATA
+        // 2. LẤY FILE ẢNH THUMBNAIL
         // ==================================================
-
-const title = document.getElementById('postTitle')?.value || '';
-const editor = document.getElementById('richEditor');
-const content = editor ? editor.innerHTML : '';
-const slug = document.getElementById('postSlug')?.value || ''; // Trong HTML bạn đặt là postSlug
-const excerpt = document.getElementById('metaDesc')?.value || ''; // Sửa ID này lại cho đúng với HTML
-const category = document.getElementById('postCategory')?.value || ''; // Thêm lấy chuyên mục
-const tags = document.getElementById('postTags')?.value || '';
+        const thumbInput = document.getElementById('thumbInput');
+        const thumbnailFile = thumbInput && thumbInput.files.length > 0 ? thumbInput.files[0] : null;
 
         // ==================================================
-        // ARTICLE ID
+        // 3. KIỂM TRA LỖI (VALIDATION)
         // ==================================================
+        if (!title.trim() || !content.trim() || content === '<br>') {
+            alert('Vui lòng nhập tiêu đề và nội dung bài viết!');
+            return;
+        }
 
-        const articleIdInput =
-            document.getElementById('articleId');
-
-        const articleId =
-            articleIdInput
-                ? articleIdInput.value
-                : '';
-
-        // ==================================================
-        // VALIDATE
-        // ==================================================
-
-        if (
-            !title.trim() ||
-            !content.trim() ||
-            content === '<br>'
-        ) {
-
-            alert(
-                'Vui lòng nhập tiêu đề và nội dung!'
-            );
-
+        // Bắt buộc có ảnh nếu xuất bản (và là bài viết mới chưa có ID)
+        if (action !== 'draft' && !thumbnailFile && !articleId) {
+            alert('Vui lòng chọn ảnh đại diện (Thumbnail) trước khi xuất bản!');
             return;
         }
 
         // ==================================================
-        // FORM DATA
+        // 4. ĐÓNG GÓI DỮ LIỆU (FORM DATA)
         // ==================================================
+        const formData = new FormData();
+        formData.append('title', title);
+        formData.append('content', content);
+        formData.append('slug', slug);
+        formData.append('excerpt', excerpt);
+        formData.append('category', category);
+        formData.append('tags', tags);
+        
+        formData.append('status', action === 'draft' ? 'draft' : 'pending');
 
-  const formData = new FormData();
-formData.append('title', title);
-formData.append('content', content);
-formData.append('slug', slug);
-formData.append('excerpt', excerpt);
-formData.append('category', category); // Gửi lên server
-formData.append('tags', tags);         // Gửi lên server
-formData.append('status', action === 'draft' ? 'draft' : 'published');
-
-        // update mode
-        if (articleId) {
-
-            formData.append(
-                'article_id',
-                articleId
-            );
+        // Gắn file ảnh vào form nếu user có chọn ảnh mới
+        if (thumbnailFile) {
+            formData.append('thumbnail', thumbnailFile);
         }
 
-        console.log('FETCH START');
+        // Nếu đang sửa bài thì truyền ID
+        if (articleId) {
+            formData.append('article_id', articleId);
+        }
 
+        // Đổi trạng thái nút bấm (loading)
+        const btn = event.target;
+        const originalText = btn ? btn.innerHTML : '';
+        if (btn) {
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> ĐANG XỬ LÝ...';
+            btn.disabled = true;
+        }
+
+        // ==================================================
+        // 5. GỬI REQUEST LÊN SERVER
+        // ==================================================
+        console.log('Bắt đầu tải lên dữ liệu bài viết...');
 
         fetch('?page=save_post', {
-
             method: 'POST',
-
             body: formData
         })
-
-        .then(res => {
-
-            console.log(res);
-
-            return res.json();
-        })
-
+        .then(res => res.json())
         .then(data => {
-
-            console.log(data);
+            // Phục hồi nút bấm
+            if (btn) {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
 
             if (data.success) {
-
                 if (action === 'draft') {
-
-                    alert(
-                        '✔️ Đã lưu bản nháp!'
-                    );
-
+                    alert('✔️ Đã lưu bản nháp thành công!');
+                    // Cập nhật lại ID để lần lưu sau là Update chứ không phải Insert
                     if (articleIdInput) {
-
-                        articleIdInput.value =
-                            data.article_id;
+                        articleIdInput.value = data.article_id;
                     }
-
-                    window.history.pushState(
-                        {},
-                        '',
-                        '?page=postnews&id=' +
-                        data.article_id
-                    );
-
+                    // Cập nhật thanh địa chỉ URL
+                    window.history.pushState({}, '', '?page=postnews&id=' + data.article_id);
                 } else {
-
-                    alert(
-                        '🎉 Xuất bản thành công!'
-                    );
-
-                    window.location.href =
-                        '?page=profile';
+                    alert('🎉 Đã gửi bài viết thành công!');
+                    window.location.href = '?page=profile';
                 }
-
             } else {
-
-                alert(
-                    data.message ||
-                    'Lỗi save bài viết'
-                );
+                alert(data.message || 'Lỗi hệ thống khi lưu bài viết.');
             }
         })
-
         .catch(err => {
-
             console.error(err);
-
-            alert(
-                'Lỗi kết nối server'
-            );
+            if (btn) {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+            alert('Lỗi kết nối đến máy chủ. Vui lòng kiểm tra mạng!');
         });
 
     } catch (error) {
-
         console.error(error);
-
-        alert(
-            'JS ERROR: ' + error.message
-        );
+        alert('JS ERROR: ' + error.message);
     }
 }

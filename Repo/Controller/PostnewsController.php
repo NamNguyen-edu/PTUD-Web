@@ -34,33 +34,33 @@ class PostnewsController
         $view->render($article);
     }
 
-    public function savePost(): void
-    {
-        header(
-            'Content-Type: application/json; charset=utf-8'
-        );
+  // Controller/PostnewsController.php
 
-        $userId = $_SESSION['user_id'] ?? 1;
+public function savePost(): void
+{
+    header('Content-Type: application/json; charset=utf-8');
 
-        try {
+    $userId = $_SESSION['user_id'] ?? 1;
 
-            $articleId =
-                $this->service
-                ->saveArticle($userId, $_POST);
-
-            echo json_encode([
-                'success'   => true,
-                'article_id'=> $articleId
-            ]);
-
-        } catch (Exception $e) {
-
-            http_response_code(500);
-
-            echo json_encode([
-                'success' => false,
-                'message' => $e->getMessage()
-            ]);
+    try {
+        // Gộp $_POST (text) và $_FILES (ảnh) lại thành 1 mảng data duy nhất
+        $data = $_POST;
+        
+        // Kiểm tra xem frontend có gửi file ảnh lên không
+        if (isset($_FILES['thumbnail']) && $_FILES['thumbnail']['error'] === UPLOAD_ERR_OK) {
+            $data['thumbnail_file'] = $_FILES['thumbnail']; // Nhét file vào mảng data
         }
+
+        // Truyền mảng gộp này xuống Service xử lý
+        $articleId = $this->service->saveArticle($userId, $data);
+
+        echo json_encode([
+            'success'   => true,
+            'article_id'=> $articleId
+        ]);
+
+    } catch (Exception $e) {
+        //... rest of error handling
     }
+}
 }

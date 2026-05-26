@@ -8,7 +8,7 @@ class ProfileService
      */
     public function getUserInfo(int $userId): ?array
     {
-        $sql = "SELECT user_id, username, email, full_name, avatar_url, bio
+        $sql = "SELECT user_id, username, email, full_name, avatar_url, bio, skills
                 FROM users
                 WHERE user_id = :user_id
                 LIMIT 1";
@@ -25,7 +25,7 @@ class ProfileService
     }
 
     /**
-     * Lấy danh sách bài viết của User (JOIN category để lấy tên chuyên mục)
+     * Lấy danh sách bài viết của User
      */
     public function getUserArticles(int $userId): array
     {
@@ -49,6 +49,46 @@ class ProfileService
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             return [];
+        }
+    }
+
+    /**
+     * Cập nhật thông tin cơ bản và kỹ năng của User vào Database
+     */
+    public function updateUserInfo(int $userId, string $fullName, string $bio, string $skills): bool
+    {
+        $sql = "UPDATE users 
+                SET full_name = :full_name, bio = :bio, skills = :skills, updated_at = NOW() 
+                WHERE user_id = :user_id";
+        try {
+            $db   = pdo_get_connection();
+            $stmt = $db->prepare($sql);
+            $stmt->bindValue(':full_name', $fullName, PDO::PARAM_STR);
+            $stmt->bindValue(':bio', $bio, PDO::PARAM_STR);
+            $stmt->bindValue(':skills', $skills, PDO::PARAM_STR);
+            $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Cập nhật đường dẫn ảnh đại diện mới sau khi crop
+     */
+    public function updateAvatarUrl(int $userId, string $avatarUrl): bool
+    {
+        $sql = "UPDATE users 
+                SET avatar_url = :avatar_url, updated_at = NOW() 
+                WHERE user_id = :user_id";
+        try {
+            $db   = pdo_get_connection();
+            $stmt = $db->prepare($sql);
+            $stmt->bindValue(':avatar_url', $avatarUrl, PDO::PARAM_STR);
+            $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            return false;
         }
     }
 }
