@@ -6,6 +6,7 @@ require_once __DIR__ . '/Services/search_service.php';
 require_once __DIR__ . '/Database/init_db.php'; 
 require_once __DIR__ . '/Services/profile_service.php';
 require_once __DIR__ . '/Services/Dashboard_admin_service.php';
+require_once __DIR__ . '/Services/Approval_service.php';
 $action = trim((string)($_GET['action'] ?? ''));
 
 function redirect($url)
@@ -199,6 +200,53 @@ if ($action !== '') {
             break;
         default:
             redirect('?page=home');
+        case 'get_article':
+        header('Content-Type: application/json; charset=utf-8');
+        $article_id = (int)($_GET['article_id'] ?? 0);
+        if (session_status() === PHP_SESSION_NONE) session_start();
+        $data = getArticleDetail($article_id);
+        echo json_encode($data
+            ? ['success' => true, 'data' => $data]
+            : ['success' => false, 'message' => 'Không tìm thấy bài viết.']
+        );
+        break;
+
+        case 'approve_publish':
+            header('Content-Type: application/json; charset=utf-8');
+            $article_id = (int)($_POST['article_id'] ?? 0);
+            $ok = approveAndPublish($article_id, (int)($_SESSION['user_id'] ?? 0));
+            echo json_encode(['success' => $ok]);
+            break;
+
+        case 'request_revision':
+            header('Content-Type: application/json; charset=utf-8');
+            $article_id = (int)($_POST['article_id'] ?? 0);
+            $note = trim($_POST['revision_note'] ?? '');
+            $ok = requestRevision($article_id, (int)($_SESSION['user_id'] ?? 0), $note);
+            echo json_encode(['success' => $ok]);
+            break;
+
+        case 'reject_article':
+            header('Content-Type: application/json; charset=utf-8');
+            $article_id = (int)($_POST['article_id'] ?? 0);
+            $ok = rejectArticle($article_id, (int)($_SESSION['user_id'] ?? 0));
+            echo json_encode(['success' => $ok]);
+            break;
+
+        case 'get_comments':
+            header('Content-Type: application/json; charset=utf-8');
+            $article_id = (int)($_GET['article_id'] ?? 0);
+            echo json_encode(['success' => true, 'data' => getEditorialComments($article_id)]);
+            break;
+
+        case 'add_comment':
+            header('Content-Type: application/json; charset=utf-8');
+            $article_id = (int)($_POST['article_id'] ?? 0);
+            $content    = trim($_POST['content'] ?? '');
+            $parent_id  = !empty($_POST['parent_id']) ? (int)$_POST['parent_id'] : null;
+            $new_id = addEditorialComment($article_id, (int)($_SESSION['user_id'] ?? 0), $content, $parent_id);
+            echo json_encode(['success' => true, 'comment_id' => $new_id]);
+            break;
     }
     exit;
 }
@@ -221,10 +269,14 @@ switch ($page) {
     case 'article':
     case 'post':
     // case 'postnews': (Đã xóa ở đây để nó không gọi hàm cũ)
+    case 'admin1':
+        require_once __DIR__ . '/Controller/Approval_controller.php';
+        (new ApprovalController())->show();
+    break;
     case 'technology':
     case 'admin_dashboard':
     case 'admin_userm':
-    case 'admin1':
+    
     case 'accountmanagement':
     case 'catalogmanagement':
     case 'version-control':
