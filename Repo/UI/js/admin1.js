@@ -88,7 +88,150 @@ function addComment() {
 
 
 
-function approveArticle() {
+function getIndexPhpPath() {
+    const path = window.location.pathname;
+    return window.location.origin + path.replace(/\/UI\/html\/[^/]+$/, '/index.php');
+}
+
+function getArticleId() {
+    const params = new URLSearchParams(window.location.search);
+    const articleIdFromUrl = params.get('article_id');
+    if (articleIdFromUrl) {
+        return articleIdFromUrl;
+    }
+
+    const hiddenArticleId = document.getElementById('articleId');
+    if (hiddenArticleId && hiddenArticleId.value.trim()) {
+        return hiddenArticleId.value.trim();
+    }
+
+    return null;
+}
+
+function enableAllActions() {
+    const approveBtn = document.querySelector('.btn-approve');
+    const revisionBtn = document.querySelector('.btn-revision');
+    const rejectBtn = document.querySelector('.text-danger.fw-bold.small.cursor-pointer');
+    const revisionTextarea = document.getElementById('revisionText');
+
+    if (approveBtn) {
+        approveBtn.disabled = false;
+        approveBtn.style.opacity = '1';
+        approveBtn.style.pointerEvents = '';
+    }
+    if (revisionBtn) {
+        revisionBtn.disabled = false;
+        revisionBtn.style.opacity = '1';
+        revisionBtn.style.pointerEvents = '';
+    }
+    if (rejectBtn) {
+        rejectBtn.style.opacity = '1';
+        rejectBtn.style.pointerEvents = '';
+        rejectBtn.style.cursor = 'pointer';
+    }
+    if (revisionTextarea) {
+        revisionTextarea.disabled = false;
+    }
+}
+
+function handleActionError(error) {
+    console.error(error);
+    showToast(error.message || 'Đã có lỗi xảy ra. Vui lòng thử lại.', 'reject');
+}
+
+async function postApprovalAction(action, payload = {}) {
+    const articleId = getArticleId();
+    if (!articleId) {
+        throw new Error('Không tìm thấy article_id trên URL');
+    }
+
+    const formData = new FormData();
+    formData.append('article_id', articleId);
+    Object.entries(payload).forEach(([key, value]) => {
+        formData.append(key, value);
+    });
+
+    const response = await fetch(getIndexPhpPath() + '?action=' + encodeURIComponent(action), {
+        method: 'POST',
+        body: formData,
+        credentials: 'same-origin'
+    });
+
+    if (!response.ok) {
+        throw new Error('Lỗi mạng: ' + response.status);
+    }
+
+    return await response.json();
+}
+
+function setWorkflowApproved() {
+    const activeStep = document.querySelector('.step-active');
+    if (!activeStep) return;
+    const nextStep = activeStep.nextElementSibling;
+
+    activeStep.classList.remove('step-active');
+    activeStep.classList.add('step-complete');
+    activeStep.innerHTML = `
+        <div class="step-box">
+            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">
+                check_circle
+            </span>
+        </div>
+        <p class="small fw-bold mt-2 mb-0">Tổng biên tập phê duyệt</p>
+    `;
+
+    if (nextStep) {
+        nextStep.classList.remove('opacity-50');
+        nextStep.innerHTML = `
+            <div class="step-box text-white bg-primary">
+                <span class="material-symbols-outlined">
+                    radio_button_checked
+                </span>
+            </div>
+            <p class="small fw-bold mt-2 mb-0 text-primary">
+                Đã duyệt
+            </p>
+        `;
+    }
+}
+
+function setWorkflowRevision() {
+    const activeStep = document.querySelector('.step-active');
+    if (!activeStep) return;
+
+    activeStep.classList.remove('step-active');
+    activeStep.classList.add('step-rejected');
+    activeStep.innerHTML = `
+        <div class="step-box bg-warning text-dark">
+            <span class="material-symbols-outlined">
+                edit_note
+            </span>
+        </div>
+        <p class="small fw-bold mt-2 mb-0 text-warning-emphasis">
+            Yêu cầu chỉnh sửa
+        </p>
+    `;
+}
+
+function setWorkflowRejected() {
+    const activeStep = document.querySelector('.step-active');
+    if (!activeStep) return;
+
+    activeStep.classList.remove('step-active');
+    activeStep.classList.add('step-rejected');
+    activeStep.innerHTML = `
+        <div class="step-box bg-danger text-white">
+            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">
+                cancel
+            </span>
+        </div>
+        <p class="small fw-bold mt-2 mb-0 text-danger">
+            Bài viết bị từ chối
+        </p>
+    `;
+}
+
+async function approveArticle() {
 
     // Step hiện tại
     const activeStep = document.querySelector('.step-active');
@@ -161,61 +304,43 @@ function requestRevision() {
     }
 }
 
-function submitRevision() {
-
+async function submitRevision() {
     const text = document
         .getElementById('revisionText')
         .value
         .trim();
 
     if (!text) {
-
-        showToast(
-            'Vui lòng nhập nội dung chỉnh sửa',
-            'warn'
-        );
-
+        showToast('Vui lòng nhập nội dung chỉnh sửa', 'warn');
         return;
     }
 
-    // Step hiện tại
-    const activeStep = document.querySelector('.step-active');
+    disableAllActions();
+    showToast('Đang gửi yêu cầu chỉnh sửa...', 'warn');
 
-    activeStep.classList.remove('step-active');
-    activeStep.classList.add('step-rejected');
-
-    activeStep.innerHTML = `
-        <div class="step-box bg-warning text-dark">
-            <span class="material-symbols-outlined">
-                edit_note
-            </span>
-        </div>
-
-        <p class="small fw-bold mt-2 mb-0 text-warning-emphasis">
-            Yêu cầu chỉnh sửa
-        </p>
-    `;
-
-    // disable nút
-   disableAllActions();
-    showToast(
-        'Đã gửi yêu cầu chỉnh sửa',
-        'warn'
-    );
-
-    setTimeout(() => {
-
-        showModal(
-            'Đã gửi yêu cầu chỉnh sửa',
-            'Biên tập viên sẽ cập nhật nội dung trước khi gửi lại.',
-            'edit_note',
-            'warn'
-        );
-
-    }, 500);
+    try {
+        const result = await postApprovalAction('request_revision', {revision_note: text});
+        if (!result.success) {
+            throw new Error(result.message || 'Gửi yêu cầu chỉnh sửa thất bại.');
+        }
+        setWorkflowRevision();
+        document.getElementById('revisionForm').style.display = 'none';
+        showToast('Đã gửi yêu cầu chỉnh sửa', 'warn');
+        setTimeout(() => {
+            showModal(
+                'Đã gửi yêu cầu chỉnh sửa',
+                'Biên tập viên sẽ cập nhật nội dung trước khi gửi lại.',
+                'edit_note',
+                'warn'
+            );
+        }, 500);
+    } catch (error) {
+        enableAllActions();
+        handleActionError(error);
+    }
 }
 
-function rejectArticle() {
+async function rejectArticle() {
 
     const confirmReject = confirm(
         'Bạn có chắc muốn từ chối bài viết này?'
@@ -223,46 +348,229 @@ function rejectArticle() {
 
     if (!confirmReject) return;
 
-    // Step hiện tại
-    const activeStep = document.querySelector('.step-active');
+    disableAllActions();
+    showToast('Đang gửi yêu cầu từ chối...', 'reject');
 
-    // Đổi sang trạng thái rejected
+    try {
+        const result = await postApprovalAction('reject_article');
+        if (!result.success) {
+            throw new Error(result.message || 'Từ chối bài viết thất bại.');
+        }
+        setWorkflowRejected();
+        showToast('Bài viết đã bị từ chối', 'reject');
+        setTimeout(() => {
+            showModal(
+                'Đã từ chối bài viết',
+                'Thông báo từ chối đã được gửi về cho biên tập viên.',
+                'cancel',
+                'reject'
+            );
+        }, 500);
+    } catch (error) {
+        enableAllActions();
+        handleActionError(error);
+    }
+}
+
+
+function getIndexPhpPath() {
+    const path = window.location.pathname;
+    return window.location.origin + path.replace(/\/UI\/html\/[^/]+$/, '/index.php');
+}
+
+function getArticleId() {
+    const params = new URLSearchParams(window.location.search);
+    const articleIdFromUrl = params.get('article_id');
+    if (articleIdFromUrl) {
+        return articleIdFromUrl;
+    }
+
+    const hiddenArticleId = document.getElementById('articleId');
+    if (hiddenArticleId && hiddenArticleId.value.trim()) {
+        return hiddenArticleId.value.trim();
+    }
+
+    return null;
+}
+
+function enableAllActions() {
+    const approveBtn = document.querySelector('.btn-approve');
+    const revisionBtn = document.querySelector('.btn-revision');
+    const rejectBtn = document.querySelector('.text-danger.fw-bold.small.cursor-pointer');
+    const revisionTextarea = document.getElementById('revisionText');
+
+    if (approveBtn) {
+        approveBtn.disabled = false;
+        approveBtn.style.opacity = '1';
+        approveBtn.style.pointerEvents = '';
+    }
+    if (revisionBtn) {
+        revisionBtn.disabled = false;
+        revisionBtn.style.opacity = '1';
+        revisionBtn.style.pointerEvents = '';
+    }
+    if (rejectBtn) {
+        rejectBtn.style.opacity = '1';
+        rejectBtn.style.pointerEvents = '';
+        rejectBtn.style.cursor = 'pointer';
+    }
+    if (revisionTextarea) {
+        revisionTextarea.disabled = false;
+    }
+}
+
+function handleActionError(error) {
+    console.error(error);
+    showToast(error.message || 'Đã có lỗi xảy ra. Vui lòng thử lại.', 'reject');
+}
+
+async function postApprovalAction(action, payload = {}) {
+    const articleId = getArticleId();
+    if (!articleId) {
+        throw new Error('Không tìm thấy article_id trên URL');
+    }
+
+    const formData = new FormData();
+    formData.append('article_id', articleId);
+    Object.entries(payload).forEach(([key, value]) => {
+        formData.append(key, value);
+    });
+
+    const response = await fetch(getIndexPhpPath() + '?action=' + encodeURIComponent(action), {
+        method: 'POST',
+        body: formData,
+        credentials: 'same-origin'
+    });
+
+    if (!response.ok) {
+        throw new Error('Lỗi mạng: ' + response.status);
+    }
+
+    return await response.json();
+}
+
+function setWorkflowApproved() {
+    const activeStep = document.querySelector('.step-active');
+    if (!activeStep) return;
+    const nextStep = activeStep.nextElementSibling;
+
+    activeStep.classList.remove('step-active');
+    activeStep.classList.add('step-complete');
+    activeStep.innerHTML = `
+        <div class="step-box">
+            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">
+                check_circle
+            </span>
+        </div>
+        <p class="small fw-bold mt-2 mb-0">Tổng biên tập phê duyệt</p>
+    `;
+
+    if (nextStep) {
+        nextStep.classList.remove('opacity-50');
+        nextStep.innerHTML = `
+            <div class="step-box text-white bg-primary">
+                <span class="material-symbols-outlined">
+                    radio_button_checked
+                </span>
+            </div>
+            <p class="small fw-bold mt-2 mb-0 text-primary">
+                Đã duyệt
+            </p>
+        `;
+    }
+}
+
+function setWorkflowRevision() {
+    const activeStep = document.querySelector('.step-active');
+    if (!activeStep) return;
+
     activeStep.classList.remove('step-active');
     activeStep.classList.add('step-rejected');
+    activeStep.innerHTML = `
+        <div class="step-box bg-warning text-dark">
+            <span class="material-symbols-outlined">
+                edit_note
+            </span>
+        </div>
+        <p class="small fw-bold mt-2 mb-0 text-warning-emphasis">
+            Yêu cầu chỉnh sửa
+        </p>
+    `;
+}
 
+function setWorkflowRejected() {
+    const activeStep = document.querySelector('.step-active');
+    if (!activeStep) return;
+
+    activeStep.classList.remove('step-active');
+    activeStep.classList.add('step-rejected');
     activeStep.innerHTML = `
         <div class="step-box bg-danger text-white">
-            <span class="material-symbols-outlined"
-                  style="font-variation-settings:'FILL' 1">
+            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">
                 cancel
             </span>
         </div>
-
         <p class="small fw-bold mt-2 mb-0 text-danger">
             Bài viết bị từ chối
         </p>
     `;
-
-    // Disable các nút action
-    disableAllActions();
-
-    showToast(
-        'Bài viết đã bị từ chối',
-        'reject'
-    );
-
-    setTimeout(() => {
-
-        showModal(
-            'Đã từ chối bài viết',
-            'Thông báo từ chối đã được gửi về cho biên tập viên.',
-            'cancel',
-            'reject'
-        );
-
-    }, 500);
 }
 
+async function approveArticle() {
+    disableAllActions();
+    showToast('Đang gửi yêu cầu duyệt...', 'success');
+
+    try {
+        const result = await postApprovalAction('approve_publish');
+        if (!result.success) {
+            throw new Error(result.message || 'Duyệt bài thất bại.');
+        }
+        setWorkflowApproved();
+        showToast('Bài viết đã được duyệt và chuyển sang xuất bản');
+        setTimeout(() => {
+            showModal(
+                'Đã duyệt bài viết!',
+                'Bài viết đã được chuyển sang trạng thái xuất bản.',
+                'check_circle',
+                'success'
+            );
+        }, 700);
+    } catch (error) {
+        enableAllActions();
+        handleActionError(error);
+    }
+}
+
+async function rejectArticle() {
+    const confirmReject = confirm(
+        'Bạn có chắc muốn từ chối bài viết này?'
+    );
+
+    if (!confirmReject) return;
+
+    disableAllActions();
+    showToast('Đang gửi yêu cầu từ chối...', 'reject');
+
+    try {
+        const result = await postApprovalAction('reject_article');
+        if (!result.success) {
+            throw new Error(result.message || 'Từ chối bài viết thất bại.');
+        }
+        setWorkflowRejected();
+        showToast('Bài viết đã bị từ chối', 'reject');
+        setTimeout(() => {
+            showModal(
+                'Đã từ chối bài viết',
+                'Thông báo từ chối đã được gửi về cho biên tập viên.',
+                'cancel',
+                'reject'
+            );
+        }, 500);
+    } catch (error) {
+        enableAllActions();
+        handleActionError(error);
+    }
+}
 
 function showToast(message, type = 'success') {
 

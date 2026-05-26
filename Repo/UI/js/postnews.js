@@ -16,6 +16,11 @@ fetch("../components/header.html")
         // Đắp HTML của header vào trang
         document.getElementById("header-placeholder").innerHTML = data;
 
+        const headerScript = document.createElement('script');
+        headerScript.src = '../js/header_user.js';
+        headerScript.defer = true;
+        document.head.appendChild(headerScript);
+
         // 1. Ẩn nút Đăng nhập / Đăng ký
         document.getElementById("login-section").classList.add("d-none");
         
@@ -219,22 +224,64 @@ function togglePublishTime(show) {
 }
 
 // 9. XỬ LÝ CÁC HÀNH ĐỘNG NHANH
-function handleQuickAction(actionType) {
-    if (actionType === 'draft') {
-        alert("✔️ Hệ thống NewsPulse: Đã lưu bản nháp thành công vào bộ nhớ tạm!");
-    }
-}
+  function handleQuickAction(action) {
+    const title = document.getElementById('postTitle').value;
+    const content = document.getElementById('richEditor').innerHTML;
+    const slug = document.getElementById('postSlug').value;
+    const excerpt = document.getElementById('metaDesc').value;
+    
+    // Lấy ID bài viết
+    const articleIdInput = document.getElementById('articleId');
+    const articleId = articleIdInput ? articleIdInput.value : '';
 
-function submitFinalForm() {
-    document.getElementById('postContent').value = document.getElementById('richEditor').innerHTML;
-    alert("🚀 NewsPulse: Bài viết đã được gửi cho Ban Biên Tập để thẩm định xuất bản!");
-}
-
-function goToProfile() {
-    const currentContent = document.getElementById('richEditor').innerText.trim();
-    if (currentContent.length > 0) {
-        const confirmLeave = confirm("Hệ thống NewsPulse: Bạn có nội dung chưa lưu, bạn có chắc muốn quay lại Profile không?");
-        if (!confirmLeave) return;
+    if (!title.trim() || !content.trim() || content === '<br>') {
+        alert("Vui lòng điền Tiêu đề và Nội dung bài viết trước khi lưu!");
+        return;
     }
-    window.location.href = 'profile.html';
+
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('content', content);
+    formData.append('slug', slug);
+    formData.append('excerpt', excerpt);
+    formData.append('status', action === 'draft' ? 'draft' : 'published');
+    
+    // Nếu đã có ID (đang sửa hoặc vừa mới lưu nháp xong) thì gửi lên
+    if (articleId) {
+        formData.append('article_id', articleId);
+    }
+
+    // Gửi ngầm qua API
+    fetch('?page=save_post', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            if (action === 'draft') {
+                // CHẾ ĐỘ LƯU NHÁP: Ở LẠI TRANG VÀ CẬP NHẬT ID
+                alert("✔️ Đã lưu bản nháp thành công!");
+                
+                // 1. Nhét ID server vừa trả về vào thẻ ẩn để lần sau bấm lưu nó hiểu là UPDATE
+                if (articleIdInput) {
+                    articleIdInput.value = data.article_id;
+                }
+                
+                // 2. Đổi luôn cái URL trên trình duyệt để lỡ user có F5 thì nó vẫn vào chế độ Sửa bài
+                window.history.pushState({}, '', '?page=postnews&id=' + data.article_id);
+                
+            } else {
+                // CHẾ ĐỘ XUẤT BẢN: ĐÁ VỀ TRANG PROFILE
+                alert("🎉 Bài viết đã xuất bản!");
+                window.location.href = '?page=profile';
+            }
+        } else {
+            alert("Lỗi từ máy chủ: " + data.message);
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Lỗi kết nối Server.");
+    });
 }
