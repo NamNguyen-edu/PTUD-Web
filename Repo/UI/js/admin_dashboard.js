@@ -3,7 +3,7 @@
  * Admin Dashboard — FIXED VERSION
  */
 
-const API_URL = '/PTUD-Web/Repo/?action=get_dashboard_data';
+const API_URL = '?action=get_dashboard_data';
 
 let initialized = false;
 
@@ -14,15 +14,63 @@ function init() {
 }
 
 document.addEventListener('appReady', init);
-document.addEventListener('DOMContentLoaded', init);
+// document.addEventListener('DOMContentLoaded', init);
 
 
 // ======================================================
 // FETCH DATA
 // ======================================================
 
+// async function loadDashboard() {
+//     try {
+//         const res = await fetch(API_URL);
+
+//         if (!res.ok) {
+//             throw new Error(`HTTP ${res.status}`);
+//         }
+
+//         const data = await res.json();
+
+//         console.log('[Dashboard API]', data);
+
+//        const ov = data.overview || {};
+
+// const kpi = {
+//     total_articles: ov.total_articles ?? 0,
+//     pending_approvals: ov.draft_articles ?? 0,
+//     active_users: ov.published_articles ?? 0,
+//     avg_approval_time_min: 0
+// };
+
+// const workflow = {
+//     live_count: ov.total_articles ?? 0,
+//     published: ov.published_articles ?? 0,
+//     draft: ov.draft_articles ?? 0,
+//     archived: 0,
+//     pending: 0
+// };
+
+// updateKPI(kpi);
+
+// updateWorkflow(workflow);
+
+// updateQueue(data.latest_articles || []);
+
+// updateActivity(data.recent_activity || []);
+
+//         runCounterAnimation();
+
+//     } catch (err) {
+//         console.error(err);
+//         showErrorBanner(err.message);
+//     }
+// }
+
+
 async function loadDashboard() {
+
     try {
+
         const res = await fetch(API_URL);
 
         if (!res.ok) {
@@ -33,19 +81,48 @@ async function loadDashboard() {
 
         console.log('[Dashboard API]', data);
 
-        updateKPI(data.kpi || {});
-        updateWorkflow(data.workflow_status || {});
-        updateQueue(data.approval_queue || []);
+        // =========================
+        // OVERVIEW
+        // =========================
+
+        const overview = data.overview || {};
+
+        updateKPI({
+            total_articles: overview.total_articles || 0,
+            pending_approvals: overview.pending_articles || 0,
+            active_users: overview.active_users || 0,
+            avg_approval_time_min: 0
+            });
+
+        updateWorkflow({
+            live_count: overview.published_articles || 0,
+            published: overview.published_articles || 0,
+            draft: overview.draft_articles || 0,
+            archived: 0,
+            pending: overview.pending_articles || 0
+        });
+
+        // =========================
+        // TABLE
+        // =========================
+
+        updateQueue(data.pending_queue || []);
+
+        // =========================
+        // ACTIVITY
+        // =========================
+
         updateActivity(data.recent_activity || []);
 
         runCounterAnimation();
 
     } catch (err) {
+
         console.error(err);
+
         showErrorBanner(err.message);
     }
 }
-
 
 // ======================================================
 // KPI
@@ -53,7 +130,7 @@ async function loadDashboard() {
 
 function updateKPI(kpi) {
 
-    const cards = document.querySelectorAll('.row.g-4.mb-5 > div');
+    const cards = document.querySelectorAll('[data-kpi]');
 
     const values = [
         kpi.total_articles ?? 0,
@@ -127,18 +204,48 @@ function updateWorkflow(workflow) {
 
     updateDonut(
         workflow.published ?? 0,
-        workflow.draft ?? 0
+        workflow.draft ?? 0,
+        workflow.review ?? 0,
+        workflow.rejected ?? 0
     );
 }
 
 
-function updateDonut(publishedPct, draftPct) {
+function updateDonut(published, draft, review, rejected) {
+
+    const total = published + draft + review + rejected;
+
+    if (total === 0) return;
 
     const circumference = 100.53;
 
-    const paths = document.querySelectorAll('.chart-path');
+    const paths =
+        document.querySelectorAll('.chart-path');
 
-    if (paths.length < 2) return;
+    if (paths.length < 4) {
+    console.error('Thiếu chart-path');
+    return;
+}
+
+    // =========================
+    // CONVERT TO %
+    // =========================
+
+    const publishedPct =
+        (published / total) * 100;
+
+    const draftPct =
+        (draft / total) * 100;
+
+    const reviewPct =
+        (review / total) * 100;
+
+    const rejectedPct =
+        (rejected / total) * 100;
+
+    // =========================
+    // ARC LENGTH
+    // =========================
 
     const publishedLength =
         (publishedPct / 100) * circumference;
@@ -146,7 +253,13 @@ function updateDonut(publishedPct, draftPct) {
     const draftLength =
         (draftPct / 100) * circumference;
 
-    // Published arc
+    const reviewLength =
+        (reviewPct / 100) * circumference;
+
+    const rejectedLength =
+        (rejectedPct / 100) * circumference;
+
+    // Published
     paths[0].setAttribute(
         'stroke-dasharray',
         `${publishedLength} ${circumference}`
@@ -154,10 +267,10 @@ function updateDonut(publishedPct, draftPct) {
 
     paths[0].setAttribute(
         'stroke-dashoffset',
-        `0`
+        '0'
     );
 
-    // Draft arc
+    // Draft
     paths[1].setAttribute(
         'stroke-dasharray',
         `${draftLength} ${circumference}`
@@ -166,6 +279,28 @@ function updateDonut(publishedPct, draftPct) {
     paths[1].setAttribute(
         'stroke-dashoffset',
         `${-publishedLength}`
+    );
+
+    // Review
+    paths[2].setAttribute(
+        'stroke-dasharray',
+        `${reviewLength} ${circumference}`
+    );
+
+    paths[2].setAttribute(
+        'stroke-dashoffset',
+        `${-publishedLength - draftLength}`
+    );
+
+    // Rejected
+    paths[3].setAttribute(
+        'stroke-dasharray',
+        `${rejectedLength} ${circumference}`
+    );
+
+    paths[3].setAttribute(
+        'stroke-dashoffset',
+        `${-publishedLength - draftLength - reviewLength}`
     );
 }
 
@@ -221,7 +356,10 @@ function updateQueue(queue) {
                 <td class="ps-4">
                     <div class="fw-bold text-truncate"
                         style="max-width:250px;">
-                        ${title}
+                        <a href="?page=admin1&article_id=${encodeURIComponent(item.article_id)}"
+                            class="text-decoration-none text-dark">
+                            ${title}
+                        </a>
                     </div>
 
                     <div class="small text-muted">
@@ -351,19 +489,16 @@ function updateActivity(activities) {
 
                     <p class="small text-muted mb-1">
 
-                        ${escapeHtml(item.actor || '')}
-
+                        ${escapeHtml(item.actor || 'Unknown')}
                         -
-
-                        ${escapeHtml(item.target || '')}
+                        ${escapeHtml(item.target || 'No target')}
 
                     </p>
 
                     <div class="text-uppercase text-muted fw-black"
                         style="font-size:0.6rem;opacity:.5;">
 
-                        ${timeAgo(item.created_at)}
-
+                    ${item.created_at ? timeAgo(item.created_at) : 'N/A'}
                     </div>
 
                 </div>

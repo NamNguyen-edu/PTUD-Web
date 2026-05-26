@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Trí tuệ Biên tập | Quy trình Phê duyệt</title>
+    <!-- Bootstrap 5 & FontAwesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+    <link rel="stylesheet" href="UI/css/admin1.css">
+    <link rel="stylesheet" href="UI/css/sidebar.css">
+    <link rel="stylesheet" href="UI/css/header_nav.css">
+</head>
+
+<body>
+
+    <div id="sidebar-placeholder"></div>
+
+    <div class="main-wrapper">
+        <div id="header_admin"></div>
+
+        <main class="content-area">
+            <div class="container-fluid">
+                <input type="hidden" id="articleId" name="article_id" value="{{ARTICLE_ID}}">
+
+                <section class="workflow-header-card shadow-sm">
+                    <div
+                        class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-end mb-5 gap-3">
+                        <div>
+                            <span class="text-primary fw-bold small text-uppercase">Giai đoạn: Phê duyệt của Tổng biên tập</span>
+                            <h2 class="display-6 fw-bold mt-1">{{ARTICLE_TITLE}}</h2>
+                        </div>
+                        <div
+                            class="text-danger bg-danger-subtle px-3 py-2 rounded-3 border border-danger-subtle small fw-bold d-flex align-items-center gap-1">
+                            <span class="material-symbols-outlined fs-6">timer</span>
+                            {{TIME_IN_STAGE}}
+                        </div>
+                    </div>
+
+                    <div class="position-relative py-2">
+                        <div class="pipeline-line"></div>
+                        <div class="d-flex justify-content-between position-relative z-2">
+                            <div class="text-center {{STEP_PENDING_CLASS}}">
+                                <div class="step-box" {{STEP_PENDING_BOX_STYLE}}><span class="material-symbols-outlined">radio_button_checked</span></div>
+                                <p class="small fw-bold mt-2 mb-0 d-none d-md-block">Tổng biên tập phê duyệt</p>
+                            </div>
+                            <div class="text-center {{STEP_APPROVED_CLASS}}">
+                                <div class="step-box" {{STEP_APPROVED_BOX_STYLE}}><span class="material-symbols-outlined">check_circle</span></div>
+                                <p class="small fw-bold mt-2 mb-0 d-none d-md-block">Đã duyệt</p>
+                            </div>
+                            <div class="text-center {{STEP_PUBLISHED_CLASS}}">
+                                <div class="step-box" {{STEP_PUBLISHED_BOX_STYLE}}><span class="material-symbols-outlined">rocket_launch</span></div>
+                                <p class="small fw-bold mt-2 mb-0 d-none d-md-block">Đã xuất bản</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="row g-4">
+                    <div class="col-lg-8">
+                        <div class="white-card mb-4 article-body">
+                            <div class="d-flex justify-content-between align-items-start mb-4">
+                                <h3 class="h4 fw-bold mb-0">Chi tiết biên tập</h3>
+                                <div class="d-flex gap-2">
+                                    <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">{{WORD_COUNT}} từ</span>
+                                    <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2">{{PRIMARY_CATEGORY}}</span>
+                                </div>
+                            </div>
+
+                            {{EXCERPT_BLOCK}}
+
+                            {{THUMBNAIL_BLOCK}}
+
+                            <div class="content-body">
+                                {{ARTICLE_BODY}}
+                            </div>
+                        </div>
+
+                        <div class="white-card">
+                            <div class="d-flex align-items-center gap-2 mb-4">
+                                <span class="material-symbols-outlined text-primary">chat_bubble</span>
+                                <h4 class="h6 fw-bold mb-0">Luồng ý kiến biên tập</h4>
+                            </div>
+
+                            {{COMMENT_LIST}}
+
+                            <div class="mt-4 pt-3 border-top">
+                                <textarea class="form-control border-0 bg-light rounded-4 p-3 small mb-2" rows="2"
+                                    placeholder="Thêm bình luận..."></textarea>
+                                <div class="text-end">
+                                    <button class="btn btn-link text-primary fw-bold text-decoration-none small p-0">Gửi
+                                        ghi chú</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="right-panel shadow-sm">
+                            <div class="white-card mb-4">
+                                <div class="d-flex align-items-center gap-3 mb-3">
+                                    {{AUTHOR_AVATAR}}
+                                    <div>
+                                        <h6 class="fw-bold mb-0">{{AUTHOR_NAME}}</h6>
+                                        <small class="text-muted">{{AUTHOR_USERNAME}}</small>
+                                    </div>
+                                </div>
+                                <div class="bg-light rounded-4 p-3 small text-muted">
+                                    {{ARTICLE_STATUS_NOTE}}
+                                </div>
+                            </div>
+
+                            {{ACTION_BLOCK}}
+
+                            <div class="white-card mb-4">
+                                <h5 class="fw-bold mb-4">Thông tin bài viết</h5>
+                                <ul class="list-unstyled mb-0">
+                                    {{INFO_ROWS}}
+                                </ul>
+                            </div>
+
+                            <div class="white-card" id="revisionForm" style="display:none;">
+                                <h6 class="fw-bold mb-3">Nội dung yêu cầu chỉnh sửa</h6>
+                                <textarea id="revisionText" class="form-control rounded-4 border-0 bg-light p-3 mb-3" rows="5" placeholder="Nhập nội dung cần chỉnh sửa..."></textarea>
+                                <button onclick="submitRevision()" class="btn btn-warning w-100 rounded-pill fw-bold text-dark">
+                                    Gửi yêu cầu chỉnh sửa
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="UI/js/load-sidebar.js"></script>
+    <script src="UI/js/admin1.js"></script>
+
+    <script>
+        function toggleRevisionForm() {
+            var form = document.getElementById("revisionForm");
+            form.style.display = form.style.display === "none" ? "block" : "none";
+        }
+    </script>
+</body>
+
+</html>
