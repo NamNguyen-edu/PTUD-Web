@@ -5,8 +5,14 @@
 
 // MODULE TỰ ĐỘNG LOAD COMPONENT (HEADER/FOOTER) TỪ TEAM
 document.addEventListener("DOMContentLoaded", function() {
+    
     // Tải Header
     // Tải Header
+const hiddenCat = document.getElementById('hiddenCategory');
+if (hiddenCat && hiddenCat.value) {
+    const categorySelect = document.getElementById('postCategory');
+    if (categorySelect) categorySelect.value = hiddenCat.value;
+}
 fetch("../components/header.html")
     .then(response => {
         if (!response.ok) throw new Error("Không thể load header");
@@ -229,20 +235,13 @@ function handleQuickAction(action, event) {
         // GET DATA
         // ==================================================
 
-        const title =
-            document.getElementById('postTitle')?.value || '';
-
-        const editor =
-            document.getElementById('richEditor');
-
-        const content =
-            editor ? editor.innerHTML : '';
-
-        const slug =
-            document.getElementById('seoSlug')?.value || '';
-
-        const excerpt =
-            document.getElementById('seoDescription')?.value || '';
+const title = document.getElementById('postTitle')?.value || '';
+const editor = document.getElementById('richEditor');
+const content = editor ? editor.innerHTML : '';
+const slug = document.getElementById('postSlug')?.value || ''; // Trong HTML bạn đặt là postSlug
+const excerpt = document.getElementById('metaDesc')?.value || ''; // Sửa ID này lại cho đúng với HTML
+const category = document.getElementById('postCategory')?.value || ''; // Thêm lấy chuyên mục
+const tags = document.getElementById('postTags')?.value || '';
 
         // ==================================================
         // ARTICLE ID
@@ -277,22 +276,14 @@ function handleQuickAction(action, event) {
         // FORM DATA
         // ==================================================
 
-        const formData = new FormData();
-
-        formData.append('title', title);
-
-        formData.append('content', content);
-
-        formData.append('slug', slug);
-
-        formData.append('excerpt', excerpt);
-
-        formData.append(
-            'status',
-            action === 'draft'
-                ? 'draft'
-                : 'published'
-        );
+  const formData = new FormData();
+formData.append('title', title);
+formData.append('content', content);
+formData.append('slug', slug);
+formData.append('excerpt', excerpt);
+formData.append('category', category); // Gửi lên server
+formData.append('tags', tags);         // Gửi lên server
+formData.append('status', action === 'draft' ? 'draft' : 'published');
 
         // update mode
         if (articleId) {
@@ -305,9 +296,6 @@ function handleQuickAction(action, event) {
 
         console.log('FETCH START');
 
-        // ==================================================
-        // FETCH
-        // ==================================================
 
         fetch('?page=save_post', {
 

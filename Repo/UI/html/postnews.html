@@ -51,6 +51,7 @@
                             <div class="row align-items-center mb-4">
                                 <div class="col-md-3"><span class="form-label">Chuyên mục chính <span class="text-danger">*</span></span></div>
                                 <div class="col-md-9">
+                                    <input type="hidden" id="hiddenCategory" value="{{CATEGORY_SLUG}}">
                                     <select class="form-control custom-select" id="postCategory" required>
                                         <option value="">-- Chọn một chuyên mục --</option>
                                         <option value="thoi-su">Thời sự</option>
@@ -58,14 +59,16 @@
                                         <option value="cong-nghe">Công nghệ</option>
                                         <option value="the-thao">Thể thao</option>
                                     </select>
+
+ 
                                     <small class="error-msg text-danger d-none">Vui lòng chọn chuyên mục để tiếp tục.</small>
                                 </div>
                             </div>
                             <div class="row align-items-center">
                                 <div class="col-md-3"><span class="form-label">Tags (Từ khóa):</span></div>
-                                <div class="col-md-9">
-                                    <input type="text" class="form-control" id="postTags" placeholder="#tin-nong, #newspulse, #vietnam">
-                                </div>
+                                   <div class="col-md-9">
+                                        <input type="text" class="form-control" id="postTags" value="{{TAGS}}" placeholder="#tin-nong, #newspulse, #vietnam">
+                                    </div>
                             </div>
                         </div>
                     </div>
