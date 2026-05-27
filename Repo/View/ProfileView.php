@@ -32,15 +32,46 @@ class ProfileView
                 $views = isset($article['view_count']) ? intval($article['view_count']) : (isset($article['views']) ? intval($article['views']) : 0);
                 $totalViews += $views;
 
-                $statusText = 'Bản nháp';
-                $statusClass = 'badge-warning';
-                if (!empty($article['status']) && (in_array(strtolower($article['status']), ['published', 'đã đăng', 'public']))) {
-                    $statusText = 'Đã đăng';
-                    $statusClass = 'badge-success';
+                // Lấy trạng thái chuẩn từ Database
+                $status = strtolower($article['status'] ?? 'draft');
+                $isLocked = false;
+
+                // Quy tắc nghiệp vụ: Phân loại nhãn và quyền chỉnh sửa
+                switch ($status) {
+                    case 'published':
+                        $statusText = 'Đã đăng';
+                        $statusClass = 'badge-success';
+                        $isLocked = true; // KHÓA
+                        break;
+                    case 'pending':
+                        $statusText = 'Chờ duyệt';
+                        $statusClass = 'badge-warning';
+                        $isLocked = true; // KHÓA
+                        break;
+                    case 'rejected':
+                        $statusText = 'Bị từ chối';
+                        $statusClass = 'badge-danger';
+                        break;
+                    case 'revision':
+                        $statusText = 'Cần sửa lại';
+                        $statusClass = 'badge-info';
+                        break;
+                    case 'draft':
+                    default:
+                        $statusText = 'Bản nháp';
+                        $statusClass = 'badge-secondary';
+                        break;
                 }
 
                 $dateFormatted = !empty($article['created_at']) ? date('d/m/Y', strtotime($article['created_at'])) : date('d/m/Y');
                 $articleId = isset($article['article_id']) ? $article['article_id'] : 0;
+
+                // Render Nút chức năng (Khóa hoặc Mở)
+                if ($isLocked) {
+                    $editBtnHtml = '<button class="btn btn-light btn-sm mr-1 text-muted" title="Bị khóa (Đang chờ duyệt hoặc Đã xuất bản)" disabled><i class="fas fa-lock"></i></button>';
+                } else {
+                    $editBtnHtml = '<a href="?page=postnews&id=' . $articleId . '" class="btn btn-light btn-sm mr-1 text-primary" title="Chỉnh sửa"><i class="fas fa-edit"></i></a>';
+                }
 
                 $articlesHtml .= '
                 <tr>
@@ -55,14 +86,14 @@ class ProfileView
                         <div class="small"><i class="fas fa-eye mr-1"></i> ' . number_format($views) . '</div>
                     </td>
                     <td class="text-right align-middle">
-                        <a href="?page=postnews&id=' . $articleId . '" class="btn btn-light btn-sm mr-1"><i class="fas fa-edit"></i></a>
-                        <button class="btn btn-light btn-sm text-danger"><i class="fas fa-trash"></i></button>
+                        ' . $editBtnHtml . '
+                        <button class="btn btn-light btn-sm text-danger" title="Xóa bài"><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>';
             }
         }
 
-$data = [
+        $data = [
             'AVATAR_URL' => $avatarUrl,
             'FULL_NAME' => htmlspecialchars($fullName),
             'BIO' => htmlspecialchars($bio),
@@ -72,10 +103,9 @@ $data = [
             'POSTS_COUNT' => $postsCount,
             'VIEWS_COUNT' => $totalViews > 1000 ? number_format($totalViews/1000, 1) . 'K' : $totalViews,
             'LIST_ARTICLES' => $articlesHtml,
-            // THÊM DÒNG NÀY VÀO: Lấy chuỗi JSON kỹ năng từ DB (Nếu trống thì gán là mảng rỗng '[]')
-'SKILLS_JSON' => (!empty($userInfo) && !empty($userInfo['skills'])) ? htmlspecialchars($userInfo['skills'], ENT_QUOTES, 'UTF-8') : '[]',        ];
+            'SKILLS_JSON' => (!empty($userInfo) && !empty($userInfo['skills'])) ? htmlspecialchars($userInfo['skills'], ENT_QUOTES, 'UTF-8') : '[]',        
+        ];
 
-echo $this->engine->render('profile', $data);
-
+        echo $this->engine->render('profile', $data);
     }
 }
