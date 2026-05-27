@@ -185,3 +185,22 @@ CREATE TABLE IF NOT EXISTS media (
     CONSTRAINT FK_media_uploader FOREIGN KEY (uploaded_by) 
         REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE RESTRICT
 ) ENGINE=InnoDB;
+
+-- 10. ARTICLE_VERSIONS — Lưu trữ phiên bản bài viết
+CREATE TABLE article_versions (
+    version_id      INT AUTO_INCREMENT PRIMARY KEY,
+    article_id      INT NOT NULL,
+    title           VARCHAR(500),
+    content         LONGTEXT,
+    version_name    VARCHAR(50),
+    edited_by       INT,
+    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (article_id)
+        REFERENCES articles(article_id)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (edited_by)
+        REFERENCES users(user_id)
+        ON DELETE SET NULL
+);
