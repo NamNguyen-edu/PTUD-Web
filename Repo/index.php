@@ -1,14 +1,5 @@
 <?php
 
-/*
-* CHANGE LOG (PHIÊN LÀM VIỆC HIỆN TẠI):
- * - AuthController.php: đã cập nhật để đảm bảo `logout()` và `currentUser()` dùng `session_start()` an toàn.
- * - AuthController.php: `currentUser()` trả về JSON gồm `logged` và `user` để header JS có thể hiển thị profile khi đã đăng nhập.
- * - UI/components/header.html: đã chuyển loader `header_user.js` thành script động để tránh lỗi 404 khi load header từ trang tĩnh.
- * - UI/js/header_user.js: đã sửa đường dẫn và logic để gọi `get_current_user` đúng theo page hiện tại, cả khi chạy root PHP và khi chạy từ `UI/html/`.
- * - UI/js/profile.js` và `UI/js/postnews.js`: đã thêm việc load `header_user.js` sau khi chèn header bằng `innerHTML`, giúp script được thực thi đúng.
- */
-
 
 session_start();
 
@@ -69,6 +60,16 @@ switch ($page) {
         (new ArticleController())->detail();
         break;
 
+    case 'article_comments':
+        require_once __DIR__ . '/Controller/CommentController.php';
+        (new CommentController())->listComments();
+        break;
+
+    case 'add_article_comment':
+        require_once __DIR__ . '/Controller/CommentController.php';
+        (new CommentController())->add();
+        break;
+
     case 'postnews':
         require_once __DIR__ . '/Controller/PostnewsController.php';
         (new PostnewsController())->show();
@@ -84,7 +85,7 @@ switch ($page) {
     case 'technology':
     case 'admin_dashboard':
     case 'admin_userm':
-    
+    case 'admin1':
     case 'accountmanagement':
     case 'catalogmanagement':
     case 'version-control':

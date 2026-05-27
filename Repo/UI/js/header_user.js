@@ -86,9 +86,4 @@ const avatarUrl = (data.user && data.user.avatar_url)
 
     window.initHeaderUser = initHeaderUser;
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initHeaderUser);
-    } else {
-        initHeaderUser();
-    }
 })();
