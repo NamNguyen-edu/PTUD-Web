@@ -85,27 +85,61 @@ public function savePost(): void
     public function handleAction(): void
 {
     header('Content-Type: application/json');
-    $action = $_POST['action_type'] ?? '';
+    $action    = $_POST['action_type'] ?? '';
     $articleId = intval($_POST['article_id'] ?? 0);
-    $userId = $_SESSION['user_id'] ?? 1;
+    $userId    = $_SESSION['user_id'] ?? 1;
 
     try {
         if ($action === 'delete') {
-            // Xóa mềm: is_deleted = 1
-            pdo_execute("UPDATE articles SET is_deleted = 1 WHERE article_id = ? AND user_id = ?", $articleId, $userId);
-        } 
-        elseif ($action === 'withdraw') {
-            // Rút bài: pending -> draft
-            pdo_execute("UPDATE articles SET status = 'draft' WHERE article_id = ? AND user_id = ? AND status = 'pending'", $articleId, $userId);
-        } 
+            // Xóa thật vì schema không có is_deleted
+            pdo_execute(
+                "DELETE FROM articles WHERE article_id = ? AND user_id = ?",
+                $articleId, $userId
+            );
+            echo json_encode(['success' => true]);
+
+        } elseif ($action === 'withdraw') {
+            pdo_execute(
+                "UPDATE articles SET status = 'draft' 
+                 WHERE article_id = ? AND user_id = ? AND status = 'pending'",
+                $articleId, $userId
+            );
+            echo json_encode(['success' => true]);
+
+        }
         elseif ($action === 'request_takedown') {
-            // Lưu yêu cầu gỡ bài vào bảng takedown_requests
-            $reason = $_POST['reason'] ?? '';
-            pdo_execute("INSERT INTO takedown_requests (article_id, user_id, reason, status) VALUES (?, ?, ?, 'pending')", 
-                        $articleId, $userId, $reason);
+    $article = pdo_query_one(
+        "SELECT status FROM articles WHERE article_id = ?",
+        $articleId
+    );
+
+    if (!$article || $article['status'] !== 'published') {
+        echo json_encode(['success' => false, 'message' => 'Bài viết không ở trạng thái có thể gỡ.']);
+        return;
+    }
+
+    // Kiểm tra đã gửi chưa
+    $existing = pdo_query_one(
+        "SELECT 1 FROM takedown_requests WHERE article_id = ? AND user_id = ?",
+        $articleId, $userId
+    );
+
+    if ($existing) {
+        echo json_encode(['success' => false, 'message' => 'Bạn đã gửi yêu cầu gỡ bài này rồi, vui lòng chờ xử lý.']);
+        return;
+    }
+
+    $reason = trim($_POST['reason'] ?? '');
+    pdo_execute(
+        "INSERT INTO takedown_requests (article_id, user_id, reason) VALUES (?, ?, ?)",
+        $articleId, $userId, $reason
+    );
+    echo json_encode(['success' => true]);
+}
+         else {
+            echo json_encode(['success' => false, 'message' => 'Action không hợp lệ.']);
         }
 
-        echo json_encode(['success' => true]);
     } catch (Exception $e) {
         echo json_encode(['success' => false, 'message' => $e->getMessage()]);
     }

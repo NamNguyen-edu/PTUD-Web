@@ -11,7 +11,7 @@ class ProfileView
         $this->engine = $engine ?? new ViewEngine();
     }
 
-    public function render(?array $userInfo, ?array $userArticles): void
+public function render(array $userInfo, array $userArticles, array $alertArticles = []): void
     {
         $fullName = (!empty($userInfo) && !empty($userInfo['full_name'])) ? $userInfo['full_name'] : 'Nguyễn Duy Bảo';
         $bio      = (!empty($userInfo) && !empty($userInfo['bio']))       ? $userInfo['bio']       : 'Nhà văn tự do, đam mê viết lách.';
@@ -109,19 +109,22 @@ class ProfileView
             }
         }
 
-        $data = [
-            'AVATAR_URL' => $avatarUrl,
-            'FULL_NAME' => htmlspecialchars($fullName),
-            'BIO' => htmlspecialchars($bio),
-            'EMAIL' => htmlspecialchars($email),
-            'MAJOR' => 'Chuyên ngành Hệ thống thông tin',
-            'ORGANIZATION' => 'UEH',
-            'POSTS_COUNT' => $postsCount,
-            'VIEWS_COUNT' => $totalViews > 1000 ? number_format($totalViews/1000, 1) . 'K' : $totalViews,
-            'LIST_ARTICLES' => $articlesHtml,
-            'SKILLS_JSON' => (!empty($userInfo) && !empty($userInfo['skills'])) ? htmlspecialchars($userInfo['skills'], ENT_QUOTES, 'UTF-8') : '[]',        
-        ];
+       $data = [
+    'AVATAR_URL'          => $avatarUrl,
+    'FULL_NAME'           => htmlspecialchars($fullName),
+    'BIO'                 => htmlspecialchars($bio),
+    'EMAIL'               => htmlspecialchars($email),
+    'MAJOR'               => 'Chuyên ngành Hệ thống thông tin',
+    'ORGANIZATION'        => 'UEH',
+    'POSTS_COUNT'         => $postsCount,
+    'VIEWS_COUNT'         => $totalViews > 1000 ? number_format($totalViews/1000, 1) . 'K' : $totalViews,
+    'LIST_ARTICLES'       => $articlesHtml,
+    'SKILLS_JSON'         => (!empty($userInfo) && !empty($userInfo['skills'])) 
+                             ? htmlspecialchars($userInfo['skills'], ENT_QUOTES, 'UTF-8') 
+                             : '[]',
+    'ALERT_ARTICLES_JSON' => htmlspecialchars(json_encode($alertArticles), ENT_QUOTES, 'UTF-8'),
+];
 
-        echo $this->engine->render('profile', $data);
+echo $this->engine->render('profile', $data);
     }
 }

@@ -91,4 +91,15 @@ class ProfileService
             return false;
         }
     }
+    public function getAlertArticles(int $userId): array
+{
+    $rows = pdo_query(
+        "SELECT article_id, title, status 
+         FROM articles 
+         WHERE user_id = ? AND status IN ('revision', 'rejected')
+         ORDER BY updated_at DESC",
+        $userId
+    );
+    return $rows ?: [];
+}
 }

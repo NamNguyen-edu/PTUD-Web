@@ -1,72 +1,4 @@
 // MODULE TỰ ĐỘNG LOAD COMPONENT (HEADER/FOOTER)
-document.addEventListener("DOMContentLoaded", function() {
-    // Tải Header
-    fetch("/PTUD-Web/Repo/UI/components/header.html")
-        .then(response => {
-            if (!response.ok) throw new Error("Không thể load header");
-            return response.text();
-        })
-        .then(data => {
-            document.getElementById("header-placeholder").innerHTML = data;
-
-            const headerScript = document.createElement('script');
-            headerScript.src = '../js/header_user.js';
-            headerScript.defer = true;
-            document.head.appendChild(headerScript);
-
-            // 1. Ẩn nút Đăng nhập / Đăng ký
-            document.getElementById("login-section").classList.add("d-none");
-            
-            // 2. Bật khu vực Profile lên
-            document.getElementById("profile-section").classList.remove("d-none");
-            document.getElementById("profile-section").classList.add("d-flex"); 
-            
-            // 3. Đổi tên và email cho trang cá nhân
-const realName = document.querySelector('.profile-sidebar h4')?.innerText || 'Biên tập viên';
-document.getElementById("profile-name").innerText = realName;
-document.getElementById("profile-menu-name").innerText = realName;
-
-            // 4. Xử lý click xổ menu mượt mà
-            const profileBtn = document.querySelector('.profile-info');
-            const profileMenu = document.querySelector('.profile-menu');
-
-            profileBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                profileMenu.classList.toggle('d-block');
-            });
-
-            document.addEventListener('click', function(e) {
-                if (!profileMenu.contains(e.target) && !profileBtn.contains(e.target)) {
-                    profileMenu.classList.remove('d-block');
-                }
-            });
-        })
-        .catch(err => console.error(err));
-
-    // Tải Footer
-    fetch("/PTUD-Web/Repo/UI/components/footer.html")
-        .then(response => {
-            if (!response.ok) throw new Error("Không thể load footer");
-            return response.text();
-        })
-        .then(data => {
-            document.getElementById("footer-placeholder").innerHTML = data;
-        })
-        .catch(err => console.error(err));
-        const hiddenSkillsInput = document.getElementById('hiddenSkills');
-    if (hiddenSkillsInput && hiddenSkillsInput.value) {
-        // Rào điều kiện để tránh lỗi nếu biến chưa được PHP thay thế
-        if (hiddenSkillsInput.value !== '{{SKILLS_JSON}}') {
-            try {
-                userSkills = JSON.parse(hiddenSkillsInput.value);
-                renderSkills(); // Gọi hàm vẽ tag ra màn hình
-            } catch(e) {
-                console.error("Lỗi parse JSON kỹ năng:", e);
-            }
-        }
-    }
-});
-
 
 // 2. KHỞI TẠO KHI TRANG LOAD XONG (Phần logic cũ của Profile)
 document.addEventListener("DOMContentLoaded", function() {
@@ -140,7 +72,48 @@ document.addEventListener("DOMContentLoaded", function() {
         } catch(e) {
             console.error("Lỗi parse JSON kỹ năng:", e);
         }
+            checkFirstTimeLogin();
+    checkArticleAlerts();
     }
+    function checkArticleAlerts() {
+    const el = document.getElementById('alertArticlesData');
+    if (!el || !el.value || el.value === '{{ALERT_ARTICLES_JSON}}') return;
+
+    let articles = [];
+    try { articles = JSON.parse(el.value); } catch(e) { return; }
+    if (!articles.length) return;
+
+    // Build danh sách bài cần xử lý
+    const statusMap = {
+        'revision':  { label: 'Cần sửa lại', cls: 'warning',  icon: 'fa-edit' },
+        'rejected':  { label: 'Bị từ chối',  cls: 'danger',   icon: 'fa-times-circle' }
+    };
+
+const listHtml = articles.map(a => {
+    const s = statusMap[a.status] || { label: a.status, cls: 'secondary', icon: 'fa-info-circle' };
+    
+    // Chỉ revision mới có nút Sửa ngay, rejected chỉ hiển thị thôi
+const actionBtn = a.status === 'revision'
+    ? `<a href="?page=postnews&id=${a.article_id}" class="btn btn-sm btn-outline-primary ml-2 font-weight-bold" style="white-space: nowrap; flex-shrink: 0;">Sửa ngay</a>`
+    : `<span class="badge badge-danger ml-2 p-2" style="white-space: nowrap; flex-shrink: 0;">Đã bị từ chối</span>`;
+
+    return `
+        <div class="d-flex align-items-center p-3 mb-2 rounded bg-white shadow-sm" 
+             style="border-left: 4px solid var(--${s.cls === 'warning' ? 'warning' : 'danger'});">
+            <i class="fas ${s.icon} text-${s.cls} mr-3 fa-lg"></i>
+            <div class="flex-grow-1">
+                <div class="font-weight-bold small">${a.title}</div>
+                <span class="badge badge-${s.cls} mt-1">${s.label}</span>
+            </div>
+            ${actionBtn}
+        </div>`;
+}).join('');
+
+    document.getElementById('alertArticlesList').innerHTML = listHtml;
+
+    // Hiện modal sau 800ms để trang load xong
+    setTimeout(() => { $('#articleAlertModal').modal('show'); }, 800);
+}
 });
 
 // 3. LOGIC CHUYỂN TAB (SỬ DỤNG BOOTSTRAP TABS KẾT HỢP CUSTOM LOGIC)
