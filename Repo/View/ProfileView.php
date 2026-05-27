@@ -51,6 +51,7 @@ class ProfileView
                     case 'rejected':
                         $statusText = 'Bị từ chối';
                         $statusClass = 'badge-danger';
+                        $isLocked = true; // KHÓA                       
                         break;
                     case 'revision':
                         $statusText = 'Cần sửa lại';
@@ -66,11 +67,26 @@ class ProfileView
                 $dateFormatted = !empty($article['created_at']) ? date('d/m/Y', strtotime($article['created_at'])) : date('d/m/Y');
                 $articleId = isset($article['article_id']) ? $article['article_id'] : 0;
 
-                // Render Nút chức năng (Khóa hoặc Mở)
+// Render Nút chức năng (Sửa - Khóa)
                 if ($isLocked) {
                     $editBtnHtml = '<button class="btn btn-light btn-sm mr-1 text-muted" title="Bị khóa (Đang chờ duyệt hoặc Đã xuất bản)" disabled><i class="fas fa-lock"></i></button>';
                 } else {
                     $editBtnHtml = '<a href="?page=postnews&id=' . $articleId . '" class="btn btn-light btn-sm mr-1 text-primary" title="Chỉnh sửa"><i class="fas fa-edit"></i></a>';
+                }
+
+                // ==========================================
+                // TASK 3: RẼ NHÁNH 3 KỊCH BẢN CHO NÚT XÓA
+                // ==========================================
+                $deleteBtnHtml = '';
+                if (in_array($status, ['draft', 'revision', 'rejected'])) {
+                    // Kịch bản 1: Xóa mềm tự do
+                    $deleteBtnHtml = '<button class="btn btn-light btn-sm text-danger" onclick="deleteArticle(' . $articleId . ')" title="Xóa bài viết"><i class="fas fa-trash"></i></button>';
+                } elseif ($status === 'pending') {
+                    // Kịch bản 2: Rút bài (Trả về nháp)
+                    $deleteBtnHtml = '<button class="btn btn-light btn-sm text-warning" onclick="withdrawArticle(' . $articleId . ')" title="Rút bài (Hủy chờ duyệt)"><i class="fas fa-undo"></i></button>';
+                } elseif ($status === 'published') {
+                    // Kịch bản 3: Yêu cầu gỡ bài (Hiện form điền lý do)
+                    $deleteBtnHtml = '<button class="btn btn-light btn-sm text-danger" onclick="openTakedownModal(' . $articleId . ')" title="Yêu cầu gỡ bài"><i class="fas fa-flag"></i></button>';
                 }
 
                 $articlesHtml .= '
@@ -87,7 +103,7 @@ class ProfileView
                     </td>
                     <td class="text-right align-middle">
                         ' . $editBtnHtml . '
-                        <button class="btn btn-light btn-sm text-danger" title="Xóa bài"><i class="fas fa-trash"></i></button>
+                        ' . $deleteBtnHtml . '
                     </td>
                 </tr>';
             }

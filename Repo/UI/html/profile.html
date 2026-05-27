@@ -308,7 +308,6 @@
             </div>
         </div>
     </div>
-    <input type="file" id="avatarInput" accept="image/*" class="d-none" onchange="openCropModal(event)">
 <input type="file" id="avatarInput" accept="image/*" class="d-none" onchange="openCropModal(event)">
     
     <div class="modal fade" id="cropModal" tabindex="-1" data-backdrop="static">
@@ -330,7 +329,33 @@
             </div>
         </div>
     </div>
-
+<div class="modal fade" id="takedownModal" tabindex="-1" data-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-lg">
+                <div class="modal-header bg-light border-0">
+                    <h6 class="modal-title font-weight-bold text-danger">
+                        <i class="fas fa-flag mr-2"></i>Yêu cầu gỡ bài viết
+                    </h6>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="alert alert-warning small">
+                        <strong>Lưu ý:</strong> Bài viết này đã được xuất bản công khai. Việc gỡ bài cần được Ban Biên Tập xem xét và phê duyệt.
+                    </div>
+                    <input type="hidden" id="takedownArticleId" value="">
+                    <div class="form-group mt-3">
+                        <label class="small font-weight-bold text-uppercase">Lý do yêu cầu gỡ <span class="text-danger">*</span></label>
+                        <textarea class="form-control bg-light border-0" id="takedownReason" rows="4" placeholder="Vui lòng nêu rõ lý do: sai số liệu, lỗi bản quyền, cập nhật thông tin mới..."></textarea>
+                        <small class="text-danger d-none" id="takedownError">Vui lòng nhập lý do gỡ bài!</small>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0 pb-4 pr-4">
+                    <button type="button" class="btn btn-light font-weight-bold" data-dismiss="modal">HỦY BỎ</button>
+                    <button type="button" class="btn btn-danger font-weight-bold px-4" onclick="submitTakedown()">GỬI YÊU CẦU</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div id="footer-placeholder" class="mt-auto w-100"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>

@@ -82,4 +82,32 @@ public function savePost(): void
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);
         }
     }
+    public function handleAction(): void
+{
+    header('Content-Type: application/json');
+    $action = $_POST['action_type'] ?? '';
+    $articleId = intval($_POST['article_id'] ?? 0);
+    $userId = $_SESSION['user_id'] ?? 1;
+
+    try {
+        if ($action === 'delete') {
+            // Xóa mềm: is_deleted = 1
+            pdo_execute("UPDATE articles SET is_deleted = 1 WHERE article_id = ? AND user_id = ?", $articleId, $userId);
+        } 
+        elseif ($action === 'withdraw') {
+            // Rút bài: pending -> draft
+            pdo_execute("UPDATE articles SET status = 'draft' WHERE article_id = ? AND user_id = ? AND status = 'pending'", $articleId, $userId);
+        } 
+        elseif ($action === 'request_takedown') {
+            // Lưu yêu cầu gỡ bài vào bảng takedown_requests
+            $reason = $_POST['reason'] ?? '';
+            pdo_execute("INSERT INTO takedown_requests (article_id, user_id, reason, status) VALUES (?, ?, ?, 'pending')", 
+                        $articleId, $userId, $reason);
+        }
+
+        echo json_encode(['success' => true]);
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    }
+}
 }
