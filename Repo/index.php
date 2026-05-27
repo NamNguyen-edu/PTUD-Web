@@ -1,54 +1,69 @@
+<!-- * CHANGE LOG (PHIÊN LÀM VIỆC HIỆN TẠI):
+ * - AuthController.php: đã cập nhật để đảm bảo `logout()` và `currentUser()` dùng `session_start()` an toàn.
+ * - AuthController.php: `currentUser()` trả về JSON gồm `logged` và `user` để header JS có thể hiển thị profile khi đã đăng nhập.
+ * - UI/components/header.html: đã chuyển loader `header_user.js` thành script động để tránh lỗi 404 khi load header từ trang tĩnh.
+ * - UI/js/header_user.js: đã sửa đường dẫn và logic để gọi `get_current_user` đúng theo page hiện tại, cả khi chạy root PHP và khi chạy từ `UI/html/`.
+ * - UI/js/profile.js` và `UI/js/postnews.js`: đã thêm việc load `header_user.js` sau khi chèn header bằng `innerHTML`, giúp script được thực thi đúng.
+  -->
+
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-  session_start();
-}
-require_once __DIR__ . '/Model/pdo.php';
-require_once __DIR__ . '/View/ViewEngine.php';
-require_once __DIR__ . '/Services/search_service.php';
-require_once __DIR__ . '/Services/profile_service.php';
-require_once __DIR__ . '/Services/Dashboard_admin_service.php';
+session_start();
 
-$page = trim((string)($_GET['page'] ?? 'home'));
+require_once __DIR__ . '/Controller/AuthController.php';
+require_once __DIR__ . '/Controller/DashboardController.php';
 
-function redirect($url)
+function redirect(string $url): void
 {
   header('Location: ' . $url);
   exit;
 }
 
-$viewEngine = new ViewEngine(__DIR__);
+$page = trim((string)($_GET['page'] ?? 'home'));
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  // Đọc hành động ẩn được gửi kèm từ FormData
-  $formAction = $_POST['action'] ?? '';
-
-  switch ($formAction) {
-    case 'login':
-    case 'signup':
-      require_once __DIR__ . '/Controller/login_controller.php';
-      $loginCtrl = new LoginController($viewEngine);
-      if ($formAction === 'login')  $loginCtrl->handleLogin();
-      if ($formAction === 'signup') $loginCtrl->handleSignup();
-      break;
-  }
-  exit;
-}
-
-// Màng lọc bảo mật phân quyền
-$ADMIN_PAGES = ['admin_dashboard', 'admin_userm', 'admin1', 'accountmanagement', 'catalogmanagement', 'version-control'];
-$userRole = $_SESSION['role'] ?? null;
-
-if (in_array($page, $ADMIN_PAGES) && $userRole !== 'admin' && $userRole !== 'chief editor') {
-  redirect('?page=login');
-}
-
-// Router hiển thị trang
 switch ($page) {
+  case 'save_post':
+    require_once __DIR__ . '/Controller/PostnewsController.php';
+    (new PostnewsController())->savePost();
+    break;
+
   case 'login':
+    require_once __DIR__ . '/Controller/AuthController.php';
+    (new AuthController())->login();
+    break;
+
   case 'signup':
-    if ($userRole) redirect('?page=home');
-    require_once __DIR__ . '/Controller/login_controller.php';
-    (new LoginController($viewEngine))->show();
+    require_once __DIR__ . '/Controller/AuthController.php';
+    (new AuthController())->signup();
+    break;
+
+  case 'logout':
+    require_once __DIR__ . '/Controller/AuthController.php';
+    (new AuthController())->logout();
+    break;
+
+  case 'search_suggestions':
+    require_once __DIR__ . '/Controller/SearchController.php';
+    (new SearchController())->suggestions(trim((string)($_GET['keyword'] ?? '')));
+    break;
+
+  case 'get_dashboard_data':
+    require_once __DIR__ . '/Controller/DashboardController.php';
+    (new DashboardController())->getDashboardData();
+    break;
+
+  case 'get_current_user':
+    require_once __DIR__ . '/Controller/AuthController.php';
+    (new AuthController())->currentUser();
+    break;
+
+  case 'home_feed':
+    require_once __DIR__ . '/Controller/home_controller.php';
+    (new HomeController())->feed();
+    break;
+
+  case 'article_detail':
+    require_once __DIR__ . '/Controller/load_articles_controller.php';
+    (new ArticleController())->detail();
     break;
 
   case 'postnews':
@@ -66,7 +81,7 @@ switch ($page) {
   case 'technology':
   case 'admin_dashboard':
   case 'admin_userm':
-  case 'admin1':
+
   case 'accountmanagement':
   case 'catalogmanagement':
   case 'version-control':
@@ -74,9 +89,19 @@ switch ($page) {
     (new PageController())->render($page);
     break;
 
+  case 'search':
+    require_once __DIR__ . '/Controller/SearchController.php';
+    (new SearchController())->search(trim((string)($_GET['keyword'] ?? '')));
+    break;
+
   case 'profile':
     require_once __DIR__ . '/Controller/ProfileController.php';
     (new ProfileController())->show();
+    break;
+
+  case 'dbtest':
+    require_once __DIR__ . '/Controller/DbTestController.php';
+    (new DbTestController())->test();
     break;
 
   default:

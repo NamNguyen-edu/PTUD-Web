@@ -16,8 +16,8 @@ class HomeController {
 
         try {
 
-            $page = isset($_GET['page'])
-                ? (int) $_GET['page']
+            $page = isset($_GET['page_num'])
+                ? (int) $_GET['page_num']
                 : 1;
 
             $data = $this->homeService

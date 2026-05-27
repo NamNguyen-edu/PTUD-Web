@@ -16,6 +16,11 @@ fetch("../components/header.html")
         // Đắp HTML của header vào trang
         document.getElementById("header-placeholder").innerHTML = data;
 
+        const headerScript = document.createElement('script');
+        headerScript.src = '../js/header_user.js';
+        headerScript.defer = true;
+        document.head.appendChild(headerScript);
+
         // 1. Ẩn nút Đăng nhập / Đăng ký
         document.getElementById("login-section").classList.add("d-none");
         
@@ -247,7 +252,7 @@ function togglePublishTime(show) {
     }
 
     // Gửi ngầm qua API
-    fetch('?action=save_post', {
+    fetch('?page=save_post', {
         method: 'POST',
         body: formData
     })
