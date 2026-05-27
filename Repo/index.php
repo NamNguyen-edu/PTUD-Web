@@ -1,13 +1,15 @@
+<?php
 
- <!-- * CHANGE LOG (PHIÊN LÀM VIỆC HIỆN TẠI):
+/*
+* CHANGE LOG (PHIÊN LÀM VIỆC HIỆN TẠI):
  * - AuthController.php: đã cập nhật để đảm bảo `logout()` và `currentUser()` dùng `session_start()` an toàn.
  * - AuthController.php: `currentUser()` trả về JSON gồm `logged` và `user` để header JS có thể hiển thị profile khi đã đăng nhập.
  * - UI/components/header.html: đã chuyển loader `header_user.js` thành script động để tránh lỗi 404 khi load header từ trang tĩnh.
  * - UI/js/header_user.js: đã sửa đường dẫn và logic để gọi `get_current_user` đúng theo page hiện tại, cả khi chạy root PHP và khi chạy từ `UI/html/`.
  * - UI/js/profile.js` và `UI/js/postnews.js`: đã thêm việc load `header_user.js` sau khi chèn header bằng `innerHTML`, giúp script được thực thi đúng.
-  -->
+ */
 
-<?php
+
 session_start();
 
 require_once __DIR__ . '/Controller/AuthController.php';
@@ -104,7 +106,14 @@ switch ($page) {
         require_once __DIR__ . '/Controller/DbTestController.php';
         (new DbTestController())->test();
         break;
-
+    case 'update_profile':
+        require_once __DIR__ . '/Controller/ProfileController.php';
+        (new ProfileController())->updateProfile();
+        break;
+    case 'upload_avatar':
+    require_once __DIR__ . '/Controller/ProfileController.php';
+    (new ProfileController())->uploadAvatar();
+    break;
     default:
         redirect('?page=home');
 }

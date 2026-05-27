@@ -36,8 +36,11 @@
                     if (menuName) menuName.textContent = name;
                     if (menuEmail) menuEmail.textContent = email;
 
-                    const avatarUrl = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(name) + '&background=0d6efd&color=fff';
-                    avatars.forEach(img => img.src = avatarUrl);
+const avatarUrl = (data.user && data.user.avatar_url) 
+                        ? data.user.avatar_url 
+                        : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(name) + '&background=0d6efd&color=fff';
+                    
+                    avatars.forEach(img => img.src = avatarUrl);                    avatars.forEach(img => img.src = avatarUrl);
 
                     const params = new URLSearchParams(window.location.search);
                     if (params.get('login_success') === '1') {

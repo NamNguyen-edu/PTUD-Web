@@ -14,41 +14,53 @@ class PostnewsController
 
     public function show(): void
     {
-        $articleId = isset($_GET['id']) ? intval($_GET['id']) : 0;
+        $articleId = isset($_GET['id'])
+            ? intval($_GET['id'])
+            : 0;
 
         $userId = $_SESSION['user_id'] ?? 1;
 
         $article = null;
 
         if ($articleId > 0) {
-            $article = $this->service->getArticleById($articleId, $userId);
+
+            $article =
+                $this->service
+                ->getArticleById($articleId, $userId);
         }
 
         $view = new PostnewsView();
+
         $view->render($article);
     }
 
-    public function savePost(): void
-    {
-        header('Content-Type: application/json; charset=utf-8');
+  // Controller/PostnewsController.php
 
-        $userId = $_SESSION['user_id'] ?? 1;
+public function savePost(): void
+{
+    header('Content-Type: application/json; charset=utf-8');
 
-        try {
+    $userId = $_SESSION['user_id'] ?? 1;
 
-            $articleId = $this->service->saveArticle($userId, $_POST);
-
-            echo json_encode([
-                'success'   => true,
-                'article_id'=> $articleId
-            ]);
-
-        } catch (Exception $e) {
-
-            echo json_encode([
-                'success' => false,
-                'message' => $e->getMessage()
-            ]);
+    try {
+        // Gộp $_POST (text) và $_FILES (ảnh) lại thành 1 mảng data duy nhất
+        $data = $_POST;
+        
+        // Kiểm tra xem frontend có gửi file ảnh lên không
+        if (isset($_FILES['thumbnail']) && $_FILES['thumbnail']['error'] === UPLOAD_ERR_OK) {
+            $data['thumbnail_file'] = $_FILES['thumbnail']; // Nhét file vào mảng data
         }
+
+        // Truyền mảng gộp này xuống Service xử lý
+        $articleId = $this->service->saveArticle($userId, $data);
+
+        echo json_encode([
+            'success'   => true,
+            'article_id'=> $articleId
+        ]);
+
+    } catch (Exception $e) {
+        //... rest of error handling
     }
+}
 }
