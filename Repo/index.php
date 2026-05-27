@@ -1,6 +1,6 @@
-
-
 <?php
+
+
 session_start();
 
 require_once __DIR__ . '/Controller/AuthController.php';
@@ -107,7 +107,14 @@ switch ($page) {
         require_once __DIR__ . '/Controller/DbTestController.php';
         (new DbTestController())->test();
         break;
-
+    case 'update_profile':
+        require_once __DIR__ . '/Controller/ProfileController.php';
+        (new ProfileController())->updateProfile();
+        break;
+    case 'upload_avatar':
+    require_once __DIR__ . '/Controller/ProfileController.php';
+    (new ProfileController())->uploadAvatar();
+    break;
     default:
         redirect('?page=home');
 }
