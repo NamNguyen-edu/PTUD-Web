@@ -75,6 +75,75 @@ switch ($page) {
         (new PostnewsController())->show();
         break;
 
+   case 'version-control':
+
+        require_once __DIR__ . '/Controller/Version_control_controller.php';
+
+        (new VersionControlController())->show();
+
+        break;
+
+    case 'version_restore':
+
+        require_once __DIR__ . '/Controller/Version_control_controller.php';
+
+        (new VersionControlController())->restoreVersion();
+
+        break;
+    
+    case 'version-list':
+
+        require_once __DIR__ . '/Controller/Version_list_controller.php';
+
+        (new VersionListController())->index();
+
+        break;
+    
+    case 'approval':
+        require_once __DIR__ . '/Controller/Approval_controller.php';
+         (new ApprovalController())->show();
+        break;
+   case 'approve_publish':
+
+        require_once __DIR__ . '/Controller/Approval_controller.php';
+
+        (new ApprovalController())->approvePublish();
+
+    break;
+
+    case 'request_revision':
+
+        require_once __DIR__ . '/Controller/Approval_controller.php';
+
+        (new ApprovalController())->requestRevision();
+
+        break;
+
+    case 'reject_article':
+
+        require_once __DIR__ . '/Controller/Approval_controller.php';
+
+        (new ApprovalController())->reject();
+
+        break;
+
+    case 'get_comments':
+
+        require_once __DIR__ . '/Controller/Approval_controller.php';
+
+        (new ApprovalController())->getComments();
+
+        break;
+
+    case 'add_comment':
+
+        require_once __DIR__ . '/Controller/Approval_controller.php';
+
+        (new ApprovalController())->addComment();
+
+        break;
+
+
     case 'home':
         require_once __DIR__ . '/Controller/home_page_controller.php';
         (new HomePageController())->render();
@@ -88,11 +157,7 @@ switch ($page) {
     case 'admin1':
     case 'accountmanagement':
     case 'catalogmanagement':
-    case 'version-control':
-        require_once __DIR__ . '/Controller/PageController.php';
-        (new PageController())->render($page);
-        break;
-
+ 
     case 'search':
         require_once __DIR__ . '/Controller/SearchController.php';
         (new SearchController())->search(trim((string)($_GET['keyword'] ?? '')));
