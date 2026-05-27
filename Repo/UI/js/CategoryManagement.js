@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', function () {
     // Kéo cấu hình đường dẫn API 
-    const API_URL = "index.php?action=category_api";
+    const API_URL = "/PTUD-WEB/Repo/Controller/category_controller.php";
 
-    // === 1. KHỞI TẠO BIẾN DOM ===
+    // === 1. Khởi tạo biến DOM ===
     const pageTitle = document.querySelector('.page-title');
     const tabButtons = document.querySelectorAll('button[data-bs-toggle="tab"]');
     const searchBar = document.getElementById('globalSearch');
@@ -14,7 +14,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const selectType = document.getElementById('modal-type');
     const btnSave = document.getElementById('btn-save-item');
 
-    // Thêm các biến xử lý modal Chỉnh sửa xịn bằng UI
     const editItemModalEl = document.getElementById('editItemModal');
     const editItemModal = editItemModalEl ? new bootstrap.Modal(editItemModalEl) : null;
     const inputEditName = document.getElementById('edit-modal-name');

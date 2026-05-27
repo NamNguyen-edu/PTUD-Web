@@ -18,9 +18,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Chạy nạp cả hai cùng lúc
   Promise.all([
-    // SỬA LẦN 1: Đường dẫn Sidebar
-    loadComponent('sidebar-placeholder', 'UI/html/sidebar_nav.html', (el) => {
-      // NÂNG CẤP: Xử lý Active Link cho chuẩn Router
+    loadComponent('sidebar-placeholder', '../html/sidebar_nav.html', (el) => {
+
       const urlParams = new URLSearchParams(window.location.search);
       const currentPage = urlParams.get('page') || 'admin_dashboard';
       const navLinks = el.querySelectorAll('.nav-link-custom, .nav-link');
@@ -35,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     }),
     // SỬA LẦN 2: Đường dẫn Header
-    loadComponent('header_admin', 'UI/html/header_admin.html', (el) => {
+    loadComponent('header_admin', '../html/header_admin.html', (el) => {
       el.className = "top-header";
     })
   ]).then(() => {
