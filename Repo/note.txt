@@ -49,4 +49,8 @@ File cần sửa: AuthController.php (bên trong hàm currentUser)
         ];
         echo json_encode(['logged' => $logged, 'user' => $user]);
 
+File profile_service:
+Thêm Function getReadingHistory():
+File ProfileController:
+Thêm Function getReadingHistory():
 ---

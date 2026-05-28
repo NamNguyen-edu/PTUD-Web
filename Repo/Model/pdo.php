@@ -80,7 +80,7 @@ function pdo_get_connection()
         return $conn;
     } catch (PDOException $e) {
 
-        die('Lỗi kết nối CSDL: ' . $e->getMessage());
+        throw new PDOException('Lỗi kết nối CSDL: ' . $e->getMessage(), (int)$e->getCode(), $e);
     }
 }
 

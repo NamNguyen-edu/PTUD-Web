@@ -83,6 +83,23 @@ class ArticleService {
 
         pdo_execute($sql, $articleId);
     }
+    private function saveReadHistory(int $userId,int $articleId): void {
+        $sql = "
+            INSERT INTO user_read_history (
+                user_id,
+                article_id,
+                read_count,
+                first_read_at,
+                last_read_at
+            )
+            VALUES (?, ?, 1, NOW(), NOW())
+
+            ON DUPLICATE KEY UPDATE
+                read_count = read_count + 1,
+                last_read_at = NOW()
+        ";
+        pdo_execute( $sql, $userId, $articleId);
+    }  
 
     public function getRelatedArticles(
         int $articleId,

@@ -214,25 +214,7 @@ function toggleReplyForm(commentId) {
         container.innerHTML = '';
     }
 }
-async function loadHeader() {
 
-    const headerPlaceholder =
-        document.getElementById('header-placeholder');
-
-    if (!headerPlaceholder) return;
-
-    const response =
-        await fetch('UI/components/header.html');
-
-    const html =
-        await response.text();
-
-    headerPlaceholder.innerHTML = html;
-
-    if (window.initHeaderUser) {
-        window.initHeaderUser();
-    }
-}
 async function loadArticle() {
     try {
         const params = new URLSearchParams(window.location.search);
@@ -328,11 +310,7 @@ function bindActions() {
 }
 
 (async function () {
-
-    await loadHeader();
-
     await loadArticle();
-
     bindActions();
 
 })();

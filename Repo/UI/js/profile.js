@@ -12,6 +12,9 @@ document.addEventListener("DOMContentLoaded", function() {
             const headerScript = document.createElement('script');
             headerScript.src = '../js/header_user.js';
             headerScript.defer = true;
+            headerScript.onload = function() {
+                if (window.initHeaderUser) window.initHeaderUser();
+            };
             document.head.appendChild(headerScript);
 
             // 1. Ẩn nút Đăng nhập / Đăng ký
@@ -70,11 +73,11 @@ document.getElementById("profile-menu-name").innerText = realName;
 
 // 2. KHỞI TẠO KHI TRANG LOAD XONG (Phần logic cũ của Profile)
 document.addEventListener('DOMContentLoaded', function() {
-    console.log("⚡ NewsPulse Profile System Ready!");
+    
     
     // Kiểm tra xem có phải lần đầu đăng nhập không để hiện Popup Preference
     checkFirstTimeLogin();
-    
+    loadReadingHistory();
     // Load dữ liệu lên giao diện    
     // Khởi tạo các tooltips của Bootstrap nếu cần
     $('[data-toggle="tooltip"]').tooltip();
@@ -91,7 +94,7 @@ function switchTab(tabId) {
 
 $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
     const targetTab = $(e.target).attr("href"); 
-    console.log("Switched to tab: " + targetTab);
+    
     
     if (targetTab === "#history") {
         renderHistoryList();
@@ -104,7 +107,7 @@ function checkFirstTimeLogin() {
     const hasPrefs = localStorage.getItem('newsPulse_UserPrefs');
     
     if (!hasPrefs) {
-        console.log("First time login detected. Showing Preferences Modal...");
+        
         setTimeout(() => {
             $('#userPreferenceModal').modal('show');
         }, 1000);
@@ -115,7 +118,7 @@ function checkFirstTimeLogin() {
 $(document).on('click', '.topic-tag', function() {
     $(this).toggleClass('selected');
     const selectedCount = $('.topic-tag.selected').length;
-    console.log("Topics selected: " + selectedCount);
+    
 });
 
 function saveUserPreferences() {
@@ -218,12 +221,12 @@ function saveProfileChanges() {
 // 8. RENDER DANH SÁCH BÀI VIẾT TRONG TAB BOOKMARK
 function renderBookmarkList() {
     const container = document.getElementById('bookmarkContainer');
-    console.log("Rendering bookmarks for user: Nguyễn Duy Bảo");
+    
 }
 
 function renderHistoryList() {
     const historyTimeline = document.querySelector('.history-timeline');
-    console.log("History timeline updated.");
+    
 }
 
 function clearHistory() {
@@ -239,6 +242,85 @@ function clearHistory() {
     }
 }
 
+async function loadReadingHistory() {
+
+    try {
+
+        const response =
+            await fetch('?page=get_reading_history');
+
+        const result =
+            await response.json();
+
+        if (!result.success) {
+            return;
+        }
+
+        const container =
+            document.getElementById(
+                'reading-history-container'
+            );
+
+        if (!container) return;
+
+        if (!result.data.length) {
+
+            container.innerHTML = `
+                <div class="text-muted">
+                    Chưa có lịch sử đọc
+                </div>
+            `;
+            return;
+        }
+        container.innerHTML =
+            result.data.map(item => {
+
+                return `
+                    <div
+                        class="history-item d-flex align-items-center p-3 mb-3 bg-white rounded shadow-sm border-left-pulse"
+                        onclick="window.location.href='?page=article&slug=${item.slug}'"
+                        style="cursor:pointer;"
+                    >
+
+                        <img
+                            src="${item.thumbnail_url || 'https://picsum.photos/100'}"
+                            style="
+                                width:80px;
+                                height:80px;
+                                object-fit:cover;
+                                border-radius:10px;
+                                margin-right:16px;
+                            "
+                        >
+
+                        <div class="history-info flex-grow-1">
+
+                            <h6 class="mb-1 font-weight-bold">
+                                ${item.title}
+                            </h6>
+
+                            <small class="text-muted">
+                                Đã đọc ${item.read_count} lần
+                            </small>
+
+                            <br>
+
+                            <small class="text-muted">
+                                ${new Date(item.last_read_at)
+                                    .toLocaleString('vi-VN')}
+                            </small>
+
+                        </div>
+
+                    </div>
+                `;
+            }).join('');
+
+    } catch (err) {
+
+        console.error(err);
+    }
+}
 function handleQuickAction(action) {
     switch(action) {
         case 'editProfile':
@@ -251,7 +333,7 @@ function handleQuickAction(action) {
             alert("Đang mở tài liệu nghiên cứu Churn Prediction (SHAP/LIME)...");
             break;
         default:
-            console.log("Action: " + action);
+            
     }
 }
 

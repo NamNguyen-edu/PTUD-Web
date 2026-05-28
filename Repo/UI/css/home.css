@@ -268,3 +268,35 @@ body {
 .sidebar-box:hover {
   background: #f0f6ff;
 }
+.search-form {
+  position: relative;
+}
+
+.search-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 100%;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  border: 1px solid #e5e7eb;
+  z-index: 9999;
+  overflow: hidden;
+  pointer-events: auto;
+}
+
+.search-dropdown.d-none {
+  display: none !important;
+  pointer-events: none !important;
+}
+
+.search-item {
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.search-item:hover {
+  background: #f3f7ff;
+}
