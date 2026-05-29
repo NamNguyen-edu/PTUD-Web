@@ -56,6 +56,10 @@ switch ($page) {
         require_once __DIR__ . '/Controller/home_controller.php';
         (new HomeController())->feed();
         break;
+    case 'mega_menu':
+        require_once __DIR__ . '/Controller/home_controller.php';
+        (new HomeController())->megaMenu();
+        break;
     case 'article':
         require_once __DIR__ . '/Controller/PageController.php';
         (new PageController())->render('article');

@@ -631,4 +631,76 @@ window.addEventListener('scroll', () => {
 if (document.getElementById('feed')) {
     loadPageComponents();
     loadMore();
+    initMegaMenu();
+}
+
+/* =========================================================
+   MEGA MENU DYNAMIC LOAD
+========================================================= */
+function initMegaMenu() {
+    const navItems = document.querySelectorAll('.navbar-custom .nav-item');
+
+    navItems.forEach(item => {
+        const category = item.dataset.category;
+        if (!category) return;
+
+        const container = item.querySelector('.mega-articles-container');
+        const navLink = item.querySelector('.nav-link');
+        let loaded = false;
+
+        const loadMegaData = async () => {
+            if (loaded) return;
+            try {
+                const response = await fetch(getAppUrl(`?page=mega_menu&category=${category}`));
+                const result = await response.json();
+                if (result.success && result.items && result.items.length > 0) {
+                    container.innerHTML = result.items.map(article => `
+                        <div class="col-md-4">
+                            <a href="${getArticleUrl(article.slug)}" class="text-decoration-none text-dark d-block mega-item-card" style="transition: transform 0.2s;">
+                                <img src="${article.thumbnail_url}" class="img-fluid rounded mb-2" style="height: 100px; width: 100%; object-fit: cover;">
+                                <div class="fw-bold small line-clamp-2" style="font-size: 0.85rem; line-height: 1.3; color: #1e293b;">${escapeHtml(article.title)}</div>
+                                <small class="text-muted" style="font-size: 0.75rem;">${article.published_time_ago}</small>
+                            </a>
+                        </div>
+                    `).join('');
+                    loaded = true;
+                } else {
+                    container.innerHTML = `<div class="col text-muted small">Không có bài viết mới nào.</div>`;
+                }
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = `<div class="col text-danger small">Lỗi tải dữ liệu.</div>`;
+            }
+        };
+
+        // Desktop: Hover
+        item.addEventListener('mouseenter', loadMegaData);
+
+        // Mobile: Click
+        if (navLink) {
+            navLink.addEventListener('click', (e) => {
+                if (window.innerWidth <= 768) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const isActive = item.classList.contains('active-mega');
+                    
+                    navItems.forEach(i => i.classList.remove('active-mega'));
+                    
+                    if (!isActive) {
+                        item.classList.add('active-mega');
+                        loadMegaData();
+                    }
+                }
+            });
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        if (window.innerWidth <= 768) {
+            if (!e.target.closest('.nav-item')) {
+                navItems.forEach(item => item.classList.remove('active-mega'));
+            }
+        }
+    });
 }
