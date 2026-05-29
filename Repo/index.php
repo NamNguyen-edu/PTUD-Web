@@ -19,6 +19,10 @@ switch ($page) {
         require_once __DIR__ . '/Controller/PostnewsController.php';
         (new PostnewsController())->savePost();
         break;
+    case 'postnews_action':
+        require_once __DIR__ . '/Controller/PostnewsController.php';
+        (new PostnewsController())->handleAction();
+        break;
 
     case 'login':
         require_once __DIR__ . '/Controller/AuthController.php';

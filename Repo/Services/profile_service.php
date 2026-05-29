@@ -39,7 +39,7 @@ class ProfileService
                 FROM articles a
                 LEFT JOIN article_categories ac ON a.article_id = ac.article_id
                 LEFT JOIN categories c          ON ac.category_id = c.category_id
-                WHERE a.user_id = :user_id
+                WHERE a.user_id = :user_id AND a.is_deleted = 0
                 ORDER BY a.created_at DESC";
         try {
             $db   = pdo_get_connection();
@@ -91,4 +91,15 @@ class ProfileService
             return false;
         }
     }
+    public function getAlertArticles(int $userId): array
+{
+    $rows = pdo_query(
+        "SELECT article_id, title, status 
+         FROM articles 
+         WHERE user_id = ? AND status IN ('revision', 'rejected')
+         ORDER BY updated_at DESC",
+        $userId
+    );
+    return $rows ?: [];
+}
 }

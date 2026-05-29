@@ -90,6 +90,8 @@ CREATE TABLE IF NOT EXISTS articles (
     approved_by   INT           NULL,
     status        ENUM('draft', 'pending', 'published', 'revision', 'rejected') NOT NULL DEFAULT 'draft',
     is_featured   TINYINT(1)    NOT NULL DEFAULT 0,
+    -- [UPDATE] Cột mới thêm: xoá mềm
+    is_deleted    TINYINT(1)    NOT NULL DEFAULT -,
     view_count    INT           NOT NULL DEFAULT 0,
     published_at  DATETIME      NULL,
     created_at    DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -188,6 +190,20 @@ CREATE TABLE IF NOT EXISTS media (
         REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 
+-- 10. Quản lý yêu cầu - THêm mới
+CREATE TABLE IF NOT EXISTS takedown_requests (
+    request_id INT AUTO_INCREMENT PRIMARY KEY,
+    article_id INT NOT NULL,
+    user_id INT NOT NULL,
+    reason TEXT NOT NULL,
+    status ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending',
+    admin_note TEXT,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    -- Ràng buộc dữ liệu (Chặt chẽ: xóa bài thì xóa luôn yêu cầu gỡ bài liên quan)
+    CONSTRAINT FK_takedown_article FOREIGN KEY (article_id) REFERENCES articles(article_id) ON DELETE CASCADE,
+    CONSTRAINT FK_takedown_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+) ENGINE=InnoDB;
 -- 10. ARTICLE_VERSIONS — Lưu trữ phiên bản bài viết
 CREATE TABLE article_versions (
     version_id      INT AUTO_INCREMENT PRIMARY KEY,

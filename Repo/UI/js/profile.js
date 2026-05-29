@@ -1,83 +1,119 @@
 // MODULE TỰ ĐỘNG LOAD COMPONENT (HEADER/FOOTER)
+
+// 2. KHỞI TẠO KHI TRANG LOAD XONG (Phần logic cũ của Profile)
 document.addEventListener("DOMContentLoaded", function() {
+    const BASE = "/PTUD-Web/Repo/UI";
+
     // Tải Header
-    fetch("../components/header.html")
+    fetch(BASE + "/components/header.html")
         .then(response => {
             if (!response.ok) throw new Error("Không thể load header");
             return response.text();
         })
         .then(data => {
-            document.getElementById("header-placeholder").innerHTML = data;
+            const el = document.getElementById("header-placeholder");
+            if (!el) return;
+            el.innerHTML = data;
 
             const headerScript = document.createElement('script');
-            headerScript.src = '../js/header_user.js';
+            headerScript.src = BASE + '/js/header_user.js';
             headerScript.defer = true;
             document.head.appendChild(headerScript);
 
-            // 1. Ẩn nút Đăng nhập / Đăng ký
-            document.getElementById("login-section").classList.add("d-none");
-            
-            // 2. Bật khu vực Profile lên
-            document.getElementById("profile-section").classList.remove("d-none");
-            document.getElementById("profile-section").classList.add("d-flex"); 
-            
-            // 3. Đổi tên và email cho trang cá nhân
-const realName = document.querySelector('.profile-sidebar h4')?.innerText || 'Biên tập viên';
-document.getElementById("profile-name").innerText = realName;
-document.getElementById("profile-menu-name").innerText = realName;
+            const loginSection = document.getElementById("login-section");
+            const profileSection = document.getElementById("profile-section");
+            if (loginSection) loginSection.classList.add("d-none");
+            if (profileSection) {
+                profileSection.classList.remove("d-none");
+                profileSection.classList.add("d-flex");
+            }
 
-            // 4. Xử lý click xổ menu mượt mà
+            const realName = document.querySelector('.profile-sidebar h4')?.innerText || 'Biên tập viên';
+            const profileName = document.getElementById("profile-name");
+            const profileMenuName = document.getElementById("profile-menu-name");
+            if (profileName) profileName.innerText = realName;
+            if (profileMenuName) profileMenuName.innerText = realName;
+
             const profileBtn = document.querySelector('.profile-info');
             const profileMenu = document.querySelector('.profile-menu');
-
-            profileBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                profileMenu.classList.toggle('d-block');
-            });
-
-            document.addEventListener('click', function(e) {
-                if (!profileMenu.contains(e.target) && !profileBtn.contains(e.target)) {
-                    profileMenu.classList.remove('d-block');
-                }
-            });
+            if (profileBtn && profileMenu) {
+                profileBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    profileMenu.classList.toggle('d-block');
+                });
+                document.addEventListener('click', function(e) {
+                    if (!profileMenu.contains(e.target) && !profileBtn.contains(e.target)) {
+                        profileMenu.classList.remove('d-block');
+                    }
+                });
+            }
         })
         .catch(err => console.error(err));
 
     // Tải Footer
-    fetch("../components/footer.html")
+    fetch(BASE + "/components/footer.html")
         .then(response => {
             if (!response.ok) throw new Error("Không thể load footer");
             return response.text();
         })
         .then(data => {
-            document.getElementById("footer-placeholder").innerHTML = data;
+            const el = document.getElementById("footer-placeholder");
+            if (!el) return;
+            el.innerHTML = data;
         })
         .catch(err => console.error(err));
-        const hiddenSkillsInput = document.getElementById('hiddenSkills');
-    if (hiddenSkillsInput && hiddenSkillsInput.value) {
-        // Rào điều kiện để tránh lỗi nếu biến chưa được PHP thay thế
-        if (hiddenSkillsInput.value !== '{{SKILLS_JSON}}') {
-            try {
-                userSkills = JSON.parse(hiddenSkillsInput.value);
-                renderSkills(); // Gọi hàm vẽ tag ra màn hình
-            } catch(e) {
-                console.error("Lỗi parse JSON kỹ năng:", e);
-            }
+
+    // Skills
+    const hiddenSkillsInput = document.getElementById('hiddenSkills');
+    if (hiddenSkillsInput && hiddenSkillsInput.value && hiddenSkillsInput.value !== '{{SKILLS_JSON}}') {
+        try {
+            userSkills = JSON.parse(hiddenSkillsInput.value);
+            renderSkills();
+        } catch(e) {
+            console.error("Lỗi parse JSON kỹ năng:", e);
         }
+            checkFirstTimeLogin();
+    checkArticleAlerts();
     }
-});
+    function checkArticleAlerts() {
+    const el = document.getElementById('alertArticlesData');
+    if (!el || !el.value || el.value === '{{ALERT_ARTICLES_JSON}}') return;
 
+    let articles = [];
+    try { articles = JSON.parse(el.value); } catch(e) { return; }
+    if (!articles.length) return;
 
-// 2. KHỞI TẠO KHI TRANG LOAD XONG (Phần logic cũ của Profile)
-document.addEventListener('DOMContentLoaded', function() {
-    console.log("⚡ NewsPulse Profile System Ready!");
+    // Build danh sách bài cần xử lý
+    const statusMap = {
+        'revision':  { label: 'Cần sửa lại', cls: 'warning',  icon: 'fa-edit' },
+        'rejected':  { label: 'Bị từ chối',  cls: 'danger',   icon: 'fa-times-circle' }
+    };
+
+const listHtml = articles.map(a => {
+    const s = statusMap[a.status] || { label: a.status, cls: 'secondary', icon: 'fa-info-circle' };
     
-    // Kiểm tra xem có phải lần đầu đăng nhập không để hiện Popup Preference
-    checkFirstTimeLogin();
-    
-    // Load dữ liệu lên giao diện    
-    // Khởi tạo các tooltips của Bootstrap nếu cần
-    $('[data-toggle="tooltip"]').tooltip();
+    // Chỉ revision mới có nút Sửa ngay, rejected chỉ hiển thị thôi
+const actionBtn = a.status === 'revision'
+    ? `<a href="?page=postnews&id=${a.article_id}" class="btn btn-sm btn-outline-primary ml-2 font-weight-bold" style="white-space: nowrap; flex-shrink: 0;">Sửa ngay</a>`
+    : `<span class="badge badge-danger ml-2 p-2" style="white-space: nowrap; flex-shrink: 0;">Đã bị từ chối</span>`;
+
+    return `
+        <div class="d-flex align-items-center p-3 mb-2 rounded bg-white shadow-sm" 
+             style="border-left: 4px solid var(--${s.cls === 'warning' ? 'warning' : 'danger'});">
+            <i class="fas ${s.icon} text-${s.cls} mr-3 fa-lg"></i>
+            <div class="flex-grow-1">
+                <div class="font-weight-bold small">${a.title}</div>
+                <span class="badge badge-${s.cls} mt-1">${s.label}</span>
+            </div>
+            ${actionBtn}
+        </div>`;
+}).join('');
+
+    document.getElementById('alertArticlesList').innerHTML = listHtml;
+
+    // Hiện modal sau 800ms để trang load xong
+    setTimeout(() => { $('#articleAlertModal').modal('show'); }, 800);
+}
 });
 
 // 3. LOGIC CHUYỂN TAB (SỬ DỤNG BOOTSTRAP TABS KẾT HỢP CUSTOM LOGIC)
@@ -356,3 +392,80 @@ function uploadAvatar() {
         btn.innerHTML = 'CẬP NHẬT ẢNH';
     });
 }
+// =========================================================================
+// TASK 3: QUẢN LÝ VÒNG ĐỜI BÀI VIẾT (ÉP CHẠY GLOBAL ĐỂ KHỚP VỚI HTML ONCLICK)
+// =========================================================================
+
+// Kịch bản 1: Xóa mềm bài viết (Nháp, Cần sửa, Bị từ chối)
+window.deleteArticle = function(articleId) {
+    if (confirm("⚠️ Bạn có chắc chắn muốn xóa vĩnh viễn bài viết này không? Hành động này không thể hoàn tác.")) {
+        window.processArticleAction(articleId, 'delete', "Đã xóa bài viết thành công!");
+    }
+};
+
+// Kịch bản 2: Rút bài (Đang chờ duyệt -> Nháp)
+window.withdrawArticle = function(articleId) {
+    if (confirm("↩️ Bài viết đang chờ duyệt. Bạn có muốn rút lại thành Bản nháp để chỉnh sửa thêm không?")) {
+        window.processArticleAction(articleId, 'withdraw', "Đã rút bài về bản nháp!");
+    }
+};
+
+// Kịch bản 3: Mở Modal Yêu cầu gỡ bài (Đã đăng)
+window.openTakedownModal = function(articleId) {
+    const modalInput = document.getElementById('takedownArticleId');
+    const modalReason = document.getElementById('takedownReason');
+    const modalError = document.getElementById('takedownError');
+
+    if (modalInput) modalInput.value = articleId;
+    if (modalReason) modalReason.value = ''; // Xóa text cũ tránh lưu vết
+    if (modalError) modalError.classList.add('d-none'); // Ẩn cảnh báo đỏ
+    
+    // Kích hoạt hiển thị Modal của Bootstrap 4
+    $('#takedownModal').modal('show');
+};
+
+// Kịch bản 3.1: Gửi form Yêu cầu gỡ bài
+window.submitTakedown = function() {
+    const articleId = document.getElementById('takedownArticleId').value;
+    const reason = document.getElementById('takedownReason').value.trim();
+
+    if (reason === '') {
+        const errorMsg = document.getElementById('takedownError');
+        if (errorMsg) errorMsg.classList.remove('d-none');
+        return;
+    }
+
+    $('#takedownModal').modal('hide');
+    window.processArticleAction(articleId, 'request_takedown', "Đã gửi yêu cầu gỡ bài đến Ban Biên Tập!", reason);
+};
+
+// HÀM LÕI: Gửi AJAX request xuống Controller bằng Fetch API
+window.processArticleAction = function(articleId, actionType, successMsg, extraData = '') {
+    const formData = new FormData();
+    formData.append('article_id', articleId);
+    formData.append('action_type', actionType);
+    if (extraData !== '') {
+        formData.append('reason', extraData);
+    }
+
+    fetch('index.php?page=postnews_action', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) throw new Error('Network response was not ok');
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            alert("✅ " + successMsg);
+            window.location.reload(); // Tải lại trang để thấy sự thay đổi
+        } else {
+            alert("❌ Lỗi từ hệ thống: " + (data.message || "Thao tác thất bại."));
+        }
+    })
+    .catch(error => {
+        console.error('Error during fetch:', error);
+        alert("❌ Đã xảy ra lỗi kết nối hoặc xử lý phía máy chủ.");
+    });
+};
