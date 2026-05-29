@@ -69,7 +69,13 @@ class ArticleService {
         $this->increaseViewCount(
             $article['article_id']
         );
+        if (!empty($_SESSION['user_id'])) {
 
+        $this->saveReadHistory(
+            (int) $_SESSION['user_id'],
+            (int) $article['article_id']
+        );
+        }
         return $article;
     }
 

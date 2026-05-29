@@ -47,10 +47,24 @@ File cần sửa: AuthController.php (bên trong hàm currentUser)
             'email' => $logged ? ($_SESSION['user_email'] ?? null) : null,
             'avatar_url' => $avatarUrl // Thêm trường này cho JS nhận diện
         ];
-        echo json_encode(['logged' => $logged, 'user' => $user]);
+CẬP NHẬT MỚI NHẤT (SỬA LỖI TRANG PROFILE & LỊCH SỬ ĐỌC):
 
-File profile_service:
-Thêm Function getReadingHistory():
-File ProfileController:
-Thêm Function getReadingHistory():
----
+1. Sửa lỗi Fatal Error trong ProfileController.php:
+   - TÌM: $alertArticles = $profileService->getAlertArticles($userId);
+   - SỬA THÀNH: $alertArticles = $this->getAlertArticles($userId); (vì hàm getAlertArticles nằm trực tiếp bên trong ProfileController chứ không phải Service).
+
+2. Kích hoạt tính năng lưu lịch sử đọc trong Services/load_articles.php:
+   - TÌM trong getArticleBySlug:
+     $this->increaseViewCount($article['article_id']);
+     return $article;
+   - SỬA THÀNH:
+     $this->increaseViewCount($article['article_id']);
+     if (!empty($_SESSION['user_id'])) {
+         $this->saveReadHistory((int)$_SESSION['user_id'], (int)$article['article_id']);
+     }
+     return $article;
+
+3. Sửa lỗi JavaScript cú pháp và lồng DOMContentLoaded trong UI/js/profile.js:
+   - Đóng dấu ngoặc nhọn } của hàm checkArticleAlerts() bị thiếu.
+   - Di chuyển dấu đóng }); của DOMContentLoaded đầu tiên (dòng 4) lên dòng 80 để tránh lồng nhau.
+   - Thay thế việc lắng nghe DOMContentLoaded thứ hai bằng việc kiểm tra document.readyState để đảm bảo hàm initProfile() luôn luôn chạy độc lập, từ đó loadReadingHistory() luôn được thực thi chính xác.
