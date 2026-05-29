@@ -15,7 +15,7 @@ class PageController
 
     public function render(string $pageName): void
     {
-        // Map page names to view file names
+
         $viewName = $this->slugToViewFile($pageName);
 
         // Load the template directly for login/signup to apply form rewrites

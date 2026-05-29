@@ -52,12 +52,30 @@ function getImage(article, width = 800, height = 500) {
         : `https://picsum.photos/${width}/${height}`;
 }
 
-function goToArticle(slug) {
+function getRepoIndexPath() {
+    const path = window.location.pathname;
+    const match = path.match(/^(.*\/Repo)(?:\/.*)?$/);
+    return match ? `${match[1]}/index.php` : '/index.php';
+}
+
+function getAppUrl(queryString) {
+    const indexPath = getRepoIndexPath();
+    return `${indexPath}${queryString.startsWith('?') ? queryString : `?${queryString}`}`;
+}
+
+function getArticleUrl(slug) {
+    return getAppUrl(`?page=article&slug=${encodeURIComponent(slug)}`);
+}
+
+function goToArticle(event, slug) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
 
     if (!slug) return;
 
-    window.location.href =
-        `?page=article&slug=${encodeURIComponent(slug)}`;
+    window.location.href = getArticleUrl(slug);
 }
 
 /* =========================================================
@@ -140,7 +158,7 @@ function bindSearchDropdown() {
         }
 
         fetch(
-            `?page=search_suggestions&keyword=${encodeURIComponent(trimmed)}`
+            getAppUrl(`?page=search_suggestions&keyword=${encodeURIComponent(trimmed)}`)
         )
             .then(response => response.json())
             .then(data => {
@@ -169,7 +187,7 @@ function bindSearchDropdown() {
     });
 
     dropdown.addEventListener('click', (event) => {
-
+        event.stopPropagation();
         const item = event.target.closest('.search-item');
 
         if (!item) return;
@@ -179,9 +197,9 @@ function bindSearchDropdown() {
         );
 
         if (keyword) {
-
+            hideDropdown();
             window.location.href =
-                `?page=search&keyword=${encodeURIComponent(keyword)}`;
+                getAppUrl(`?page=search&keyword=${encodeURIComponent(keyword)}`);
         }
     });
 
@@ -230,10 +248,10 @@ function renderArticleCard(article) {
     return `
         <div class="col-md-4 mb-4">
 
-            <div
-                class="article-card h-100 shadow-sm"
-                style="cursor:pointer;"
-                onclick="goToArticle('${escapeHtml(article.slug)}')"
+            <a
+                class="article-card h-100 shadow-sm d-block"
+                style="cursor:pointer; text-decoration:none; color:inherit;"
+                href="${getArticleUrl(article.slug)}"
             >
 
                 <img
@@ -261,7 +279,7 @@ function renderArticleCard(article) {
                     </span>
                 </div>
 
-            </div>
+            </a>
 
         </div>
     `;
@@ -283,10 +301,10 @@ function renderHeroBlock(article) {
 
             <div class="col-lg-12">
 
-                <div
-                    class="article-card p-0 overflow-hidden shadow-sm position-relative"
-                    style="cursor:pointer;"
-                    onclick="goToArticle('${escapeHtml(article.slug)}')"
+                <a
+                    class="article-card p-0 overflow-hidden shadow-sm position-relative d-block"
+                    style="cursor:pointer; text-decoration:none; color:inherit;"
+                    href="${getArticleUrl(article.slug)}"
                 >
 
                     <img
@@ -318,7 +336,7 @@ function renderHeroBlock(article) {
                         </div>
 
                     </div>
-                </div>
+                </a>
             </div>
         </div>
     `;
@@ -331,10 +349,10 @@ function renderMixedBlock(bigArticle, sideArticles) {
 
             <div class="col-lg-8">
 
-                <div
-                    class="article-card h-100 shadow-sm overflow-hidden"
-                    style="cursor:pointer;"
-                    onclick="goToArticle('${escapeHtml(bigArticle.slug)}')"
+<a
+                        class="article-card h-100 shadow-sm overflow-hidden d-block"
+                        style="cursor:pointer; text-decoration:none; color:inherit;"
+                        href="${getArticleUrl(bigArticle.slug)}"
                 >
 
                     <img
@@ -359,17 +377,17 @@ function renderMixedBlock(bigArticle, sideArticles) {
                         </p>
 
                     </div>
-                </div>
+                </a>
             </div>
 
             <div class="col-lg-4">
 
                 ${sideArticles.map(article => `
 
-                    <div
-                        class="article-card shadow-sm mb-3"
-                        style="cursor:pointer;"
-                        onclick="goToArticle('${escapeHtml(article.slug)}')"
+                    <a
+                        class="article-card shadow-sm mb-3 d-block"
+                        style="cursor:pointer; text-decoration:none; color:inherit;"
+                        href="${getArticleUrl(article.slug)}"
                     >
 
                         <div class="mb-2">
@@ -388,11 +406,21 @@ function renderMixedBlock(bigArticle, sideArticles) {
                             👁 ${formatViewCount(article.view_count)}
                         </div>
 
-                    </div>
+                    </a>
 
                 `).join('')}
 
             </div>
+        </div>
+    `;
+}
+
+function showFeedError(message) {
+    if (!feed) return;
+
+    feed.innerHTML = `
+        <div class="alert alert-danger text-center py-4">
+            ${escapeHtml(message)}
         </div>
     `;
 }
@@ -486,7 +514,7 @@ async function loadMore() {
     try {
 
         const response = await fetch(
-            `?page=home_feed&page_num=${currentPage}&category=${encodeURIComponent(currentCategory)}`
+            getAppUrl(`?page=home_feed&page_num=${currentPage}&category=${encodeURIComponent(currentCategory)}`)
         );
 
         const result = await response.json();
@@ -530,6 +558,12 @@ async function loadMore() {
     } catch (error) {
 
         console.error(error);
+
+        if (currentPage === 1) {
+            showFeedError('Không thể tải bài viết. Vui lòng kiểm tra kết nối cơ sở dữ liệu hoặc thử lại sau.');
+        }
+
+        hasMore = false;
 
     } finally {
 
@@ -594,5 +628,7 @@ window.addEventListener('scroll', () => {
    INITIALIZE
 ========================================================= */
 
-loadPageComponents();
-loadMore();
+if (document.getElementById('feed')) {
+    loadPageComponents();
+    loadMore();
+}

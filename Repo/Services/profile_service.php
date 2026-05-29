@@ -91,15 +91,42 @@ class ProfileService
             return false;
         }
     }
-    public function getAlertArticles(int $userId): array
-{
-    $rows = pdo_query(
-        "SELECT article_id, title, status 
-         FROM articles 
-         WHERE user_id = ? AND status IN ('revision', 'rejected')
-         ORDER BY updated_at DESC",
-        $userId
-    );
-    return $rows ?: [];
+    public function getReadingHistory(int $userId): array {
+
+    $sql = "
+        SELECT
+            h.history_id,
+            h.read_count,
+            h.last_read_at,
+
+            a.article_id,
+            a.title,
+            a.slug,
+            a.thumbnail_url,
+            a.excerpt
+
+        FROM user_read_history h
+
+        INNER JOIN articles a
+            ON h.article_id = a.article_id
+
+        WHERE h.user_id = :user_id
+
+        ORDER BY h.last_read_at DESC
+    ";
+
+    try {
+        $db = pdo_get_connection();
+        $stmt = $db->prepare($sql);
+        $stmt->bindValue(
+            ':user_id',
+            $userId,
+            PDO::PARAM_INT
+        );
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        return [];
+    }
 }
 }
