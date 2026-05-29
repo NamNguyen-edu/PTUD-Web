@@ -17,7 +17,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 </head>
 
-<body class="bg-light-custom d-flex flex-column min-vh-100">
+<body 
+class="bg-light-custom d-flex flex-column min-vh-100">
+<input type="hidden" id="alertArticlesData" value="{{ALERT_ARTICLES_JSON}}">
     <div id="header-placeholder"></div>
     <main class="flex-grow-1 profile-wrapper">
         <div class="container mt-5 pb-5">
@@ -294,7 +296,6 @@
             </div>
         </div>
     </div>
-    <input type="file" id="avatarInput" accept="image/*" class="d-none" onchange="openCropModal(event)">
 <input type="file" id="avatarInput" accept="image/*" class="d-none" onchange="openCropModal(event)">
     
     <div class="modal fade" id="cropModal" tabindex="-1" data-backdrop="static">
@@ -316,8 +317,55 @@
             </div>
         </div>
     </div>
-
+<div class="modal fade" id="takedownModal" tabindex="-1" data-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-lg">
+                <div class="modal-header bg-light border-0">
+                    <h6 class="modal-title font-weight-bold text-danger">
+                        <i class="fas fa-flag mr-2"></i>Yêu cầu gỡ bài viết
+                    </h6>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="alert alert-warning small">
+                        <strong>Lưu ý:</strong> Bài viết này đã được xuất bản công khai. Việc gỡ bài cần được Ban Biên Tập xem xét và phê duyệt.
+                    </div>
+                    <input type="hidden" id="takedownArticleId" value="">
+                    <div class="form-group mt-3">
+                        <label class="small font-weight-bold text-uppercase">Lý do yêu cầu gỡ <span class="text-danger">*</span></label>
+                        <textarea class="form-control bg-light border-0" id="takedownReason" rows="4" placeholder="Vui lòng nêu rõ lý do: sai số liệu, lỗi bản quyền, cập nhật thông tin mới..."></textarea>
+                        <small class="text-danger d-none" id="takedownError">Vui lòng nhập lý do gỡ bài!</small>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0 pb-4 pr-4">
+                    <button type="button" class="btn btn-light font-weight-bold" data-dismiss="modal">HỦY BỎ</button>
+                    <button type="button" class="btn btn-danger font-weight-bold px-4" onclick="submitTakedown()">GỬI YÊU CẦU</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div id="footer-placeholder" class="mt-auto w-100"></div>
+    <div class="modal fade" id="articleAlertModal" tabindex="-1" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-lg">
+            <div class="modal-header border-0 pb-0">
+                <h6 class="modal-title font-weight-bold">
+                    <i class="fas fa-bell text-warning mr-2"></i>Thông báo bài viết cần xử lý
+                </h6>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+<div class="modal-body p-4" style="max-height: 60vh; overflow-y: auto;">
+    <p class="text-muted small mb-3">Bạn có bài viết cần chú ý từ Ban Biên Tập:</p>
+    <div id="alertArticlesList"></div>
+</div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-primary font-weight-bold px-4" data-dismiss="modal">
+                    ĐÃ HIỂU
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
