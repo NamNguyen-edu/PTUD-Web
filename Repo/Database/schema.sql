@@ -204,3 +204,21 @@ CREATE TABLE IF NOT EXISTS takedown_requests (
     CONSTRAINT FK_takedown_article FOREIGN KEY (article_id) REFERENCES articles(article_id) ON DELETE CASCADE,
     CONSTRAINT FK_takedown_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
+-- 10. ARTICLE_VERSIONS — Lưu trữ phiên bản bài viết
+CREATE TABLE article_versions (
+    version_id      INT AUTO_INCREMENT PRIMARY KEY,
+    article_id      INT NOT NULL,
+    title           VARCHAR(500),
+    content         LONGTEXT,
+    version_name    VARCHAR(50),
+    edited_by       INT,
+    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (article_id)
+        REFERENCES articles(article_id)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (edited_by)
+        REFERENCES users(user_id)
+        ON DELETE SET NULL
+);
