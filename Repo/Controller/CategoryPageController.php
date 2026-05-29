@@ -43,18 +43,18 @@ class CategoryPageController {
             $slug = isset($_GET['slug']) ? trim((string)$_GET['slug']) : 'cong-nghe';
             $page = isset($_GET['page_num']) ? (int)$_GET['page_num'] : 1;
 
-            // Simple File Cache per category page
-            $cacheDir = __DIR__ . '/../cache';
-            if (!is_dir($cacheDir)) {
-                @mkdir($cacheDir, 0777, true);
-            }
-            $cacheFile = $cacheDir . '/category_' . $slug . '_page_' . $page . '.json';
-            $cacheTtl = 30; // 30 seconds
+            // // Simple File Cache per category page
+            // $cacheDir = __DIR__ . '/../cache';
+            // if (!is_dir($cacheDir)) {
+            //     @mkdir($cacheDir, 0777, true);
+            // }
+            // $cacheFile = $cacheDir . '/category_' . $slug . '_page_' . $page . '.json';
+            // $cacheTtl = 30; // 30 seconds
 
-            if (file_exists($cacheFile) && (time() - filemtime($cacheFile) < $cacheTtl)) {
-                echo file_get_contents($cacheFile);
-                return;
-            }
+            // if (file_exists($cacheFile) && (time() - filemtime($cacheFile) < $cacheTtl)) {
+            //     echo file_get_contents($cacheFile);
+            //     return;
+            // }
 
             $data = $this->categoryService->getCategoryArticles($slug, $page);
             $response = json_encode([
@@ -62,7 +62,7 @@ class CategoryPageController {
                 'data' => $data
             ]);
 
-            @file_put_contents($cacheFile, $response);
+            // @file_put_contents($cacheFile, $response);
             echo $response;
 
         } catch (Exception $e) {

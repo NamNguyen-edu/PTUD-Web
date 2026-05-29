@@ -11,7 +11,8 @@ let currentPage = 1;
 let hasMore = true;
 let loading = false;
 let articlesCount = 0;
-const LIMIT_BEFORE_PAGINATION = 12;
+let articlesBuffer = [];
+const LIMIT_BEFORE_PAGINATION = 10;
 
 /* =========================================================
    UTILITIES
@@ -62,42 +63,134 @@ function getArticleUrl(articleSlug) {
    LAYOUT RENDERERS
 ========================================================= */
 
-function renderTagList(tags) {
-    if (!tags || !tags.length) return '';
-    return tags.map(tag => `
-        <span class="badge badge-theme me-1" style="font-size: 0.75rem;">
-            #${escapeHtml(tag)}
-        </span>
-    `).join('');
+/* =========================================================
+   CREDIBILITY & VOTING / CATEGORY STYLING UTILITIES
+========================================================= */
+
+const pillColors = {
+    'thời sự': { bg: '#fee2e2', text: '#dc2626' }, // Crimson
+    'công nghệ': { bg: '#d1fae5', text: '#059669' }, // Emerald
+    'kinh doanh': { bg: '#dbeafe', text: '#2563eb' }, // Blue
+    'kinh tế': { bg: '#dbeafe', text: '#2563eb' }, // Light blue
+    'tài chính': { bg: '#fef3c7', text: '#d97706' }, // Amber
+    'ai': { bg: '#581c87', text: '#ffffff' }, // Deep Purple (white text)
+    'trí tuệ nhân tạo': { bg: '#581c87', text: '#ffffff' },
+    'startup': { bg: '#eff6ff', text: '#1e40af' },
+    'giáo dục': { bg: '#faf5ff', text: '#7c3aed' },
+    'đời sống': { bg: '#fdf2f8', text: '#db2777' }
+};
+
+function getPillStyle(name) {
+    const lower = name.toLowerCase().trim();
+    for (const key in pillColors) {
+        if (lower === key || lower.includes(key)) {
+            return pillColors[key];
+        }
+    }
+    return { bg: '#f1f5f9', text: '#475569' };
+}
+
+function renderPills(categories = [], tags = []) {
+    let html = '';
+    
+    // Chuyên mục (Categories)
+    categories.slice(0, 2).forEach(cat => {
+        const style = getPillStyle(cat);
+        html += `
+            <span class="category-pill shadow-sm" style="background-color: ${style.bg}; color: ${style.text}; font-weight: 600; padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; display: inline-block;">
+                ${escapeHtml(cat)}
+            </span>
+        `;
+    });
+    
+    // Thẻ (Tags)
+    tags.slice(0, 2).forEach(tag => {
+        const style = getPillStyle(tag);
+        html += `
+            <span class="tag-pill" style="background-color: ${style.bg}; color: ${style.text}; padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; display: inline-block; opacity: 0.9;">
+                ${escapeHtml(tag)}
+            </span>
+        `;
+    });
+    
+    return `<div class="pill-container d-flex flex-wrap gap-2 mb-2">${html}</div>`;
+}
+
+function renderCredibilityBadge(upvoteCount, downvoteCount) {
+    const up = Number(upvoteCount || 0);
+    const down = Number(downvoteCount || 0);
+    const total = up + down;
+    if (total < 5) return ''; // Cần tối thiểu 5 lượt đánh giá để xác nhận độ tin cậy
+    
+    const ratio = up / total;
+    if (ratio >= 0.8) {
+        return `
+            <div class="mb-2">
+                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1 fw-semibold" style="font-size: 0.78rem;">
+                    ✓ Tin cậy cao
+                </span>
+            </div>
+        `;
+    } else if (ratio < 0.5) {
+        return `
+            <div class="mb-2">
+                <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3 py-1 fw-semibold" style="font-size: 0.78rem;">
+                    ⚠️ Nghi vấn/Sai lệch
+                </span>
+            </div>
+        `;
+    }
+    return '';
+}
+
+function renderCardStats(article) {
+    const up = Number(article.upvote_count || 0);
+    const down = Number(article.downvote_count || 0);
+    return `
+        <div class="card-stats-row d-flex align-items-center gap-3 mt-auto pt-3 border-top text-muted small" style="font-size: 0.8rem;">
+            <span class="stat-views d-flex align-items-center gap-1">
+                👁 ${formatViewCount(article.view_count)} lượt xem
+            </span>
+            <span class="stat-upvotes text-success fw-bold d-flex align-items-center gap-1">
+                ▲ ${formatViewCount(up)}
+            </span>
+            <span class="stat-downvotes text-danger fw-bold d-flex align-items-center gap-1">
+                ▼ ${formatViewCount(down)}
+            </span>
+        </div>
+    `;
 }
 
 function renderArticleCard(article) {
     return `
         <div class="col-md-4 mb-4">
             <a
-                class="article-card h-100 shadow-sm d-block p-3"
-                style="cursor:pointer; text-decoration:none; color:inherit; border-radius: 12px; background: #fff;"
+                class="article-card h-100 shadow-sm d-flex flex-column p-0"
+                style="cursor:pointer; text-decoration:none; color:inherit; background:#fff; border-radius:12px; overflow:hidden !important; border:1px solid #edf2f7; transition:all 0.2s; padding: 0 !important;"
                 href="${getArticleUrl(article.slug)}"
             >
-                <img
-                    src="${getImage(article)}"
-                    loading="lazy"
-                    class="img-fluid rounded mb-3"
-                    style="height:200px;width:100%;object-fit:cover;"
-                >
-                <div class="mb-2">
-                    ${renderTagList(article.tags)}
+                <div class="overflow-hidden" style="height:220px; width:100%;">
+                    <img
+                        src="${getImage(article)}"
+                        loading="lazy"
+                        class="w-100 h-100 object-fit-cover card-img-top"
+                        style="transition: transform 0.3s;"
+                    >
                 </div>
-                <h5 class="fw-bold line-clamp-2" style="font-size: 1.1rem; line-height: 1.4; color: #1e293b;">
-                    ${escapeHtml(article.title)}
-                </h5>
-                <p class="text-muted small line-clamp-3">
-                    ${escapeHtml(article.excerpt || '')}
-                </p>
-                <div class="vote-box small mt-3">
-                    <span class="vote up text-theme">
-                        👁 ${formatViewCount(article.view_count)}
-                    </span>
+                <div class="p-3 d-flex flex-column flex-grow-1">
+                    ${renderCredibilityBadge(article.upvote_count, article.downvote_count)}
+                    
+                    <h5 class="fw-bold line-clamp-2 mb-2" style="font-size: 1.1rem; line-height: 1.4; color: #1a202c;">
+                        ${escapeHtml(article.title)}
+                    </h5>
+                    
+                    ${renderPills(article.categories, article.tags)}
+                    
+                    <p class="text-muted small line-clamp-3 mb-3" style="line-height: 1.5; font-size: 0.85rem;">
+                        ${escapeHtml(article.excerpt || '')}
+                    </p>
+                    
+                    ${renderCardStats(article)}
                 </div>
             </a>
         </div>
@@ -113,6 +206,10 @@ function renderGridBlock(articles) {
 }
 
 function renderHeroBlock(article) {
+    const up = Number(article.upvote_count || 0);
+    const down = Number(article.downvote_count || 0);
+    const badgeHtml = renderCredibilityBadge(article.upvote_count, article.downvote_count);
+    
     return `
         <div class="row mb-5">
             <div class="col-lg-12">
@@ -128,23 +225,102 @@ function renderHeroBlock(article) {
                         style="height:480px;object-fit:cover;"
                     >
                     <div
-                        class="position-absolute bottom-0 p-4 text-white w-100"
+                        class="position-absolute bottom-0 p-4 text-white w-100 d-flex flex-column"
                         style="background:linear-gradient(transparent, rgba(0,0,0,0.88));"
                     >
-                        <div class="mb-2">
-                            ${renderTagList(article.tags)}
-                        </div>
-                        <h1 class="fw-bold display-6">
+                        ${badgeHtml}
+                        
+                        <h1 class="fw-bold display-6 mb-3" style="line-height: 1.2;">
                             ${escapeHtml(article.title)}
                         </h1>
-                        <p class="mt-2 fs-5 text-light opacity-90 d-none d-md-block">
+                        
+                        ${renderPills(article.categories, article.tags)}
+                        
+                        <p class="mt-2 fs-5 text-light opacity-90 d-none d-md-block line-clamp-2" style="font-size: 1rem; line-height: 1.6;">
                             ${escapeHtml(article.excerpt || '')}
                         </p>
-                        <div class="vote-box mt-3">
-                            👁 ${formatViewCount(article.view_count)}
+                        
+                        <div class="d-flex align-items-center gap-4 mt-3 small opacity-75">
+                            <span>👁 ${formatViewCount(article.view_count)} lượt xem</span>
+                            <span class="text-success fw-bold">▲ ${formatViewCount(up)}</span>
+                            <span class="text-danger fw-bold">▼ ${formatViewCount(down)}</span>
                         </div>
                     </div>
                 </a>
+            </div>
+        </div>
+    `;
+}
+
+function renderMixedScrollBlock(bigArticle, sideArticles) {
+    const bigUp = Number(bigArticle.upvote_count || 0);
+    const bigDown = Number(bigArticle.downvote_count || 0);
+    
+    return `
+        <div class="row mb-5">
+            <div class="col-lg-8 mb-4 mb-lg-0">
+                <a
+                    class="article-card h-100 shadow-sm overflow-hidden d-flex flex-column p-0"
+                    style="cursor:pointer; text-decoration:none; color:inherit; background:#fff; border-radius:16px; border:1px solid #edf2f7; padding: 0 !important; overflow: hidden !important;"
+                    href="${getArticleUrl(bigArticle.slug)}"
+                >
+                    <div style="height:430px; width:100%; overflow:hidden;">
+                        <img
+                            src="${getImage(bigArticle, 1000, 600)}"
+                            loading="lazy"
+                            class="w-100 h-100 object-fit-cover"
+                        >
+                    </div>
+                    <div class="p-4 d-flex flex-column flex-grow-1">
+                        ${renderCredibilityBadge(bigArticle.upvote_count, bigArticle.downvote_count)}
+                        
+                        <h2 class="fw-bold mb-3" style="font-size: 1.6rem; color: #1a202c;">
+                            ${escapeHtml(bigArticle.title)}
+                        </h2>
+                        
+                        ${renderPills(bigArticle.categories, bigArticle.tags)}
+                        
+                        <p class="text-muted mt-2 small line-clamp-3 mb-4" style="line-height:1.6; font-size:0.92rem;">
+                            ${escapeHtml(bigArticle.excerpt || '')}
+                        </p>
+                        
+                        ${renderCardStats(bigArticle)}
+                    </div>
+                </a>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="d-flex flex-column gap-3 scrollable-side-column" style="max-height: 690px; overflow-y: auto; padding-right: 4px;">
+                    ${sideArticles.map(article => {
+                        const up = Number(article.upvote_count || 0);
+                        const down = Number(article.downvote_count || 0);
+                        return `
+                            <a
+                                class="article-card shadow-sm d-flex flex-column"
+                                style="cursor:pointer; text-decoration:none; color:inherit; background:#fff; border-radius:16px; border:1px solid #edf2f7; margin-bottom: 0; padding: 24px !important;"
+                                href="${getArticleUrl(article.slug)}"
+                            >
+                                ${renderCredibilityBadge(article.upvote_count, article.downvote_count)}
+                                
+                                <h5 class="fw-bold line-clamp-2 mb-2" style="font-size: 1.02rem; line-height: 1.4; color: #1a202c;">
+                                    ${escapeHtml(article.title)}
+                                </h5>
+                                
+                                ${renderPills(article.categories, article.tags)}
+                                
+                                <p class="small text-muted line-clamp-2 mb-3" style="line-height:1.5; font-size:0.8rem;">
+                                    ${escapeHtml(article.excerpt || '')}
+                                </p>
+                                
+                                <div class="d-flex align-items-center gap-3 mt-auto pt-2 border-top text-muted small" style="font-size: 0.75rem;">
+                                    <span>👁 ${formatViewCount(article.view_count)}</span>
+                                    <span class="text-success fw-bold">▲ ${formatViewCount(up)}</span>
+                                    <span class="text-danger fw-bold">▼ ${formatViewCount(down)}</span>
+                                </div>
+                            </a>
+                        `;
+                    }).join('')}
+                </div>
             </div>
         </div>
     `;
@@ -155,72 +331,144 @@ function renderMixedBlock(bigArticle, sideArticles) {
         <div class="row mb-5">
             <div class="col-lg-8 mb-4 mb-lg-0">
                 <a
-                    class="article-card h-100 shadow-sm overflow-hidden d-block"
-                    style="cursor:pointer; text-decoration:none; color:inherit; border-radius: 16px; background: #fff;"
+                    class="article-card h-100 shadow-sm overflow-hidden d-flex flex-column p-0"
+                    style="cursor:pointer; text-decoration:none; color:inherit; border-radius: 16px; background: #fff; border:1px solid #edf2f7; padding: 0 !important; overflow: hidden !important;"
                     href="${getArticleUrl(bigArticle.slug)}"
                 >
-                    <img
-                        src="${getImage(bigArticle, 1000, 600)}"
-                        loading="lazy"
-                        class="w-100"
-                        style="height:400px;object-fit:cover;"
-                    >
-                    <div class="p-4">
-                        <div class="mb-2">
-                            ${renderTagList(bigArticle.tags)}
-                        </div>
-                        <h2 class="fw-bold">
+                    <div style="height:400px; width:100%; overflow:hidden;">
+                        <img
+                            src="${getImage(bigArticle, 1000, 600)}"
+                            loading="lazy"
+                            class="w-100 h-100 object-fit-cover"
+                        >
+                    </div>
+                    <div class="p-4 d-flex flex-column flex-grow-1">
+                        ${renderCredibilityBadge(bigArticle.upvote_count, bigArticle.downvote_count)}
+                        
+                        <h2 class="fw-bold mb-3" style="font-size: 1.5rem; color: #1a202c;">
                             ${escapeHtml(bigArticle.title)}
                         </h2>
-                        <p class="text-muted mt-3">
+                        
+                        ${renderPills(bigArticle.categories, bigArticle.tags)}
+                        
+                        <p class="text-muted mt-2 small line-clamp-3 mb-4" style="line-height: 1.6; font-size: 0.9rem;">
                             ${escapeHtml(bigArticle.excerpt || '')}
                         </p>
+                        
+                        ${renderCardStats(bigArticle)}
                     </div>
                 </a>
             </div>
-            <div class="col-lg-4">
-                ${sideArticles.map(article => `
-                    <a
-                        class="article-card shadow-sm mb-3 d-block p-3"
-                        style="cursor:pointer; text-decoration:none; color:inherit; border-radius: 12px; background: #fff;"
-                        href="${getArticleUrl(article.slug)}"
-                    >
-                        <div class="mb-2">
-                            ${renderTagList(article.tags)}
-                        </div>
-                        <h5 class="fw-bold line-clamp-2">
-                            ${escapeHtml(article.title)}
-                        </h5>
-                        <p class="text-muted small line-clamp-2">
-                            ${escapeHtml(article.excerpt || '')}
-                        </p>
-                        <div class="vote-box small mt-2">
-                            👁 ${formatViewCount(article.view_count)}
-                        </div>
-                    </a>
-                `).join('')}
+            
+            <div class="col-lg-4 d-flex flex-column gap-3">
+                ${sideArticles.map(article => {
+                    const up = Number(article.upvote_count || 0);
+                    const down = Number(article.downvote_count || 0);
+                    return `
+                        <a
+                            class="article-card shadow-sm d-flex flex-column p-4 flex-grow-1"
+                            style="cursor:pointer; text-decoration:none; color:inherit; border-radius: 12px; background: #fff; border:1px solid #edf2f7;"
+                            href="${getArticleUrl(article.slug)}"
+                        >
+                            ${renderCredibilityBadge(article.upvote_count, article.downvote_count)}
+                            
+                            <h5 class="fw-bold line-clamp-2 mb-2" style="font-size: 1.05rem; line-height: 1.4; color: #1a202c;">
+                                ${escapeHtml(article.title)}
+                            </h5>
+                            
+                            ${renderPills(article.categories, article.tags)}
+                            
+                            <p class="text-muted small line-clamp-2 mb-3" style="line-height:1.5; font-size:0.8rem;">
+                                ${escapeHtml(article.excerpt || '')}
+                            </p>
+                            
+                            <div class="d-flex align-items-center gap-3 mt-auto pt-2 border-top text-muted small" style="font-size: 0.75rem;">
+                                <span>👁 ${formatViewCount(article.view_count)}</span>
+                                <span class="text-success fw-bold">▲ ${formatViewCount(up)}</span>
+                                <span class="text-danger fw-bold">▼ ${formatViewCount(down)}</span>
+                            </div>
+                        </a>
+                    `;
+                }).join('')}
             </div>
         </div>
     `;
 }
 
-function renderDynamicLayout(articles) {
-    if (!articles.length) return;
-    const layoutType = currentPage % 3;
-    let html = '';
+function renderDynamicLayout() {
+    if (!articlesBuffer.length) return;
 
-    if (layoutType === 1 && articles[0]) {
-        html += renderHeroBlock(articles[0]);
-        if (articles.slice(1).length > 0) {
-            html += renderGridBlock(articles.slice(1));
-        }
-    } else if (layoutType === 2 && articles.length >= 3) {
-        html += renderMixedBlock(articles[0], articles.slice(1, 3));
-        if (articles.slice(3).length > 0) {
-            html += renderGridBlock(articles.slice(3));
+    // Chọn ngẫu nhiên layoutType: 0 (Grid), 1 (Hero), 2 (Mixed), 3 (Mixed Scroll)
+    let layoutType;
+    if (currentPage === 1) {
+        // Trang đầu tiên ưu tiên Hero (1), Mixed (2), hoặc Mixed Scroll (3) để luôn có bài tiêu điểm lớn ở đầu.
+        const r = Math.random();
+        if (r < 0.33) {
+            layoutType = 1;
+        } else if (r < 0.66) {
+            layoutType = 2;
+        } else {
+            layoutType = 3;
         }
     } else {
-        html += renderGridBlock(articles);
+        layoutType = Math.floor(Math.random() * 4);
+    }
+
+    // Nếu chọn kiểu Mixed Scroll (3) nhưng trong buffer có ít hơn 4 bài, chuyển về Mixed thường (2) hoặc Grid (0)
+    if (layoutType === 3 && articlesBuffer.length < 4) {
+        layoutType = articlesBuffer.length >= 3 ? 2 : 0;
+    }
+    // Nếu chọn kiểu Mixed (2) nhưng trong buffer có ít hơn 3 bài, chuyển sang Grid (0)
+    if (layoutType === 2 && articlesBuffer.length < 3) {
+        layoutType = 0;
+    }
+
+    let renderCount = 0;
+    if (layoutType === 1) {
+        // Hero: 1 Hero + 3 * N Grid
+        const gridAvailable = articlesBuffer.length - 1;
+        const gridCount = Math.floor(gridAvailable / 3) * 3;
+        renderCount = 1 + gridCount;
+    } else if (layoutType === 2) {
+        // Mixed: 3 tiêu điểm (1 lớn + 2 nhỏ) + 3 * N Grid
+        const gridAvailable = articlesBuffer.length - 3;
+        const gridCount = Math.floor(gridAvailable / 3) * 3;
+        renderCount = 3 + gridCount;
+    } else if (layoutType === 3) {
+        // Mixed Scroll: 1 bài lớn + tối đa 7 bài nhỏ bên phải cuộn dọc (không có Grid bên dưới)
+        const sideCount = Math.min(7, articlesBuffer.length - 1);
+        renderCount = 1 + sideCount;
+    } else {
+        // Grid: 3 * N Grid
+        renderCount = Math.floor(articlesBuffer.length / 3) * 3;
+    }
+
+    // Fallback nếu renderCount tính ra bằng 0 nhưng buffer vẫn còn bài viết,
+    // ta lấy toàn bộ bài viết còn lại để hiển thị nốt dạng Grid.
+    if (renderCount === 0 && articlesBuffer.length > 0) {
+        renderCount = articlesBuffer.length;
+    }
+
+    // Cắt ra số bài viết cần render
+    const toRender = articlesBuffer.slice(0, renderCount);
+    articlesBuffer = articlesBuffer.slice(renderCount);
+
+    let html = '';
+
+    if (layoutType === 1 && toRender[0]) {
+        html += renderHeroBlock(toRender[0]);
+        if (toRender.slice(1).length > 0) {
+            html += renderGridBlock(toRender.slice(1));
+        }
+    } else if (layoutType === 2 && toRender.length >= 3) {
+        html += renderMixedBlock(toRender[0], toRender.slice(1, 3));
+        if (toRender.slice(3).length > 0) {
+            html += renderGridBlock(toRender.slice(3));
+        }
+    } else if (layoutType === 3 && toRender.length >= 4) {
+        html += renderMixedScrollBlock(toRender[0], toRender.slice(1));
+    } else {
+        html += renderGridBlock(toRender);
     }
 
     feed.insertAdjacentHTML('beforeend', html);
@@ -262,17 +510,27 @@ async function loadMore() {
             if (currentPage === 1) {
                 feed.innerHTML = `<div class="text-center py-5 text-muted">Chưa có bài viết nào thuộc chuyên mục này.</div>`;
             }
+            
+            // Render nốt các bài viết dư thừa trong buffer
+            if (articlesBuffer.length > 0) {
+                feed.insertAdjacentHTML('beforeend', renderGridBlock(articlesBuffer));
+                articlesBuffer = [];
+            }
             return;
         }
 
-        renderDynamicLayout(articles);
+        // Gộp bài viết mới vào buffer
+        articlesBuffer = articlesBuffer.concat(articles);
+
+        renderDynamicLayout();
         currentPage++;
         articlesCount += articles.length;
         hasMore = result.data.has_more;
 
-        if (articlesCount >= LIMIT_BEFORE_PAGINATION && hasMore) {
-            hasMore = false;
+        if (hasMore) {
             paginationWrapper.classList.remove('d-none');
+        } else {
+            paginationWrapper.classList.add('d-none');
         }
 
     } catch (error) {

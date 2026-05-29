@@ -91,8 +91,10 @@ CREATE TABLE IF NOT EXISTS articles (
     status        ENUM('draft', 'pending', 'published', 'revision', 'rejected') NOT NULL DEFAULT 'draft',
     is_featured   TINYINT(1)    NOT NULL DEFAULT 0,
     -- [UPDATE] Cột mới thêm: xoá mềm
-    is_deleted    TINYINT(1)    NOT NULL DEFAULT -,
+    is_deleted    TINYINT(1)    NOT NULL DEFAULT 0,
     view_count    INT           NOT NULL DEFAULT 0,
+    upvote_count  INT           NOT NULL DEFAULT 0,
+    downvote_count INT           NOT NULL DEFAULT 0,
     published_at  DATETIME      NULL,
     created_at    DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at    DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -250,3 +252,18 @@ CREATE TABLE user_read_history (
         REFERENCES articles(article_id)
         ON DELETE CASCADE
 );
+
+
+-- 12. ARTICLE_VOTES — Lưu trữ bình chọn kiểm chứng
+CREATE TABLE IF NOT EXISTS article_votes (
+    vote_id     INT NOT NULL AUTO_INCREMENT,
+    article_id  INT NOT NULL,
+    user_id     INT NOT NULL,
+    vote_type   ENUM('up', 'down') NOT NULL,
+    created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (vote_id),
+    UNIQUE KEY uq_user_article_vote (user_id, article_id),
+    CONSTRAINT fk_votes_article FOREIGN KEY (article_id) REFERENCES articles(article_id) ON DELETE CASCADE,
+    CONSTRAINT fk_votes_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+

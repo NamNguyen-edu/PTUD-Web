@@ -33,6 +33,8 @@ class CategoryService {
                 a.excerpt,
                 a.thumbnail_url,
                 a.view_count,
+                a.upvote_count,
+                a.downvote_count,
                 a.published_at,
                 (
                     SELECT GROUP_CONCAT(t.name SEPARATOR ',')
