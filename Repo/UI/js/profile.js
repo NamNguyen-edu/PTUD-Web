@@ -76,33 +76,37 @@ document.addEventListener("DOMContentLoaded", function() {
             console.error("Lỗi parse JSON kỹ năng:", e);
         }
             checkFirstTimeLogin();
-    checkArticleAlerts();
-    }
+            checkArticleAlerts();
+        }
+    }); // Đóng DOMContentLoaded ở dòng 4
+
     function checkArticleAlerts() {
-    const el = document.getElementById('alertArticlesData');
-    if (!el || !el.value || el.value === '{{ALERT_ARTICLES_JSON}}') return;
+        const el = document.getElementById('alertArticlesData');
+        if (!el || !el.value || el.value === '{{ALERT_ARTICLES_JSON}}') return;
 
-    let articles = [];
-    try { articles = JSON.parse(el.value); } catch(e) { return; }
-    if (!articles.length) return;
+        let articles = [];
+        try { articles = JSON.parse(el.value); } catch(e) { return; }
+        if (!articles.length) return;
 
-    // Build danh sách bài cần xử lý
-    const statusMap = {
-        'revision':  { label: 'Cần sửa lại', cls: 'warning',  icon: 'fa-edit' },
-        'rejected':  { label: 'Bị từ chối',  cls: 'danger',   icon: 'fa-times-circle' }
-    };
+        // Build danh sách bài cần xử lý
+        const statusMap = {
+            'revision':  { label: 'Cần sửa lại', cls: 'warning',  icon: 'fa-edit' },
+            'rejected':  { label: 'Bị từ chối',  cls: 'danger',   icon: 'fa-times-circle' }
+        };
+    } // Đóng checkArticleAlerts
 
-// 2. KHỞI TẠO KHI TRANG LOAD XONG (Phần logic cũ của Profile)
-document.addEventListener('DOMContentLoaded', function() {
-    
-    
-    // Kiểm tra xem có phải lần đầu đăng nhập không để hiện Popup Preference
-    checkFirstTimeLogin();
-    loadReadingHistory();
-    // Load dữ liệu lên giao diện    
-    // Khởi tạo các tooltips của Bootstrap nếu cần
-    $('[data-toggle="tooltip"]').tooltip();
-});
+    // 2. KHỞI TẠO KHI TRANG LOAD XONG (Phần logic cũ của Profile)
+    function initProfile() {
+        checkFirstTimeLogin();
+        loadReadingHistory();
+        $('[data-toggle="tooltip"]').tooltip();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initProfile);
+    } else {
+        initProfile();
+    }
 
 // 3. LOGIC CHUYỂN TAB (SỬ DỤNG BOOTSTRAP TABS KẾT HỢP CUSTOM LOGIC)
 function switchTab(tabId) {
@@ -321,7 +325,7 @@ async function loadReadingHistory() {
                             </h6>
 
                             <small class="text-muted">
-                                Đã đọc ${item.read_count} lần
+                                ${parseInt(item.read_count) === 1 ? 'Đọc lần đầu tiên' : `Đã đọc ${item.read_count} lần`}
                             </small>
 
                             <br>

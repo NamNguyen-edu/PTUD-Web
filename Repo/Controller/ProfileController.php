@@ -14,7 +14,7 @@ class ProfileController
     $userArticles   = $profileService->getUserArticles($userId);
 
     // Query bài có trạng thái cần thông báo
-    $alertArticles  = $profileService->getAlertArticles($userId);
+    $alertArticles  = $this->getAlertArticles($userId);
 
     $view = new ProfileView();
     $view->render($userInfo, $userArticles, $alertArticles);
