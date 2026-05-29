@@ -8,7 +8,7 @@ class HomeService {
 
         $page = max(1, $page);
 
-        $limit = 6;
+        $limit = 10;
         $offset = ($page - 1) * $limit;
 
         $sql = "
@@ -59,7 +59,7 @@ class HomeService {
 
     public function getTrendingFeed(int $page = 1): array {
         $page = max(1, $page);
-        $limit = 6;
+        $limit = 10;
         $offset = ($page - 1) * $limit;
 
         $sql = "
@@ -132,7 +132,7 @@ class HomeService {
         }
 
         $page = max(1, $page);
-        $limit = 6;
+        $limit = 10;
         $offset = ($page - 1) * $limit;
 
         $placeholders = implode(',', array_fill(0, count($slugs), '?'));
@@ -170,8 +170,53 @@ class HomeService {
 
         $articles = pdo_query($sql, ...$slugs);
 
-        if (empty($articles) && $page === 1) {
+        // Fallback cải tiến: Nếu không có bài viết nào ở trang này, nạp tiếp từ homepage feed
+        if (empty($articles)) {
             return $this->getHomepageFeed($page);
+        }
+
+        // Lấp đầy cải tiến: Nếu số bài viết lấy ra ít hơn $limit và là trang 1,
+        // ta tự động lấy thêm các bài viết published khác từ homepage để lấp đầy cho đủ $limit bài,
+        // giúp giao diện luôn đầy đặn và nút Xem thêm xuất hiện nếu DB còn bài viết.
+        if (count($articles) < $limit && $page === 1) {
+            $needed = $limit - count($articles);
+            $excludeIds = array_column($articles, 'article_id');
+            if (empty($excludeIds)) {
+                $excludeIds = [0];
+            }
+            $placeholdersExclude = implode(',', array_fill(0, count($excludeIds), '?'));
+            
+            $fallbackSql = "
+                SELECT
+                    a.article_id,
+                    a.title,
+                    a.slug,
+                    a.excerpt,
+                    a.thumbnail_url,
+                    a.view_count,
+                    a.upvote_count,
+                    a.downvote_count,
+                    a.published_at,
+                    (
+                        SELECT GROUP_CONCAT(t.name SEPARATOR ',')
+                        FROM tags t
+                        INNER JOIN article_tags at ON t.tag_id = at.tag_id
+                        WHERE at.article_id = a.article_id
+                    ) AS tag_names,
+                    (
+                        SELECT GROUP_CONCAT(c.name SEPARATOR ',')
+                        FROM categories c
+                        INNER JOIN article_categories ac ON c.category_id = ac.category_id
+                        WHERE ac.article_id = a.article_id
+                    ) AS category_names
+                FROM articles a
+                WHERE a.status = 'published'
+                  AND a.article_id NOT IN ($placeholdersExclude)
+                ORDER BY a.published_at DESC
+                LIMIT $needed
+            ";
+            $fallbackArticles = pdo_query($fallbackSql, ...$excludeIds);
+            $articles = array_merge($articles, $fallbackArticles);
         }
 
         foreach ($articles as &$article) {

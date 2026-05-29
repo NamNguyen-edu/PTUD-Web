@@ -11,7 +11,8 @@ let currentPage = 1;
 let hasMore = true;
 let loading = false;
 let articlesCount = 0;
-const LIMIT_BEFORE_PAGINATION = 12;
+let articlesBuffer = [];
+const LIMIT_BEFORE_PAGINATION = 10;
 
 /* =========================================================
    UTILITIES
@@ -164,8 +165,8 @@ function renderArticleCard(article) {
     return `
         <div class="col-md-4 mb-4">
             <a
-                class="article-card h-100 shadow-sm d-flex flex-column"
-                style="cursor:pointer; text-decoration:none; color:inherit; background:#fff; border-radius:12px; overflow:hidden; border:1px solid #edf2f7; transition:all 0.2s;"
+                class="article-card h-100 shadow-sm d-flex flex-column p-0"
+                style="cursor:pointer; text-decoration:none; color:inherit; background:#fff; border-radius:12px; overflow:hidden !important; border:1px solid #edf2f7; transition:all 0.2s; padding: 0 !important;"
                 href="${getArticleUrl(article.slug)}"
             >
                 <div class="overflow-hidden" style="height:220px; width:100%;">
@@ -251,13 +252,87 @@ function renderHeroBlock(article) {
     `;
 }
 
+function renderMixedScrollBlock(bigArticle, sideArticles) {
+    const bigUp = Number(bigArticle.upvote_count || 0);
+    const bigDown = Number(bigArticle.downvote_count || 0);
+    
+    return `
+        <div class="row mb-5">
+            <div class="col-lg-8 mb-4 mb-lg-0">
+                <a
+                    class="article-card h-100 shadow-sm overflow-hidden d-flex flex-column p-0"
+                    style="cursor:pointer; text-decoration:none; color:inherit; background:#fff; border-radius:16px; border:1px solid #edf2f7; padding: 0 !important; overflow: hidden !important;"
+                    href="${getArticleUrl(bigArticle.slug)}"
+                >
+                    <div style="height:430px; width:100%; overflow:hidden;">
+                        <img
+                            src="${getImage(bigArticle, 1000, 600)}"
+                            loading="lazy"
+                            class="w-100 h-100 object-fit-cover"
+                        >
+                    </div>
+                    <div class="p-4 d-flex flex-column flex-grow-1">
+                        ${renderCredibilityBadge(bigArticle.upvote_count, bigArticle.downvote_count)}
+                        
+                        <h2 class="fw-bold mb-3" style="font-size: 1.6rem; color: #1a202c;">
+                            ${escapeHtml(bigArticle.title)}
+                        </h2>
+                        
+                        ${renderPills(bigArticle.categories, bigArticle.tags)}
+                        
+                        <p class="text-muted mt-2 small line-clamp-3 mb-4" style="line-height:1.6; font-size:0.92rem;">
+                            ${escapeHtml(bigArticle.excerpt || '')}
+                        </p>
+                        
+                        ${renderCardStats(bigArticle)}
+                    </div>
+                </a>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="d-flex flex-column gap-3 scrollable-side-column" style="max-height: 690px; overflow-y: auto; padding-right: 4px;">
+                    ${sideArticles.map(article => {
+                        const up = Number(article.upvote_count || 0);
+                        const down = Number(article.downvote_count || 0);
+                        return `
+                            <a
+                                class="article-card shadow-sm d-flex flex-column"
+                                style="cursor:pointer; text-decoration:none; color:inherit; background:#fff; border-radius:16px; border:1px solid #edf2f7; margin-bottom: 0; padding: 24px !important;"
+                                href="${getArticleUrl(article.slug)}"
+                            >
+                                ${renderCredibilityBadge(article.upvote_count, article.downvote_count)}
+                                
+                                <h5 class="fw-bold line-clamp-2 mb-2" style="font-size: 1.02rem; line-height: 1.4; color: #1a202c;">
+                                    ${escapeHtml(article.title)}
+                                </h5>
+                                
+                                ${renderPills(article.categories, article.tags)}
+                                
+                                <p class="small text-muted line-clamp-2 mb-3" style="line-height:1.5; font-size:0.8rem;">
+                                    ${escapeHtml(article.excerpt || '')}
+                                </p>
+                                
+                                <div class="d-flex align-items-center gap-3 mt-auto pt-2 border-top text-muted small" style="font-size: 0.75rem;">
+                                    <span>👁 ${formatViewCount(article.view_count)}</span>
+                                    <span class="text-success fw-bold">▲ ${formatViewCount(up)}</span>
+                                    <span class="text-danger fw-bold">▼ ${formatViewCount(down)}</span>
+                                </div>
+                            </a>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+        </div>
+    `;
+}
+
 function renderMixedBlock(bigArticle, sideArticles) {
     return `
         <div class="row mb-5">
             <div class="col-lg-8 mb-4 mb-lg-0">
                 <a
-                    class="article-card h-100 shadow-sm overflow-hidden d-flex flex-column"
-                    style="cursor:pointer; text-decoration:none; color:inherit; border-radius: 16px; background: #fff; border:1px solid #edf2f7;"
+                    class="article-card h-100 shadow-sm overflow-hidden d-flex flex-column p-0"
+                    style="cursor:pointer; text-decoration:none; color:inherit; border-radius: 16px; background: #fff; border:1px solid #edf2f7; padding: 0 !important; overflow: hidden !important;"
                     href="${getArticleUrl(bigArticle.slug)}"
                 >
                     <div style="height:400px; width:100%; overflow:hidden;">
@@ -320,23 +395,80 @@ function renderMixedBlock(bigArticle, sideArticles) {
     `;
 }
 
-function renderDynamicLayout(articles) {
-    if (!articles.length) return;
-    const layoutType = currentPage % 3;
-    let html = '';
+function renderDynamicLayout() {
+    if (!articlesBuffer.length) return;
 
-    if (layoutType === 1 && articles[0]) {
-        html += renderHeroBlock(articles[0]);
-        if (articles.slice(1).length > 0) {
-            html += renderGridBlock(articles.slice(1));
-        }
-    } else if (layoutType === 2 && articles.length >= 3) {
-        html += renderMixedBlock(articles[0], articles.slice(1, 3));
-        if (articles.slice(3).length > 0) {
-            html += renderGridBlock(articles.slice(3));
+    // Chọn ngẫu nhiên layoutType: 0 (Grid), 1 (Hero), 2 (Mixed), 3 (Mixed Scroll)
+    let layoutType;
+    if (currentPage === 1) {
+        // Trang đầu tiên ưu tiên Hero (1), Mixed (2), hoặc Mixed Scroll (3) để luôn có bài tiêu điểm lớn ở đầu.
+        const r = Math.random();
+        if (r < 0.33) {
+            layoutType = 1;
+        } else if (r < 0.66) {
+            layoutType = 2;
+        } else {
+            layoutType = 3;
         }
     } else {
-        html += renderGridBlock(articles);
+        layoutType = Math.floor(Math.random() * 4);
+    }
+
+    // Nếu chọn kiểu Mixed Scroll (3) nhưng trong buffer có ít hơn 4 bài, chuyển về Mixed thường (2) hoặc Grid (0)
+    if (layoutType === 3 && articlesBuffer.length < 4) {
+        layoutType = articlesBuffer.length >= 3 ? 2 : 0;
+    }
+    // Nếu chọn kiểu Mixed (2) nhưng trong buffer có ít hơn 3 bài, chuyển sang Grid (0)
+    if (layoutType === 2 && articlesBuffer.length < 3) {
+        layoutType = 0;
+    }
+
+    let renderCount = 0;
+    if (layoutType === 1) {
+        // Hero: 1 Hero + 3 * N Grid
+        const gridAvailable = articlesBuffer.length - 1;
+        const gridCount = Math.floor(gridAvailable / 3) * 3;
+        renderCount = 1 + gridCount;
+    } else if (layoutType === 2) {
+        // Mixed: 3 tiêu điểm (1 lớn + 2 nhỏ) + 3 * N Grid
+        const gridAvailable = articlesBuffer.length - 3;
+        const gridCount = Math.floor(gridAvailable / 3) * 3;
+        renderCount = 3 + gridCount;
+    } else if (layoutType === 3) {
+        // Mixed Scroll: 1 bài lớn + tối đa 7 bài nhỏ bên phải cuộn dọc (không có Grid bên dưới)
+        const sideCount = Math.min(7, articlesBuffer.length - 1);
+        renderCount = 1 + sideCount;
+    } else {
+        // Grid: 3 * N Grid
+        renderCount = Math.floor(articlesBuffer.length / 3) * 3;
+    }
+
+    // Fallback nếu renderCount tính ra bằng 0 nhưng buffer vẫn còn bài viết,
+    // ta lấy toàn bộ bài viết còn lại để hiển thị nốt dạng Grid.
+    if (renderCount === 0 && articlesBuffer.length > 0) {
+        renderCount = articlesBuffer.length;
+    }
+
+    // Cắt ra số bài viết cần render
+    const toRender = articlesBuffer.slice(0, renderCount);
+    articlesBuffer = articlesBuffer.slice(renderCount);
+
+    let html = '';
+
+    if (layoutType === 1 && toRender[0]) {
+        html += renderHeroBlock(toRender[0]);
+        if (toRender.slice(1).length > 0) {
+            html += renderGridBlock(toRender.slice(1));
+        }
+    } else if (layoutType === 2 && toRender.length >= 3) {
+        html += renderMixedBlock(toRender[0], toRender.slice(1, 3));
+        if (toRender.slice(3).length > 0) {
+            html += renderGridBlock(toRender.slice(3));
+        }
+    } else if (layoutType === 3 && toRender.length >= 4) {
+        html += renderMixedScrollBlock(toRender[0], toRender.slice(1));
+    } else {
+        html += renderGridBlock(toRender);
     }
 
     feed.insertAdjacentHTML('beforeend', html);
@@ -378,17 +510,27 @@ async function loadMore() {
             if (currentPage === 1) {
                 feed.innerHTML = `<div class="text-center py-5 text-muted">Chưa có bài viết nào thuộc chuyên mục này.</div>`;
             }
+            
+            // Render nốt các bài viết dư thừa trong buffer
+            if (articlesBuffer.length > 0) {
+                feed.insertAdjacentHTML('beforeend', renderGridBlock(articlesBuffer));
+                articlesBuffer = [];
+            }
             return;
         }
 
-        renderDynamicLayout(articles);
+        // Gộp bài viết mới vào buffer
+        articlesBuffer = articlesBuffer.concat(articles);
+
+        renderDynamicLayout();
         currentPage++;
         articlesCount += articles.length;
         hasMore = result.data.has_more;
 
-        if (articlesCount >= LIMIT_BEFORE_PAGINATION && hasMore) {
-            hasMore = false;
+        if (hasMore) {
             paginationWrapper.classList.remove('d-none');
+        } else {
+            paginationWrapper.classList.add('d-none');
         }
 
     } catch (error) {
