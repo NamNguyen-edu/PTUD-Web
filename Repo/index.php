@@ -64,6 +64,10 @@ switch ($page) {
         require_once __DIR__ . '/Controller/home_controller.php';
         (new HomeController())->trendingFeed();
         break;
+    case 'hot_news':
+        require_once __DIR__ . '/Controller/home_controller.php';
+        (new HomeController())->hotNews();
+        break;
     case 'mega_menu':
         require_once __DIR__ . '/Controller/home_controller.php';
         (new HomeController())->megaMenu();
@@ -165,6 +169,10 @@ switch ($page) {
     case 'upload_avatar':
         require_once __DIR__ . '/Controller/ProfileController.php';
         (new ProfileController())->uploadAvatar();
+        break;
+    case 'vote_article':
+        require_once __DIR__ . '/Controller/VoteController.php';
+        (new VoteController())->vote();
         break;
     case 'category':
         require_once __DIR__ . '/Controller/CategoryPageController.php';

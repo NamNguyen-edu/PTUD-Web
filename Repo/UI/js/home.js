@@ -234,107 +234,190 @@ function loadPageComponents() {
    ARTICLE COMPONENTS
 ========================================================= */
 
-function renderTagList(tags = []) {
+/* =========================================================
+   CREDIBILITY & VOTING / CATEGORY STYLING UTILITIES
+========================================================= */
 
-    return tags.map(tag => `
-        <span class="tag me-1">
-            ${escapeHtml(tag)}
-        </span>
-    `).join('');
+const pillColors = {
+    'thời sự': { bg: '#fee2e2', text: '#dc2626' }, // Crimson
+    'công nghệ': { bg: '#d1fae5', text: '#059669' }, // Emerald
+    'kinh doanh': { bg: '#dbeafe', text: '#2563eb' }, // Blue
+    'kinh tế': { bg: '#dbeafe', text: '#2563eb' }, // Light blue
+    'tài chính': { bg: '#fef3c7', text: '#d97706' }, // Amber
+    'ai': { bg: '#581c87', text: '#ffffff' }, // Deep Purple (white text)
+    'trí tuệ nhân tạo': { bg: '#581c87', text: '#ffffff' },
+    'startup': { bg: '#eff6ff', text: '#1e40af' },
+    'giáo dục': { bg: '#faf5ff', text: '#7c3aed' },
+    'đời sống': { bg: '#fdf2f8', text: '#db2777' }
+};
+
+function getPillStyle(name) {
+    const lower = name.toLowerCase().trim();
+    for (const key in pillColors) {
+        if (lower === key || lower.includes(key)) {
+            return pillColors[key];
+        }
+    }
+    return { bg: '#f1f5f9', text: '#475569' };
+}
+
+function renderPills(categories = [], tags = []) {
+    let html = '';
+    
+    // Chuyên mục (Categories) - ưu tiên hiển thị trước
+    categories.slice(0, 2).forEach(cat => {
+        const style = getPillStyle(cat);
+        html += `
+            <span class="category-pill shadow-sm" style="background-color: ${style.bg}; color: ${style.text}; font-weight: 600; padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; display: inline-block;">
+                ${escapeHtml(cat)}
+            </span>
+        `;
+    });
+    
+    // Thẻ (Tags) - hiển thị như các hashtag phụ
+    tags.slice(0, 2).forEach(tag => {
+        const style = getPillStyle(tag);
+        html += `
+            <span class="tag-pill" style="background-color: ${style.bg}; color: ${style.text}; padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; display: inline-block; opacity: 0.9;">
+                ${escapeHtml(tag)}
+            </span>
+        `;
+    });
+    
+    return `<div class="pill-container d-flex flex-wrap gap-2 mb-2">${html}</div>`;
+}
+
+function renderCredibilityBadge(upvoteCount, downvoteCount) {
+    const up = Number(upvoteCount || 0);
+    const down = Number(downvoteCount || 0);
+    const total = up + down;
+    if (total < 5) return ''; // Cần tối thiểu 5 lượt đánh giá để xác nhận độ tin cậy
+    
+    const ratio = up / total;
+    if (ratio >= 0.8) {
+        return `
+            <div class="mb-2">
+                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1 fw-semibold" style="font-size: 0.78rem;">
+                    ✓ Tin cậy cao
+                </span>
+            </div>
+        `;
+    } else if (ratio < 0.5) {
+        return `
+            <div class="mb-2">
+                <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3 py-1 fw-semibold" style="font-size: 0.78rem;">
+                    ⚠️ Nghi vấn/Sai lệch
+                </span>
+            </div>
+        `;
+    }
+    return '';
+}
+
+function renderCardStats(article) {
+    const up = Number(article.upvote_count || 0);
+    const down = Number(article.downvote_count || 0);
+    return `
+        <div class="card-stats-row d-flex align-items-center gap-3 mt-auto pt-3 border-top text-muted small" style="font-size: 0.8rem;">
+            <span class="stat-views d-flex align-items-center gap-1">
+                👁 ${formatViewCount(article.view_count)} lượt xem
+            </span>
+            <span class="stat-upvotes text-success fw-bold d-flex align-items-center gap-1">
+                ▲ ${formatViewCount(up)}
+            </span>
+            <span class="stat-downvotes text-danger fw-bold d-flex align-items-center gap-1">
+                ▼ ${formatViewCount(down)}
+            </span>
+        </div>
+    `;
 }
 
 function renderArticleCard(article) {
-
     return `
         <div class="col-md-4 mb-4">
-
             <a
-                class="article-card h-100 shadow-sm d-block"
-                style="cursor:pointer; text-decoration:none; color:inherit;"
+                class="article-card h-100 shadow-sm d-flex flex-column"
+                style="cursor:pointer; text-decoration:none; color:inherit; background:#fff; border-radius:12px; overflow:hidden; border:1px solid #edf2f7; transition:all 0.2s;"
                 href="${getArticleUrl(article.slug)}"
             >
-
-                <img
-                    src="${getImage(article)}"
-                    loading="lazy"
-                    class="img-fluid rounded mb-3"
-                    style="height:220px;width:100%;object-fit:cover;"
-                >
-
-                <div class="mb-2">
-                    ${renderTagList(article.tags)}
+                <div class="overflow-hidden" style="height:220px; width:100%;">
+                    <img
+                        src="${getImage(article)}"
+                        loading="lazy"
+                        class="w-100 h-100 object-fit-cover card-img-top"
+                        style="transition: transform 0.3s;"
+                    >
                 </div>
-
-                <h5 class="fw-bold">
-                    ${escapeHtml(article.title)}
-                </h5>
-
-                <p class="text-muted small">
-                    ${escapeHtml(article.excerpt || '')}
-                </p>
-
-                <div class="vote-box small mt-3">
-                    <span class="vote up">
-                        👁 ${formatViewCount(article.view_count)}
-                    </span>
+                <div class="p-3 d-flex flex-column flex-grow-1">
+                    ${renderCredibilityBadge(article.upvote_count, article.downvote_count)}
+                    
+                    <h5 class="fw-bold line-clamp-2 mb-2" style="font-size: 1.1rem; line-height: 1.4; color: #1a202c;">
+                        ${escapeHtml(article.title)}
+                    </h5>
+                    
+                    ${renderPills(article.categories, article.tags)}
+                    
+                    <p class="text-muted small line-clamp-3 mb-3" style="line-height: 1.5; font-size: 0.85rem;">
+                        ${escapeHtml(article.excerpt || '')}
+                    </p>
+                    
+                    ${renderCardStats(article)}
                 </div>
-
             </a>
-
         </div>
     `;
 }
 
 function renderGridBlock(articles) {
-
     return `
-        <div class="row mb-5">
+        <div class="row mb-4">
             ${articles.map(renderArticleCard).join('')}
         </div>
     `;
 }
 
 function renderHeroBlock(article) {
-
+    const up = Number(article.upvote_count || 0);
+    const down = Number(article.downvote_count || 0);
+    
+    // Tự sinh badge tin cậy cao trên Hero image
+    const badgeHtml = renderCredibilityBadge(article.upvote_count, article.downvote_count);
+    
     return `
         <div class="row mb-5">
-
             <div class="col-lg-12">
-
                 <a
                     class="article-card p-0 overflow-hidden shadow-sm position-relative d-block"
-                    style="cursor:pointer; text-decoration:none; color:inherit;"
+                    style="cursor:pointer; text-decoration:none; color:inherit; border-radius: 16px;"
                     href="${getArticleUrl(article.slug)}"
                 >
-
                     <img
                         src="${getImage(article, 1200, 600)}"
                         loading="lazy"
                         class="w-100"
                         style="height:520px;object-fit:cover;"
                     >
-
                     <div
-                        class="position-absolute bottom-0 p-4 text-white w-100"
+                        class="position-absolute bottom-0 p-4 text-white w-100 d-flex flex-column"
                         style="background:linear-gradient(transparent, rgba(0,0,0,0.92));"
                     >
-
-                        <div class="mb-3">
-                            ${renderTagList(article.tags)}
-                        </div>
-
-                        <h1 class="fw-bold display-5">
+                        ${badgeHtml}
+                        
+                        <h1 class="fw-bold display-6 mb-3" style="line-height: 1.2;">
                             ${escapeHtml(article.title)}
                         </h1>
-
-                        <p class="mt-3 fs-5">
+                        
+                        ${renderPills(article.categories, article.tags)}
+                        
+                        <p class="mt-2 fs-5 opacity-90 line-clamp-2" style="font-size: 1rem; max-width: 800px; line-height: 1.6;">
                             ${escapeHtml(article.excerpt || '')}
                         </p>
-
-                        <div class="vote-box mt-3">
-                            👁 ${formatViewCount(article.view_count)}
+                        
+                        <div class="d-flex align-items-center gap-4 mt-3 small opacity-75">
+                            <span>👁 ${formatViewCount(article.view_count)} lượt xem</span>
+                            <span class="text-success fw-bold">▲ ${formatViewCount(up)}</span>
+                            <span class="text-danger fw-bold">▼ ${formatViewCount(down)}</span>
                         </div>
-
                     </div>
                 </a>
             </div>
@@ -343,73 +426,72 @@ function renderHeroBlock(article) {
 }
 
 function renderMixedBlock(bigArticle, sideArticles) {
-
+    const bigUp = Number(bigArticle.upvote_count || 0);
+    const bigDown = Number(bigArticle.downvote_count || 0);
+    
     return `
         <div class="row mb-5">
-
             <div class="col-lg-8">
-
-<a
-                        class="article-card h-100 shadow-sm overflow-hidden d-block"
-                        style="cursor:pointer; text-decoration:none; color:inherit;"
-                        href="${getArticleUrl(bigArticle.slug)}"
+                <a
+                    class="article-card h-100 shadow-sm overflow-hidden d-flex flex-column"
+                    style="cursor:pointer; text-decoration:none; color:inherit; background:#fff; border-radius:16px; border:1px solid #edf2f7;"
+                    href="${getArticleUrl(bigArticle.slug)}"
                 >
-
-                    <img
-                        src="${getImage(bigArticle, 1000, 600)}"
-                        loading="lazy"
-                        class="w-100"
-                        style="height:430px;object-fit:cover;"
-                    >
-
-                    <div class="p-4">
-
-                        <div class="mb-2">
-                            ${renderTagList(bigArticle.tags)}
-                        </div>
-
-                        <h2 class="fw-bold">
+                    <div style="height:430px; width:100%; overflow:hidden;">
+                        <img
+                            src="${getImage(bigArticle, 1000, 600)}"
+                            loading="lazy"
+                            class="w-100 h-100 object-fit-cover"
+                        >
+                    </div>
+                    <div class="p-4 d-flex flex-column flex-grow-1">
+                        ${renderCredibilityBadge(bigArticle.upvote_count, bigArticle.downvote_count)}
+                        
+                        <h2 class="fw-bold mb-3" style="font-size: 1.6rem; color: #1a202c;">
                             ${escapeHtml(bigArticle.title)}
                         </h2>
-
-                        <p class="text-muted mt-3">
+                        
+                        ${renderPills(bigArticle.categories, bigArticle.tags)}
+                        
+                        <p class="text-muted mt-2 small line-clamp-3 mb-4" style="line-height:1.6; font-size:0.92rem;">
                             ${escapeHtml(bigArticle.excerpt || '')}
                         </p>
-
+                        
+                        ${renderCardStats(bigArticle)}
                     </div>
                 </a>
             </div>
-
-            <div class="col-lg-4">
-
-                ${sideArticles.map(article => `
-
-                    <a
-                        class="article-card shadow-sm mb-3 d-block"
-                        style="cursor:pointer; text-decoration:none; color:inherit;"
-                        href="${getArticleUrl(article.slug)}"
-                    >
-
-                        <div class="mb-2">
-                            ${renderTagList(article.tags)}
-                        </div>
-
-                        <h5 class="fw-bold">
-                            ${escapeHtml(article.title)}
-                        </h5>
-
-                        <p class="small text-muted">
-                            ${escapeHtml(article.excerpt || '')}
-                        </p>
-
-                        <div class="vote-box small mt-2">
-                            👁 ${formatViewCount(article.view_count)}
-                        </div>
-
-                    </a>
-
-                `).join('')}
-
+            
+            <div class="col-lg-4 d-flex flex-column gap-3">
+                ${sideArticles.map(article => {
+                    const up = Number(article.upvote_count || 0);
+                    const down = Number(article.downvote_count || 0);
+                    return `
+                        <a
+                            class="article-card shadow-sm d-flex flex-column p-4 flex-grow-1"
+                            style="cursor:pointer; text-decoration:none; color:inherit; background:#fff; border-radius:16px; border:1px solid #edf2f7;"
+                            href="${getArticleUrl(article.slug)}"
+                        >
+                            ${renderCredibilityBadge(article.upvote_count, article.downvote_count)}
+                            
+                            <h5 class="fw-bold line-clamp-2 mb-2" style="font-size: 1.05rem; line-height: 1.4; color: #1a202c;">
+                                ${escapeHtml(article.title)}
+                            </h5>
+                            
+                            ${renderPills(article.categories, article.tags)}
+                            
+                            <p class="small text-muted line-clamp-2 mb-3" style="line-height:1.5; font-size:0.8rem;">
+                                ${escapeHtml(article.excerpt || '')}
+                            </p>
+                            
+                            <div class="d-flex align-items-center gap-3 mt-auto pt-2 border-top text-muted small" style="font-size: 0.75rem;">
+                                <span>👁 ${formatViewCount(article.view_count)}</span>
+                                <span class="text-success fw-bold">▲ ${formatViewCount(up)}</span>
+                                <span class="text-danger fw-bold">▼ ${formatViewCount(down)}</span>
+                            </div>
+                        </a>
+                    `;
+                }).join('')}
             </div>
         </div>
     `;
@@ -643,12 +725,83 @@ window.addEventListener('scroll', () => {
     }
 });
 
+function renderHotNewsCardStats(article) {
+    const up = Number(article.upvote_count || 0);
+    const down = Number(article.downvote_count || 0);
+    return `
+        <div class="card-stats-row d-flex align-items-center gap-3 mt-auto pt-2 text-muted small" style="font-size: 0.78rem;">
+            <span class="stat-views d-flex align-items-center gap-1">
+                👁 ${formatViewCount(article.view_count)} lượt xem
+            </span>
+            <span class="stat-upvotes text-success fw-bold d-flex align-items-center gap-1">
+                ▲ ${formatViewCount(up)}
+            </span>
+            <span class="stat-downvotes text-danger fw-bold d-flex align-items-center gap-1">
+                ▼ ${formatViewCount(down)}
+            </span>
+        </div>
+    `;
+}
+
+async function loadHotNews() {
+    const container = document.getElementById('hot-news-container');
+    if (!container) return;
+    try {
+        const response = await fetch(getAppUrl('?page=hot_news'));
+        const result = await response.json();
+        if (result.success && result.items && result.items.length > 0) {
+            const badges = [
+                '<span class="position-absolute badge bg-warning text-dark font-weight-bold shadow-sm" style="top: 20px; left: 20px; font-size: 0.78rem; border-radius: 6px; z-index: 10; padding: 4px 8px;">TOP 1</span>',
+                '<span class="position-absolute badge bg-secondary text-white font-weight-bold shadow-sm" style="top: 20px; left: 20px; font-size: 0.78rem; border-radius: 6px; z-index: 10; padding: 4px 8px;">TOP 2</span>',
+                '<span class="position-absolute badge bg-danger text-white font-weight-bold shadow-sm" style="top: 20px; left: 20px; font-size: 0.78rem; border-radius: 6px; z-index: 10; padding: 4px 8px;">TOP 3</span>',
+                '<span class="position-absolute badge bg-dark text-white font-weight-bold shadow-sm" style="top: 20px; left: 20px; font-size: 0.78rem; border-radius: 6px; z-index: 10; padding: 4px 8px;">TOP 4</span>'
+            ];
+            container.innerHTML = result.items.map((article, idx) => {
+                const badge = badges[idx] || '';
+                return `
+                    <div class="col-md-3 mb-3">
+                        <a 
+                            href="${getArticleUrl(article.slug)}" 
+                            class="article-card shadow-sm d-flex flex-column h-100 text-decoration-none text-dark sidebar-item position-relative p-0 overflow-hidden"
+                            style="border-radius: 12px; transition: transform 0.2s; background: #fff; border: 1px solid #edf2f7;"
+                        >
+                            ${badge}
+                            <div class="overflow-hidden w-100" style="height: 140px;">
+                                <img 
+                                    src="${getImage(article, 300, 200)}" 
+                                    class="w-100 h-100 object-fit-cover card-img-top" 
+                                    style="transition: transform 0.3s;"
+                                >
+                            </div>
+                            <div class="p-3 d-flex flex-column flex-grow-1">
+                                <h6 class="fw-bold line-clamp-2 mb-2" style="font-size: 0.95rem; line-height: 1.4; color: #1a202c;">
+                                    ${escapeHtml(article.title)}
+                                </h6>
+                                
+                                ${renderPills(article.categories, article.tags)}
+                                
+                                ${renderHotNewsCardStats(article)}
+                            </div>
+                        </a>
+                    </div>
+                `;
+            }).join('');
+        } else {
+            container.innerHTML = '<div class="col text-muted small">Không có tin nóng nào hôm nay.</div>';
+        }
+    } catch (err) {
+        console.error(err);
+        container.innerHTML = '<div class="col text-danger small">Không thể tải tin nóng.</div>';
+    }
+}
+
 /* =========================================================
    INITIALIZE
 ========================================================= */
 
 if (document.getElementById('feed')) {
     loadPageComponents();
+    loadHotNews();
     loadMore();
     initMegaMenu();
 }

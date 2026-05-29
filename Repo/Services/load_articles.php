@@ -17,6 +17,8 @@ class ArticleService {
                 a.excerpt,
                 a.thumbnail_url,
                 a.view_count,
+                a.upvote_count,
+                a.downvote_count,
                 a.published_at,
                 u.full_name AS author_name
             FROM articles a

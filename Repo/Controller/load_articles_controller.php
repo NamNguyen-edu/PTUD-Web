@@ -61,6 +61,14 @@ class ArticleController {
                     $article['article_id']
                 );
 
+            $userVote = null;
+            $userId = !empty($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
+            if ($userId > 0) {
+                require_once __DIR__ . '/../Services/vote_service.php';
+                $userVote = (new VoteService())->getUserVote($userId, intval($article['article_id']));
+            }
+            $article['user_vote'] = $userVote;
+
             $currentUser = [
                 'logged' => !empty($_SESSION['user_id']),
                 'id' => $_SESSION['user_id'] ?? null,
