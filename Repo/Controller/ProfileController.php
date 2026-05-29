@@ -19,17 +19,7 @@ class ProfileController
     $view = new ProfileView();
     $view->render($userInfo, $userArticles, $alertArticles);
     }
-public function getAlertArticles(int $userId): array
-{
-    $rows = pdo_query(
-        "SELECT article_id, title, status 
-         FROM articles 
-         WHERE user_id = ? AND status IN ('revision', 'rejected')
-         ORDER BY updated_at DESC",
-        $userId
-    );
-    return $rows ?: [];
-}
+
 public function updateProfile(): void
     {
         header('Content-Type: application/json; charset=utf-8');
