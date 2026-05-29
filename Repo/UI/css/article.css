@@ -79,20 +79,28 @@ body {
   z-index: 2;
 }
 
-/* TAG */
-.tags span {
-  background: #e3f0ff;
+/* TAG & CATEGORY PILLS */
+.category-pill {
   padding: 6px 14px;
   border-radius: 20px;
-  margin-right: 8px;
+  font-weight: 600;
   font-size: 0.85rem;
-  transition: 0.2s;
-  cursor: pointer;
+  display: inline-block;
 }
 
-.tags span:hover {
-  background: #0d6efd;
-  color: white;
+.tag-pill {
+  background: #f1f5f9;
+  color: #475569;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  display: inline-block;
+  transition: all 0.2s ease;
+}
+
+.tag-pill:hover {
+  background: #e2e8f0;
+  color: #1e293b;
 }
 
 /* CONTENT */
@@ -130,80 +138,34 @@ body {
   border-radius: 3px;
 }
 
-/* VOTE */
-.vote-box {
-  display: flex;
-  gap: 20px;
-  margin-top: 30px;
-  font-weight: 600;
+/* VOTE INTERACTIVE DASHBOARD */
+.vote-interactive-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
 }
 
-.vote {
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.vote.up {
-  color: green;
-}
-
-.vote.down {
-  color: red;
-}
-
-.vote.up:hover {
-  color: #16a34a;
-  transform: scale(1.2);
-}
-
-.vote.down:hover {
-  color: #dc2626;
-  transform: scale(1.2);
-}
-
-/* ACTION BUTTONS */
-.article-actions {
-  display: flex;
-  gap: 12px;
-  margin-top: 30px;
-  padding-top: 25px;
-  border-top: 1px solid #e5e7eb;
-  flex-wrap: wrap;
-}
-
-.action-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
-  background: white;
-  color: #374151;
-  font-weight: 500;
+.vote-interactive-box button {
+  min-width: 170px;
+  border-width: 2px;
   font-size: 0.95rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  user-select: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
 }
 
-.action-btn:hover {
-  border-color: #0d6efd;
-  color: #0d6efd;
-  background: #f0f7ff;
+.vote-interactive-box button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.2);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
 }
 
-.action-btn.active {
-  border-color: #0d6efd;
-  background: #0d6efd;
-  color: white;
+.vote-interactive-box button:active {
+  transform: translateY(0);
 }
 
-.action-btn.active:hover {
-  background: #0a58ca;
-  border-color: #0a58ca;
+.vote-interactive-box .badge {
+  font-size: 0.85rem !important;
+  font-weight: 700;
+  border-radius: 6px;
 }
 
 .action-icon {
@@ -395,4 +357,81 @@ body {
   font-weight: 500;
   font-size: 0.95rem;
   line-height: 1.4;
+}
+
+/* MOBILE RESPONSIVE ARTICLE */
+@media (max-width: 768px) {
+  .article-container {
+    padding: 20px 15px !important;
+    border-radius: 12px !important;
+  }
+
+  .article-title {
+    font-size: 1.8rem !important;
+    font-weight: 800 !important;
+    line-height: 1.3 !important;
+  }
+
+  .meta {
+    font-size: 0.8rem !important;
+    padding: 8px 0 !important;
+  }
+
+  .article-image {
+    height: 200px !important;
+    border-radius: 10px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .article-content {
+    font-size: 1.05rem !important;
+  }
+
+  .article-content .lead {
+    font-size: 1.15rem !important;
+  }
+
+  .article-content h4 {
+    font-size: 1.25rem !important;
+    margin-top: 2rem !important;
+  }
+
+  .article-actions {
+    gap: 8px !important;
+    padding-top: 20px !important;
+  }
+
+  .action-btn {
+    padding: 8px 16px !important;
+    font-size: 0.85rem !important;
+    flex: 1 1 calc(50% - 8px) !important; /* Hai nút một hàng */
+    justify-content: center !important;
+  }
+
+  .comment-item {
+    gap: 10px !important;
+    padding-bottom: 12px !important;
+  }
+
+  .comment-avatar {
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 0.85rem !important;
+  }
+
+  .comment-box, .reply-box {
+    padding: 12px !important;
+    border-radius: 10px !important;
+  }
+
+  .comment-box textarea, .reply-box textarea {
+    padding: 10px !important;
+    min-height: 80px !important;
+    font-size: 0.9rem !important;
+  }
+
+  .comment-meta {
+    font-size: 0.8rem !important;
+    gap: 5px !important;
+  }
 }

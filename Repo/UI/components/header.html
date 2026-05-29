@@ -1,9 +1,10 @@
 <div class="row topbar align-items-center">
     <div class="col-3 logo">NewsPulse</div>
     <div class="col-6 p-0">
-        <form action="?page=search" method="get" class="d-flex search-form">
-            <input id="search-box" type="text" name="keyword" class="search-box" placeholder="Search news, topics..." autocomplete="off">
-            <button type="submit" class="btn btn-search">Search</button>
+        <form action="" method="get" class="d-flex search-form">
+            <input type="hidden" name="page" value="search">    
+            <input id="search-box" type="text" name="keyword" class="search-box" placeholder="Tìm kiếm tin tức, chủ đề..." autocomplete="off">
+            <button type="submit" class="btn btn-search">Tìm kiếm</button>
             <div id="search-dropdown" class="search-dropdown d-none" aria-live="polite" aria-label="Search suggestions"></div>
         </form>
     </div>

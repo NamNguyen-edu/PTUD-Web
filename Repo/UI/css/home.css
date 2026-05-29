@@ -268,3 +268,136 @@ body {
 .sidebar-box:hover {
   background: #f0f6ff;
 }
+.search-form {
+  position: relative;
+}
+
+.search-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 100%;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  border: 1px solid #e5e7eb;
+  z-index: 9999;
+  overflow: hidden;
+  pointer-events: auto;
+}
+
+.search-dropdown.d-none {
+  display: none !important;
+  pointer-events: none !important;
+}
+
+.search-item {
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.search-item:hover {
+  background: #f3f7ff;
+}
+
+/* MOBILE RESPONSIVE HOME */
+@media (max-width: 768px) {
+  /* Hàng danh mục chuyên mục: Cuộn ngang cảm ứng siêu mượt */
+  .navbar-custom {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    justify-content: flex-start !important;
+    padding: 8px 10px !important;
+    gap: 8px !important;
+  }
+
+  .navbar-custom .col {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    padding: 0 10px !important;
+  }
+
+  .nav-link {
+    font-size: 0.9rem !important;
+    white-space: nowrap !important;
+  }
+
+  /* Khối Hero (Banner tin chính nổi bật) */
+  .hero {
+    padding: 20px !important;
+    border-radius: 12px !important;
+  }
+
+  .hero-title {
+    font-size: 1.6rem !important;
+    font-weight: 800 !important;
+  }
+
+  /* Khối ảnh Hero động trên Feed */
+  .feed-img-hero, 
+  .article-card img {
+    height: 240px !important;
+  }
+
+  /* Chiều cao của ảnh bài viết lớn */
+  .col-lg-12 img {
+    height: 280px !important;
+  }
+
+  /* Chiều cao của ảnh bài viết vừa */
+  .col-lg-8 img {
+    height: 250px !important;
+  }
+
+  /* Grid bài viết nhỏ xếp gọn */
+  .col-md-4, .col-lg-8, .col-lg-4 {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Font chữ bài viết thu nhỏ phù hợp điện thoại */
+  .article-card h5 {
+    font-size: 1.05rem !important;
+  }
+
+  .article-card h2 {
+    font-size: 1.3rem !important;
+  }
+
+  .article-card p {
+    font-size: 0.85rem !important;
+  }
+
+  .nav-item.active-mega .mega-menu {
+    display: block !important;
+  }
+  
+  .mega-menu {
+    position: absolute !important;
+    width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    border-radius: 0 0 12px 12px !important;
+    padding: 15px !important;
+    z-index: 10000 !important;
+  }
+}
+
+/* Custom scrollbar cho cột tin cuộn dọc */
+.scrollable-side-column::-webkit-scrollbar {
+    width: 6px;
+}
+.scrollable-side-column::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+}
+.scrollable-side-column::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+.scrollable-side-column::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}

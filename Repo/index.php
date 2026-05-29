@@ -1,8 +1,5 @@
 <?php
-
-
 session_start();
-
 require_once __DIR__ . '/Controller/AuthController.php';
 require_once __DIR__ . '/Controller/DashboardController.php';
 
@@ -13,6 +10,7 @@ function redirect(string $url): void
 }
 
 $page = trim((string)($_GET['page'] ?? 'home'));
+
 
 switch ($page) {
     case 'save_post':
@@ -58,7 +56,26 @@ switch ($page) {
         require_once __DIR__ . '/Controller/home_controller.php';
         (new HomeController())->feed();
         break;
-
+    case 'for_you_feed':
+        require_once __DIR__ . '/Controller/home_controller.php';
+        (new HomeController())->forYouFeed();
+        break;
+    case 'trending_feed':
+        require_once __DIR__ . '/Controller/home_controller.php';
+        (new HomeController())->trendingFeed();
+        break;
+    case 'hot_news':
+        require_once __DIR__ . '/Controller/home_controller.php';
+        (new HomeController())->hotNews();
+        break;
+    case 'mega_menu':
+        require_once __DIR__ . '/Controller/home_controller.php';
+        (new HomeController())->megaMenu();
+        break;
+    case 'article':
+        require_once __DIR__ . '/Controller/PageController.php';
+        (new PageController())->render('article');
+        break;
     case 'article_detail':
         require_once __DIR__ . '/Controller/load_articles_controller.php';
         (new ArticleController())->detail();
@@ -80,27 +97,18 @@ switch ($page) {
         break;
 
    case 'version-control':
-
         require_once __DIR__ . '/Controller/Version_control_controller.php';
-
         (new VersionControlController())->show();
-
         break;
 
     case 'version_restore':
-
         require_once __DIR__ . '/Controller/Version_control_controller.php';
-
         (new VersionControlController())->restoreVersion();
-
         break;
     
     case 'version-list':
-
         require_once __DIR__ . '/Controller/Version_list_controller.php';
-
         (new VersionListController())->index();
-
         break;
     
     case 'approval':
@@ -108,59 +116,37 @@ switch ($page) {
          (new ApprovalController())->show();
         break;
    case 'approve_publish':
-
         require_once __DIR__ . '/Controller/Approval_controller.php';
-
         (new ApprovalController())->approvePublish();
-
-    break;
+        break;
 
     case 'request_revision':
-
         require_once __DIR__ . '/Controller/Approval_controller.php';
-
         (new ApprovalController())->requestRevision();
-
         break;
 
     case 'reject_article':
-
         require_once __DIR__ . '/Controller/Approval_controller.php';
-
         (new ApprovalController())->reject();
-
         break;
 
     case 'get_comments':
-
         require_once __DIR__ . '/Controller/Approval_controller.php';
-
         (new ApprovalController())->getComments();
-
         break;
 
     case 'add_comment':
-
         require_once __DIR__ . '/Controller/Approval_controller.php';
-
         (new ApprovalController())->addComment();
-
         break;
-
-
+    case 'get_reading_history':
+        require_once __DIR__ . '/Controller/ProfileController.php';
+        (new ProfileController())->getReadingHistory();
+        break;
     case 'home':
         require_once __DIR__ . '/Controller/home_page_controller.php';
         (new HomePageController())->render();
         break;
-
-    case 'article':
-    case 'post':
-    case 'technology':
-    case 'admin_dashboard':
-    case 'admin_userm':
-    case 'admin1':
-    case 'accountmanagement':
-    case 'catalogmanagement':
  
     case 'search':
         require_once __DIR__ . '/Controller/SearchController.php';
@@ -181,9 +167,26 @@ switch ($page) {
         (new ProfileController())->updateProfile();
         break;
     case 'upload_avatar':
-    require_once __DIR__ . '/Controller/ProfileController.php';
-    (new ProfileController())->uploadAvatar();
-    break;
+        require_once __DIR__ . '/Controller/ProfileController.php';
+        (new ProfileController())->uploadAvatar();
+        break;
+    case 'vote_article':
+        require_once __DIR__ . '/Controller/VoteController.php';
+        (new VoteController())->vote();
+        break;
+    case 'category':
+        require_once __DIR__ . '/Controller/CategoryPageController.php';
+        (new CategoryPageController())->show();
+        break;
+    case 'category_feed':
+        require_once __DIR__ . '/Controller/CategoryPageController.php';
+        (new CategoryPageController())->feed();
+        break;
+    case 'technology':
+        require_once __DIR__ . '/Controller/CategoryPageController.php';
+        $_GET['slug'] = 'cong-nghe';
+        (new CategoryPageController())->show();
+        break;
     default:
         redirect('?page=home');
 }

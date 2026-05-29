@@ -47,28 +47,24 @@ File cần sửa: AuthController.php (bên trong hàm currentUser)
             'email' => $logged ? ($_SESSION['user_email'] ?? null) : null,
             'avatar_url' => $avatarUrl // Thêm trường này cho JS nhận diện
         ];
-        echo json_encode(['logged' => $logged, 'user' => $user]);
+CẬP NHẬT MỚI NHẤT (SỬA LỖI TRANG PROFILE & LỊCH SỬ ĐỌC):
 
----
+1. Sửa lỗi Fatal Error trong ProfileController.php:
+   - TÌM: $alertArticles = $profileService->getAlertArticles($userId);
+   - SỬA THÀNH: $alertArticles = $this->getAlertArticles($userId); (vì hàm getAlertArticles nằm trực tiếp bên trong ProfileController chứ không phải Service).
 
+2. Kích hoạt tính năng lưu lịch sử đọc trong Services/load_articles.php:
+   - TÌM trong getArticleBySlug:
+     $this->increaseViewCount($article['article_id']);
+     return $article;
+   - SỬA THÀNH:
+     $this->increaseViewCount($article['article_id']);
+     if (!empty($_SESSION['user_id'])) {
+         $this->saveReadHistory((int)$_SESSION['user_id'], (int)$article['article_id']);
+     }
+     return $article;
 
-Thêm database mới:
--- 10. Quản lý yêu cầu - THêm mới
-CREATE TABLE IF NOT EXISTS takedown_requests (
-    request_id INT AUTO_INCREMENT PRIMARY KEY,
-    article_id INT NOT NULL,
-    user_id INT NOT NULL,
-    reason TEXT NOT NULL,
-    status ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending',
-    admin_note TEXT,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    -- Ràng buộc dữ liệu (Chặt chẽ: xóa bài thì xóa luôn yêu cầu gỡ bài liên quan)
-    CONSTRAINT FK_takedown_article FOREIGN KEY (article_id) REFERENCES articles(article_id) ON DELETE CASCADE,
-    CONSTRAINT FK_takedown_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
-) ENGINE=InnoDB;
-
-
-Ở bản articles thêm mới
-  -- [UPDATE] Cột mới thêm: xoá mềm
-    is_deleted    TINYINT(1)    NOT NULL DEFAULT -
+3. Sửa lỗi JavaScript cú pháp và lồng DOMContentLoaded trong UI/js/profile.js:
+   - Đóng dấu ngoặc nhọn } của hàm checkArticleAlerts() bị thiếu.
+   - Di chuyển dấu đóng }); của DOMContentLoaded đầu tiên (dòng 4) lên dòng 80 để tránh lồng nhau.
+   - Thay thế việc lắng nghe DOMContentLoaded thứ hai bằng việc kiểm tra document.readyState để đảm bảo hàm initProfile() luôn luôn chạy độc lập, từ đó loadReadingHistory() luôn được thực thi chính xác.

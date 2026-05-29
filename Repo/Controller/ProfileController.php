@@ -14,7 +14,7 @@ class ProfileController
     $userArticles   = $profileService->getUserArticles($userId);
 
     // Query bài có trạng thái cần thông báo
-    $alertArticles  = $profileService->getAlertArticles($userId);
+    $alertArticles  = $this->getAlertArticles($userId);
 
     $view = new ProfileView();
     $view->render($userInfo, $userArticles, $alertArticles);
@@ -112,4 +112,23 @@ public function updateProfile(): void
             echo json_encode(['success' => false, 'message' => 'Lỗi hệ thống: ' . $e->getMessage()]);
         }
     }
+    public function getReadingHistory(): void
+        {
+            header('Content-Type: application/json; charset=utf-8');
+            if (empty($_SESSION['user_id'])) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Chưa đăng nhập'
+                ]);
+                return;
+            }
+            $profileService = new ProfileService();
+            $history = $profileService->getReadingHistory(
+                (int) $_SESSION['user_id']
+            );
+            echo json_encode([
+                'success' => true,
+                'data' => $history
+            ]);
+        }
 }

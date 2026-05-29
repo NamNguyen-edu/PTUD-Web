@@ -214,25 +214,89 @@ function toggleReplyForm(commentId) {
         container.innerHTML = '';
     }
 }
-async function loadHeader() {
 
-    const headerPlaceholder =
-        document.getElementById('header-placeholder');
-
-    if (!headerPlaceholder) return;
-
-    const response =
-        await fetch('UI/components/header.html');
-
-    const html =
-        await response.text();
-
-    headerPlaceholder.innerHTML = html;
-
-    if (window.initHeaderUser) {
-        window.initHeaderUser();
+function updateCredibilityBadge(up, down) {
+    const badgeEl = document.getElementById('article-credibility-badge');
+    if (!badgeEl) return;
+    const total = up + down;
+    if (total < 5) {
+        badgeEl.innerHTML = '';
+        return;
+    }
+    const ratio = up / total;
+    if (ratio >= 0.8) {
+        badgeEl.innerHTML = `
+            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1 fw-semibold" style="font-size: 0.85rem; display: inline-block;">
+                ✓ Tin cậy cao
+            </span>
+        `;
+    } else if (ratio < 0.5) {
+        badgeEl.innerHTML = `
+            <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3 py-1 fw-semibold" style="font-size: 0.85rem; display: inline-block;">
+                ⚠️ Nghi vấn/Sai lệch
+            </span>
+        `;
+    } else {
+        badgeEl.innerHTML = '';
     }
 }
+
+function updateVoteButtons(userVote, upCount, downCount) {
+    const btnUp = document.getElementById('btn-upvote');
+    const btnDown = document.getElementById('btn-downvote');
+    const lblUp = document.getElementById('detail-upvotes');
+    const lblDown = document.getElementById('detail-downvotes');
+    
+    if (lblUp) lblUp.innerText = upCount;
+    if (lblDown) lblDown.innerText = downCount;
+    
+    if (!btnUp || !btnDown) return;
+    
+    // Reset styles
+    btnUp.className = "btn btn-outline-success px-4 py-2 rounded-pill d-flex align-items-center gap-2 transition-all";
+    btnDown.className = "btn btn-outline-danger px-4 py-2 rounded-pill d-flex align-items-center gap-2 transition-all";
+    
+    if (userVote === 'up') {
+        btnUp.classList.remove('btn-outline-success');
+        btnUp.classList.add('btn-success', 'text-white');
+    } else if (userVote === 'down') {
+        btnDown.classList.remove('btn-outline-danger');
+        btnDown.classList.add('btn-danger', 'text-white');
+    }
+}
+
+async function handleVoteClick(type) {
+    if (!currentUser || !currentUser.logged) {
+        alert('Bạn cần đăng nhập để đánh giá độ tin cậy của bài viết.');
+        return;
+    }
+    
+    try {
+        const formData = new URLSearchParams();
+        formData.set('slug', currentSlug);
+        formData.set('type', type);
+        
+        const response = await fetch('?page=vote_article', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const result = await response.json();
+        if (!result.success) {
+            alert(result.message || 'Không thể thực hiện đánh giá.');
+            return;
+        }
+        
+        // Cập nhật giao diện trực quan tức thì
+        updateVoteButtons(result.user_vote, result.upvotes, result.downvotes);
+        updateCredibilityBadge(result.upvotes, result.downvotes);
+        
+    } catch (error) {
+        console.error(error);
+        alert('Đã xảy ra lỗi kết nối khi bình chọn.');
+    }
+}
+
 async function loadArticle() {
     try {
         const params = new URLSearchParams(window.location.search);
@@ -267,6 +331,12 @@ async function loadArticle() {
         document.getElementById('article-views').innerHTML = article.view_count;
         document.getElementById('related-articles').innerHTML = renderRelatedArticles(result.data.related_articles);
 
+        // Nạp chỉ số upvote/downvote và trạng thái vote
+        const upCount = Number(article.upvote_count || 0);
+        const downCount = Number(article.downvote_count || 0);
+        updateVoteButtons(article.user_vote, upCount, downCount);
+        updateCredibilityBadge(upCount, downCount);
+
         renderCommentForm();
         renderComments(result.data.comments || []);
 
@@ -279,27 +349,17 @@ async function loadArticle() {
 }
 
 function bindActions() {
-    const copyBtn = document.getElementById('copy-link-btn');
-    const shareBtn = document.getElementById('share-btn');
-
-    copyBtn.addEventListener('click', async () => {
-        await navigator.clipboard.writeText(window.location.href);
-        copyBtn.classList.add('active');
-        copyBtn.innerHTML = '✅ Copied';
-        setTimeout(() => {
-            copyBtn.classList.remove('active');
-            copyBtn.innerHTML = '🔗 Copy Link';
-        }, 1500);
-    });
-
-    shareBtn.addEventListener('click', async () => {
-        if (navigator.share) {
-            await navigator.share({
-                title: document.title,
-                url: window.location.href
-            });
-        }
-    });
+    // Gắn sự kiện click cho các nút bình chọn tương tác
+    const btnUp = document.getElementById('btn-upvote');
+    const btnDown = document.getElementById('btn-downvote');
+    
+    if (btnUp) {
+        btnUp.addEventListener('click', () => handleVoteClick('up'));
+    }
+    
+    if (btnDown) {
+        btnDown.addEventListener('click', () => handleVoteClick('down'));
+    }
 
     commentFormContainer.addEventListener('click', event => {
         if (event.target.matches('#submit-comment-btn')) {
@@ -328,11 +388,6 @@ function bindActions() {
 }
 
 (async function () {
-
-    await loadHeader();
-
     await loadArticle();
-
     bindActions();
-
 })();

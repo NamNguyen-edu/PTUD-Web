@@ -18,6 +18,9 @@ document.addEventListener("DOMContentLoaded", function() {
             const headerScript = document.createElement('script');
             headerScript.src = BASE + '/js/header_user.js';
             headerScript.defer = true;
+            headerScript.onload = function() {
+                if (window.initHeaderUser) window.initHeaderUser();
+            };
             document.head.appendChild(headerScript);
 
             const loginSection = document.getElementById("login-section");
@@ -73,48 +76,37 @@ document.addEventListener("DOMContentLoaded", function() {
             console.error("Lỗi parse JSON kỹ năng:", e);
         }
             checkFirstTimeLogin();
-    checkArticleAlerts();
-    }
+            checkArticleAlerts();
+        }
+    }); // Đóng DOMContentLoaded ở dòng 4
+
     function checkArticleAlerts() {
-    const el = document.getElementById('alertArticlesData');
-    if (!el || !el.value || el.value === '{{ALERT_ARTICLES_JSON}}') return;
+        const el = document.getElementById('alertArticlesData');
+        if (!el || !el.value || el.value === '{{ALERT_ARTICLES_JSON}}') return;
 
-    let articles = [];
-    try { articles = JSON.parse(el.value); } catch(e) { return; }
-    if (!articles.length) return;
+        let articles = [];
+        try { articles = JSON.parse(el.value); } catch(e) { return; }
+        if (!articles.length) return;
 
-    // Build danh sách bài cần xử lý
-    const statusMap = {
-        'revision':  { label: 'Cần sửa lại', cls: 'warning',  icon: 'fa-edit' },
-        'rejected':  { label: 'Bị từ chối',  cls: 'danger',   icon: 'fa-times-circle' }
-    };
+        // Build danh sách bài cần xử lý
+        const statusMap = {
+            'revision':  { label: 'Cần sửa lại', cls: 'warning',  icon: 'fa-edit' },
+            'rejected':  { label: 'Bị từ chối',  cls: 'danger',   icon: 'fa-times-circle' }
+        };
+    } // Đóng checkArticleAlerts
 
-const listHtml = articles.map(a => {
-    const s = statusMap[a.status] || { label: a.status, cls: 'secondary', icon: 'fa-info-circle' };
-    
-    // Chỉ revision mới có nút Sửa ngay, rejected chỉ hiển thị thôi
-const actionBtn = a.status === 'revision'
-    ? `<a href="?page=postnews&id=${a.article_id}" class="btn btn-sm btn-outline-primary ml-2 font-weight-bold" style="white-space: nowrap; flex-shrink: 0;">Sửa ngay</a>`
-    : `<span class="badge badge-danger ml-2 p-2" style="white-space: nowrap; flex-shrink: 0;">Đã bị từ chối</span>`;
+    // 2. KHỞI TẠO KHI TRANG LOAD XONG (Phần logic cũ của Profile)
+    function initProfile() {
+        checkFirstTimeLogin();
+        loadReadingHistory();
+        $('[data-toggle="tooltip"]').tooltip();
+    }
 
-    return `
-        <div class="d-flex align-items-center p-3 mb-2 rounded bg-white shadow-sm" 
-             style="border-left: 4px solid var(--${s.cls === 'warning' ? 'warning' : 'danger'});">
-            <i class="fas ${s.icon} text-${s.cls} mr-3 fa-lg"></i>
-            <div class="flex-grow-1">
-                <div class="font-weight-bold small">${a.title}</div>
-                <span class="badge badge-${s.cls} mt-1">${s.label}</span>
-            </div>
-            ${actionBtn}
-        </div>`;
-}).join('');
-
-    document.getElementById('alertArticlesList').innerHTML = listHtml;
-
-    // Hiện modal sau 800ms để trang load xong
-    setTimeout(() => { $('#articleAlertModal').modal('show'); }, 800);
-}
-});
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initProfile);
+    } else {
+        initProfile();
+    }
 
 // 3. LOGIC CHUYỂN TAB (SỬ DỤNG BOOTSTRAP TABS KẾT HỢP CUSTOM LOGIC)
 function switchTab(tabId) {
@@ -127,7 +119,7 @@ function switchTab(tabId) {
 
 $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
     const targetTab = $(e.target).attr("href"); 
-    console.log("Switched to tab: " + targetTab);
+    
     
     if (targetTab === "#history") {
         renderHistoryList();
@@ -140,7 +132,7 @@ function checkFirstTimeLogin() {
     const hasPrefs = localStorage.getItem('newsPulse_UserPrefs');
     
     if (!hasPrefs) {
-        console.log("First time login detected. Showing Preferences Modal...");
+        
         setTimeout(() => {
             $('#userPreferenceModal').modal('show');
         }, 1000);
@@ -151,7 +143,7 @@ function checkFirstTimeLogin() {
 $(document).on('click', '.topic-tag', function() {
     $(this).toggleClass('selected');
     const selectedCount = $('.topic-tag.selected').length;
-    console.log("Topics selected: " + selectedCount);
+    
 });
 
 function saveUserPreferences() {
@@ -254,12 +246,12 @@ function saveProfileChanges() {
 // 8. RENDER DANH SÁCH BÀI VIẾT TRONG TAB BOOKMARK
 function renderBookmarkList() {
     const container = document.getElementById('bookmarkContainer');
-    console.log("Rendering bookmarks for user: Nguyễn Duy Bảo");
+    
 }
 
 function renderHistoryList() {
     const historyTimeline = document.querySelector('.history-timeline');
-    console.log("History timeline updated.");
+    
 }
 
 function clearHistory() {
@@ -275,6 +267,85 @@ function clearHistory() {
     }
 }
 
+async function loadReadingHistory() {
+
+    try {
+
+        const response =
+            await fetch('?page=get_reading_history');
+
+        const result =
+            await response.json();
+
+        if (!result.success) {
+            return;
+        }
+
+        const container =
+            document.getElementById(
+                'reading-history-container'
+            );
+
+        if (!container) return;
+
+        if (!result.data.length) {
+
+            container.innerHTML = `
+                <div class="text-muted">
+                    Chưa có lịch sử đọc
+                </div>
+            `;
+            return;
+        }
+        container.innerHTML =
+            result.data.map(item => {
+
+                return `
+                    <div
+                        class="history-item d-flex align-items-center p-3 mb-3 bg-white rounded shadow-sm border-left-pulse"
+                        onclick="window.location.href='?page=article&slug=${item.slug}'"
+                        style="cursor:pointer;"
+                    >
+
+                        <img
+                            src="${item.thumbnail_url || 'https://picsum.photos/100'}"
+                            style="
+                                width:80px;
+                                height:80px;
+                                object-fit:cover;
+                                border-radius:10px;
+                                margin-right:16px;
+                            "
+                        >
+
+                        <div class="history-info flex-grow-1">
+
+                            <h6 class="mb-1 font-weight-bold">
+                                ${item.title}
+                            </h6>
+
+                            <small class="text-muted">
+                                ${parseInt(item.read_count) === 1 ? 'Đọc lần đầu tiên' : `Đã đọc ${item.read_count} lần`}
+                            </small>
+
+                            <br>
+
+                            <small class="text-muted">
+                                ${new Date(item.last_read_at)
+                                    .toLocaleString('vi-VN')}
+                            </small>
+
+                        </div>
+
+                    </div>
+                `;
+            }).join('');
+
+    } catch (err) {
+
+        console.error(err);
+    }
+}
 function handleQuickAction(action) {
     switch(action) {
         case 'editProfile':
@@ -287,7 +358,7 @@ function handleQuickAction(action) {
             alert("Đang mở tài liệu nghiên cứu Churn Prediction (SHAP/LIME)...");
             break;
         default:
-            console.log("Action: " + action);
+            
     }
 }
 
