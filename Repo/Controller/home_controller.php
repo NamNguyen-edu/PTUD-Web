@@ -107,4 +107,59 @@ class HomeController {
         if ($diff < 30) return $diff . ' ngày trước';
         return date('d/m/Y', $time);
     }
+
+    public function trendingFeed(): void {
+        header('Content-Type: application/json; charset=utf-8');
+        try {
+            $page = isset($_GET['page_num']) ? (int)$_GET['page_num'] : 1;
+            
+            // Simple File Cache
+            $cacheDir = __DIR__ . '/../cache';
+            if (!is_dir($cacheDir)) {
+                @mkdir($cacheDir, 0777, true);
+            }
+            $cacheFile = $cacheDir . '/trending_page_' . $page . '.json';
+            $cacheTtl = 30; // 30 seconds
+
+            if (file_exists($cacheFile) && (time() - filemtime($cacheFile) < $cacheTtl)) {
+                echo file_get_contents($cacheFile);
+                return;
+            }
+
+            $data = $this->homeService->getTrendingFeed($page);
+            $response = json_encode([
+                'success' => true,
+                'data' => $data
+            ]);
+            @file_put_contents($cacheFile, $response);
+            echo $response;
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function forYouFeed(): void {
+        header('Content-Type: application/json; charset=utf-8');
+        try {
+            $page = isset($_GET['page_num']) ? (int)$_GET['page_num'] : 1;
+            $topicsStr = isset($_GET['topics']) ? trim((string)$_GET['topics']) : '';
+            $topics = !empty($topicsStr) ? explode(',', $topicsStr) : [];
+
+            $data = $this->homeService->getForYouFeed($page, $topics);
+            echo json_encode([
+                'success' => true,
+                'data' => $data
+            ]);
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
 }

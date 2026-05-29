@@ -13,13 +13,33 @@
 <div id="header-placeholder"></div>
 <div class="container-fluid">
   <div class="row navbar-custom text-center">
-    <div class="col"><a class="nav-link active" onclick="loadCategory(event, 'world')">Dành cho bạn</a></div>
-    <div class="col"><a class="nav-link" onclick="loadCategory(event, 'thoi-su')">Tin thịnh hành</a></div>
-    <div class="col"><a class="nav-link" onclick="loadCategory(event, 'review-san-pham')">Đã xác minh</a></div>
-    <div class="col"><a class="nav-link" onclick="loadCategory(event, 'thoi-su')">Thời Sự</a></div>
+    <div class="col"><a class="nav-link active" onclick="loadCategory(event, 'for-you')">Dành cho bạn</a></div>
+    <div class="col"><a class="nav-link" onclick="loadCategory(event, 'trending')">Tin thịnh hành</a></div>
+    
+    <div class="col nav-item" data-category="thoi-su">
+      <a class="nav-link" href="?page=category&slug=thoi-su">Thời sự ▾</a>
+      <div class="mega-menu text-start">
+        <div class="row">
+          <div class="col-md-4">
+            <h6>Chuyên mục Thời sự</h6>
+            <ul class="menu-list list-unstyled">
+              <li onclick="loadCategory(event, 'thoi-su')">Trong nước</li>
+              <li onclick="loadCategory(event, 'thoi-su')">Quốc tế</li>
+              <li onclick="loadCategory(event, 'thoi-su')">Xem tất cả Thời sự</li>
+            </ul>
+          </div>
+          <div class="col-md-8 border-start">
+            <h6>Bài viết Thời sự mới nhất</h6>
+            <div class="row mega-articles-container">
+              <div class="col text-muted">Đang tải bài viết mới nhất...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     
     <div class="col nav-item" data-category="cong-nghe">
-      <a class="nav-link" href="?page=technology">Công nghệ ▾</a>
+      <a class="nav-link" href="?page=category&slug=cong-nghe">Công nghệ ▾</a>
       <div class="mega-menu text-start">
         <div class="row">
           <div class="col-md-4">
@@ -42,7 +62,7 @@
     </div>
 
     <div class="col nav-item" data-category="kinh-doanh">
-      <a class="nav-link">Kinh doanh ▾</a>
+      <a class="nav-link" href="?page=category&slug=kinh-doanh">Kinh doanh ▾</a>
       <div class="mega-menu text-start">
         <div class="row">
           <div class="col-md-4">

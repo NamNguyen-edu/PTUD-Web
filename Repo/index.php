@@ -56,6 +56,14 @@ switch ($page) {
         require_once __DIR__ . '/Controller/home_controller.php';
         (new HomeController())->feed();
         break;
+    case 'for_you_feed':
+        require_once __DIR__ . '/Controller/home_controller.php';
+        (new HomeController())->forYouFeed();
+        break;
+    case 'trending_feed':
+        require_once __DIR__ . '/Controller/home_controller.php';
+        (new HomeController())->trendingFeed();
+        break;
     case 'mega_menu':
         require_once __DIR__ . '/Controller/home_controller.php';
         (new HomeController())->megaMenu();
@@ -155,9 +163,22 @@ switch ($page) {
         (new ProfileController())->updateProfile();
         break;
     case 'upload_avatar':
-    require_once __DIR__ . '/Controller/ProfileController.php';
-    (new ProfileController())->uploadAvatar();
-    break;
+        require_once __DIR__ . '/Controller/ProfileController.php';
+        (new ProfileController())->uploadAvatar();
+        break;
+    case 'category':
+        require_once __DIR__ . '/Controller/CategoryPageController.php';
+        (new CategoryPageController())->show();
+        break;
+    case 'category_feed':
+        require_once __DIR__ . '/Controller/CategoryPageController.php';
+        (new CategoryPageController())->feed();
+        break;
+    case 'technology':
+        require_once __DIR__ . '/Controller/CategoryPageController.php';
+        $_GET['slug'] = 'cong-nghe';
+        (new CategoryPageController())->show();
+        break;
     default:
         redirect('?page=home');
 }

@@ -9,7 +9,7 @@ let currentPage = 1;
 let hasMore = true;
 let loading = false;
 let articlesCount = 0;
-let currentCategory = "world";
+let currentCategory = "for-you";
 
 const LIMIT_BEFORE_PAGINATION = 12;
 
@@ -513,9 +513,28 @@ async function loadMore() {
 
     try {
 
-        const response = await fetch(
-            getAppUrl(`?page=home_feed&page_num=${currentPage}&category=${encodeURIComponent(currentCategory)}`)
-        );
+        let url = '';
+        if (currentCategory === 'for-you') {
+            let topicsStr = '';
+            try {
+                const prefs = localStorage.getItem('newsPulse_UserPrefs');
+                if (prefs) {
+                    const parsed = JSON.parse(prefs);
+                    if (parsed && Array.isArray(parsed.topics)) {
+                        topicsStr = parsed.topics.join(',');
+                    }
+                }
+            } catch (e) {
+                console.error("Error reading UserPrefs:", e);
+            }
+            url = getAppUrl(`?page=for_you_feed&page_num=${currentPage}&topics=${encodeURIComponent(topicsStr)}`);
+        } else if (currentCategory === 'trending') {
+            url = getAppUrl(`?page=trending_feed&page_num=${currentPage}`);
+        } else {
+            url = getAppUrl(`?page=home_feed&page_num=${currentPage}&category=${encodeURIComponent(currentCategory)}`);
+        }
+
+        const response = await fetch(url);
 
         const result = await response.json();
 

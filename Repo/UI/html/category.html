@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>{{CATEGORY_NAME}} - NewsPulse</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="UI/css/header.css">
+  <link rel="stylesheet" href="UI/css/footer.css">
+  <link rel="stylesheet" href="UI/css/home.css">
+  <style>
+    /* DYNAMIC CATEGORY COLOR THEME */
+    .theme-cong-nghe {
+      --primary-color: #10b981; /* Emerald Green */
+      --primary-hover: #059669;
+      --banner-bg: linear-gradient(135deg, #022c22, #064e3b);
+      --badge-bg: #e6f4ea;
+      --badge-color: #137333;
+    }
+    .theme-kinh-doanh {
+      --primary-color: #d97706; /* Gold Amber */
+      --primary-hover: #b45309;
+      --banner-bg: linear-gradient(135deg, #451a03, #78350f);
+      --badge-bg: #fef7e0;
+      --badge-color: #b06000;
+    }
+    .theme-thoi-su {
+      --primary-color: #dc2626; /* Crimson Red */
+      --primary-hover: #b91c1c;
+      --banner-bg: linear-gradient(135deg, #450a0a, #7f1d1d);
+      --badge-bg: #fce8e6;
+      --badge-color: #c5221f;
+    }
+    /* Fallback theme */
+    .theme-default {
+      --primary-color: #0d6efd; /* Blue */
+      --primary-hover: #0b5ed7;
+      --banner-bg: linear-gradient(135deg, #0a192f, #172a45);
+      --badge-bg: #e8f0fe;
+      --badge-color: #1a73e8;
+    }
+
+    /* DYNAMIC PAGE BACKGROUND BASED ON THEME */
+    body:has(.theme-cong-nghe) {
+      background: #f4fbf7 !important; /* Soft Emerald Mint tint */
+    }
+    body:has(.theme-kinh-doanh) {
+      background: #fdfaf2 !important; /* Soft Amber Cream tint */
+    }
+    body:has(.theme-thoi-su) {
+      background: #fdf5f5 !important; /* Soft Crimson Rose tint */
+    }
+    body:has(.theme-default) {
+      background: #f8fafc !important; /* Default slate gray */
+    }
+
+    /* CSS styles using the theme variables */
+    .category-banner {
+      background: var(--banner-bg);
+      color: white;
+      padding: 4.5rem 2rem;
+      border-radius: 16px;
+      margin-bottom: 2.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      position: relative;
+      overflow: hidden;
+    }
+    .category-banner::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 70%);
+      border-radius: 50%;
+    }
+    .category-title {
+      font-size: 3rem;
+      font-weight: 800;
+      margin-bottom: 0.75rem;
+      letter-spacing: -1px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .category-desc {
+      font-size: 1.15rem;
+      max-width: 700px;
+      color: rgba(255, 255, 255, 0.85);
+      line-height: 1.6;
+    }
+    .btn-theme-primary {
+      background-color: var(--primary-color) !important;
+      border: none !important;
+      color: white !important;
+      transition: background-color 0.2s, transform 0.2s;
+    }
+    .btn-theme-primary:hover {
+      background-color: var(--primary-hover) !important;
+      transform: translateY(-2px);
+    }
+    .badge-theme {
+      background-color: var(--badge-bg) !important;
+      color: var(--badge-color) !important;
+      font-weight: 600;
+    }
+    .border-left-theme {
+      border-left: 4px solid var(--primary-color) !important;
+    }
+    .text-theme {
+      color: var(--primary-color) !important;
+    }
+  </style>
+</head>
+
+<body>
+<div id="header-placeholder"></div>
+<div class="container-fluid py-4 px-md-5 {{THEME_CLASS}}" id="category-wrapper" data-slug="{{CATEGORY_SLUG}}">
+  
+  <!-- BREADCRUMB -->
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="?page=home" class="text-decoration-none text-muted">Trang chủ</a></li>
+      <li class="breadcrumb-item active text-theme font-weight-bold" aria-current="page">{{CATEGORY_NAME}}</li>
+    </ol>
+  </nav>
+
+  <!-- BANNER CHUYÊN MỤC DÂN DỤNG -->
+  <div class="category-banner">
+    <h1 class="category-title">{{CATEGORY_NAME}}</h1>
+    <p class="category-desc">{{CATEGORY_DESC}}</p>
+  </div>
+
+  <!-- PHẦN THÂN: BÀI VIẾT FEED & LAYOUT ĐA DẠNG -->
+  <div id="feed" class="mt-4"></div>  
+  
+  <!-- PHÂN TRANG -->
+  <div id="pagination-wrapper" class="text-center my-4 d-none">
+    <button id="load-more-btn" class="btn btn-theme-primary rounded-pill px-5 py-2 shadow-sm">
+      Xem thêm bài viết <i class="fa-solid fa-chevron-down ms-2"></i>
+    </button>
+  </div>
+  
+  <!-- LOADER -->
+  <div id="loader" class="text-center my-4 d-none">
+    <div class="spinner-border text-theme"></div>
+  </div>
+
+</div>
+<div id="footer-placeholder"></div>
+
+<script src="UI/js/category.js"></script>
+</body>
+</html>
