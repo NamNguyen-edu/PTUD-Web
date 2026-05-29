@@ -19,7 +19,17 @@ class ProfileController
     $view = new ProfileView();
     $view->render($userInfo, $userArticles, $alertArticles);
     }
-
+private function getAlertArticles($userId) 
+    {
+        // Query những bài có trạng thái revision hoặc rejected và chưa bị xóa mềm
+        $sql = "SELECT * FROM articles 
+                WHERE user_id = ? 
+                AND status IN ('revision', 'rejected') 
+                AND is_deleted = 0 
+                ORDER BY updated_at DESC";
+                
+        return pdo_query($sql, $userId);
+    }
 public function updateProfile(): void
     {
         header('Content-Type: application/json; charset=utf-8');

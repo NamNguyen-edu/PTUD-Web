@@ -27,6 +27,7 @@
                     loginSection?.classList.remove('d-flex');
                     loginSection?.classList.add('d-none');
                     profileSection?.classList.remove('d-none');
+                    profileSection?.classList.add('d-flex');
 
                     const name = data.user.name || 'Người dùng';
                     const email = data.user.email || '';
@@ -85,5 +86,6 @@ const avatarUrl = (data.user && data.user.avatar_url)
     }
 
     window.initHeaderUser = initHeaderUser;
+    document.addEventListener('DOMContentLoaded', initHeaderUser);
 
 })();

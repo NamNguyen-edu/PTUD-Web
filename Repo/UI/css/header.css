@@ -125,7 +125,7 @@
 }
 
 #login-section {
-  display: flex !important;
+  display: flex;
   flex-wrap: nowrap;
   gap: 8px;
   justify-content: flex-end;
