@@ -39,6 +39,16 @@ switch ($page) {
         (new AuthController())->logout();
         break;
 
+    case 'update_settings':
+        require_once __DIR__ . '/Controller/AuthController.php';
+        (new AuthController())->updateSettings();
+        break;
+
+    case 'video_feed':
+        require_once __DIR__ . '/Controller/home_controller.php';
+        (new HomeController())->videoFeed();
+        break;
+
     case 'search_suggestions':
         require_once __DIR__ . '/Controller/SearchController.php';
         (new SearchController())->suggestions(trim((string)($_GET['keyword'] ?? '')));

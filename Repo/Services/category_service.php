@@ -9,12 +9,21 @@ class CategoryService {
      */
     public function getCategoryDetails(string $slug): ?array {
         $sql = "
-            SELECT category_id, name, slug, description, thumbnail_url
+            SELECT category_id, name, slug, description, thumbnail_url, parent_id
             FROM categories
             WHERE slug = ? AND is_active = 1
             LIMIT 1
         ";
-        return pdo_query_one($sql, $slug) ?: null;
+        $cat = pdo_query_one($sql, $slug);
+        if ($cat && $cat['parent_id'] !== null) {
+            $parentSql = "SELECT name, slug FROM categories WHERE category_id = ?";
+            $parent = pdo_query_one($parentSql, $cat['parent_id']);
+            if ($parent) {
+                $cat['parent_name'] = $parent['name'];
+                $cat['parent_slug'] = $parent['slug'];
+            }
+        }
+        return $cat ?: null;
     }
 
     /**
