@@ -12,13 +12,12 @@
 
 /* Định dạng Logo */
 .logo {
-    color: var(--primary-blue);
-    font-size: 32px;
+    color: var(--primary-blue) !important;
     font-weight: bold;
     font-family: 'Times New Roman', serif;
 }
 
-/* Nút bấm thương hiệu (Update lại theo class btn-newspulse) */
+/* Nút bấm thương hiệu */
 .btn-primary {
     background-color: var(--primary-blue) !important;
     border: none !important;
@@ -35,46 +34,53 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    height: 100vh;
 }
 
-.bg-banner .banner-content h1,
+.bg-banner .banner-content h1 {
+    color: var(--dark-text) !important;
+}
+
 .bg-banner .banner-content p {
     color: var(--dark-text) !important;
+    border-color: var(--dark-text) !important;
 }
 
 .tracking-widest {
     letter-spacing: 0.2em;
 }
 
-/* Đường gạch ngang "Or" */
+/* Đường gạch ngang "Or" chuẩn flexbox */
 .divider {
     display: flex;
     align-items: center;
-    color: #ccc;
+    text-align: center;
     margin: 20px 0;
 }
 
 .divider hr {
     flex: 1;
     border: 0;
-    border-top: 1px solid #eee;
+    border-top: 1px solid #dee2e6;
+    margin: 0;
 }
 
 .divider span {
-    padding: 0 10px;
-    font-size: 12px;
-    background-color: white;
+    padding: 0 15px;
+    font-size: 14px;
+    color: #6c757d;
+    font-weight: 500;
 }
 
 /* Responsive cho mobile */
 @media (max-width: 992px) {
     .col-lg-4 {
-        padding: 40px 20px !important;
+        padding: 60px 20px !important;
     }
 }
 
 /* Hiệu ứng focus cho input */
 .form-control:focus {
-    border-color: var(--primary-blue);
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    border-color: var(--primary-blue) !important;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
 }
