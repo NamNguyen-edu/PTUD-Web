@@ -64,7 +64,7 @@ function pdo_get_connection()
     // --Lấy từ file .env
     $sslCaContent = getenv('DB_SSL_CA') ?: ($_ENV['DB_SSL_CA'] ?? '');
     $sslCaFile = sys_get_temp_dir() . '/ca_pulse.pem';
-    if (!empty($sslCaContent)) {
+    if (!empty($sslCaContent) && !file_exists($sslCaFile)) {
         file_put_contents($sslCaFile, $sslCaContent);
     }
 
