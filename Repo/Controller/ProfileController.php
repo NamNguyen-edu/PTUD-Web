@@ -141,15 +141,4 @@ public function updateProfile(): void
                 'data' => $history
             ]);
         }
-    public function getBookmarks(): void
-{
-    header('Content-Type: application/json; charset=utf-8');
-    if (empty($_SESSION['user_id'])) {
-        echo json_encode(['success' => false]);
-        return;
-    }
-    require_once __DIR__ . '/../Services/BookmarkService.php';
-    $bookmarks = (new BookmarkService())->getUserBookmarks(intval($_SESSION['user_id']));
-    echo json_encode(['success' => true, 'data' => $bookmarks]);
-}
 }

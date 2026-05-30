@@ -267,16 +267,3 @@ CREATE TABLE IF NOT EXISTS article_votes (
     CONSTRAINT fk_votes_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
--- 13. Bookmarks
-
-CREATE TABLE IF NOT EXISTS bookmarks (
-    bookmark_id INT NOT NULL AUTO_INCREMENT,
-    user_id     INT NOT NULL,
-    article_id  INT NOT NULL,
-    created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (bookmark_id),
-    UNIQUE KEY uq_user_article (user_id, article_id),
-    CONSTRAINT fk_bookmark_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    CONSTRAINT fk_bookmark_article FOREIGN KEY (article_id) REFERENCES articles(article_id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
