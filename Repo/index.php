@@ -207,6 +207,14 @@ switch ($page) {
         require_once __DIR__ . '/Controller/SettingsController.php';
         (new SettingsController())->changePassword();
         break;    
+    case 'check_new_articles':
+        require_once __DIR__ . '/Controller/NotificationController.php';
+        (new NotificationController())->checkNewArticles();
+        break;
+    case 'check_new_comments':
+        require_once __DIR__ . '/Controller/NotificationController.php';
+        (new NotificationController())->checkNewComments();
+        break;
     default:
         redirect('?page=home');
 }
