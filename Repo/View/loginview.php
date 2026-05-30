@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/ViewEngine.php';
+
 class LoginView
 {
   private ViewEngine $engine;
@@ -9,21 +10,14 @@ class LoginView
     $this->engine = $engine ?? new ViewEngine();
   }
 
-  /**
-   * Render giao diện Đăng nhập / Đăng ký
-   * * @param array $data Dữ liệu bổ sung nếu muốn truyền vào placeholder {{KEY}} trong template html
-   */
-  public function render(array $data = []): void
+  public function render(string $error = ''): void
   {
-
-    $defaultData = [
-      'META_TITLE' => $data['meta_title'] ?? 'NewsPulse - Authenticate',
+    // Chuẩn bị dữ liệu để map vào template
+    $data = [
+      'ERROR_MESSAGE' => !empty($error) ? '<div class="alert alert-danger">' . $error . '</div>' : ''
     ];
 
-    // Gộp dữ liệu mặc định với dữ liệu tùy biến truyền vào
-    $mergedData = array_merge($defaultData, $data);
-
-    // Render file 'login'
-    echo $this->engine->render('login', $mergedData);
+    // ViewEngine sẽ tìm file login.html, thay thế {{ERROR_MESSAGE}} bằng HTML bên trên
+    echo $this->engine->render('login', $data);
   }
 }
