@@ -109,6 +109,7 @@
                             </div>
                             <input type="file" id="thumbInput" hidden accept="image/*" onchange="previewThumbnail(event)">
                             <button type="button" class="btn btn-outline-primary btn-sm btn-block" onclick="document.getElementById('thumbInput').click()">CHỌN FILE ẢNH</button>
+                            <input type="hidden" id="currentThumbUrl" value="{{THUMBNAIL_URL}}">
                             <small class="error-msg text-danger d-none">Ảnh đại diện là bắt buộc.</small>
                         </div>
                     </div>

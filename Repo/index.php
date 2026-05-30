@@ -223,28 +223,27 @@ switch ($page) {
     case 'change_password':
         require_once __DIR__ . '/Controller/SettingsController.php';
         (new SettingsController())->changePassword();
+        break;    
+    case 'check_new_articles':
+        require_once __DIR__ . '/Controller/NotificationController.php';
+        (new NotificationController())->checkNewArticles();
         break;
-
-    // --- CÁC CASE QUẢN TRỊ ADMIN (BỊ THIẾU TỪ REPO GỐC ĐƯỢC TÍCH HỢP LẠI) ---
-    case 'admin_dashboard':
-    case 'admin_userm':
-    case 'accountmangement':
-        authorize('manage_users');
-        require_once __DIR__ . '/Controller/account_controller.php';
-        (new AccountController())->render();
+    case 'check_new_comments':
+        require_once __DIR__ . '/Controller/NotificationController.php';
+        (new NotificationController())->checkNewComments();
         break;
-
-    case 'categorymanagement':
-        authorize('manage_category');
-        require_once __DIR__ . '/Controller/category_controller.php';
-        (new CategoryController())->render();
+    case 'bookmark_toggle':
+        require_once __DIR__ . '/Controller/BookmarkController.php';
+        (new BookmarkController())->toggle();
         break;
-    case 'api_category':
-        authorize('manage_category');
-        require_once __DIR__ . '/Controller/category_controller.php';
-        (new CategoryController())->handleApi();
+    case 'bookmark_list':
+        require_once __DIR__ . '/Controller/BookmarkController.php';
+        (new BookmarkController())->list();
         break;
-
+    case 'get_bookmarks':
+        require_once __DIR__ . '/Controller/ProfileController.php';
+        (new ProfileController())->getBookmarks();
+        break;
     default:
         redirect('?page=home');
 }
