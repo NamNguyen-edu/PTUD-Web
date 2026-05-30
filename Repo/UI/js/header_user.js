@@ -321,7 +321,7 @@
                         pushNotif({
                             type: 'article', title: 'Bài viết mới trong chủ đề yêu thích',
                             message: data.count > 1 ? `${first.title} và ${data.count - 1} bài viết khác` : first.title,
-                            link: getUrl('article_detail', { slug: first.slug }),
+                            link: getUrl('article', { slug: first.slug }),
                             time: new Date().toISOString(), read: false
                         });
                     }
@@ -341,7 +341,7 @@
                     pushNotif({
                         type: 'comment', title: 'Bình luận mới',
                         message: data.count > 1 ? `${data.count} bình luận mới trên bài viết của bạn` : `Bình luận mới trên: ${first.article_title}`,
-                        link: getUrl('article_detail', { slug: first.article_slug }),
+                        link: getUrl('article', { slug: first.article_slug }),
                         time: new Date().toISOString(), read: false
                     });
                 }
@@ -497,6 +497,7 @@
        7. KÍCH HOẠT HỆ THỐNG KHI TẢI TRANG
     ============================================= */
     window.initHeaderUser = initHeaderUser;
+
     document.addEventListener('DOMContentLoaded', initHeaderUser);
 
 })();
