@@ -1,7 +1,8 @@
 <?php
+
 require_once __DIR__ . '/ViewEngine.php';
 
-class AccountView
+class CategoryView
 {
     private ViewEngine $engine;
 
@@ -12,7 +13,6 @@ class AccountView
 
     public function render(array $data = []): void
     {
-        // Render file giao diện accoutnmanagement.html (Spelled exactly 'accoutnmanagement' in UI/html)
-        echo $this->engine->render('accoutnmanagement', $data);
+        echo $this->engine->render('category', $data);
     }
 }
