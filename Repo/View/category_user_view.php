@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/ViewEngine.php';
 
-class CategoryView
+class CategoryUserView
 {
     private ViewEngine $engine;
 
@@ -13,6 +13,6 @@ class CategoryView
 
     public function render(array $data = []): void
     {
-        echo $this->engine->render('category', $data);
+        echo $this->engine->render('category_user', $data);
     }
 }

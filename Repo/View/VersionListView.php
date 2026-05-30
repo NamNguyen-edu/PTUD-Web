@@ -49,7 +49,7 @@ class VersionListView
             >
                 <td class="col-title">
                     <span class="article-title">'
-                        . htmlspecialchars($a['title'])
+                        . htmlspecialchars($a['title'] ?? '')
                     . '</span>
                 </td>
 
