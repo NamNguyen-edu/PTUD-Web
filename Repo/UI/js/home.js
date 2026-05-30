@@ -17,9 +17,7 @@ const LIMIT_BEFORE_PAGINATION = 10;
 let lastScrollTop = 0;
 const scrollThreshold = 100;
 
-/* =========================================================
-   UTILITIES
-========================================================= */
+
 
 function escapeHtml(str) {
 
@@ -79,9 +77,7 @@ function goToArticle(event, slug) {
     window.location.href = getArticleUrl(slug);
 }
 
-/* =========================================================
-   SEARCH DROPDOWN
-========================================================= */
+
 
 function bindSearchDropdown() {
 
@@ -221,31 +217,25 @@ function bindSearchDropdown() {
     });
 }
 
-/* =========================================================
-   LOAD HEADER / FOOTER
-========================================================= */
+
 
 function loadPageComponents() {
-    // Server (ViewEngine) already rendered header and footer into placeholders.
-    // Just activate search dropdown on the pre-rendered header.
+    
+    
     bindSearchDropdown();
 }
 
-/* =========================================================
-   ARTICLE COMPONENTS
-========================================================= */
 
-/* =========================================================
-   CREDIBILITY & VOTING / CATEGORY STYLING UTILITIES
-========================================================= */
+
+
 
 const pillColors = {
-    'thời sự': { bg: '#fee2e2', text: '#dc2626' }, // Crimson
-    'công nghệ': { bg: '#d1fae5', text: '#059669' }, // Emerald
-    'kinh doanh': { bg: '#dbeafe', text: '#2563eb' }, // Blue
-    'kinh tế': { bg: '#dbeafe', text: '#2563eb' }, // Light blue
-    'tài chính': { bg: '#fef3c7', text: '#d97706' }, // Amber
-    'ai': { bg: '#581c87', text: '#ffffff' }, // Deep Purple (white text)
+    'thời sự': { bg: '#fee2e2', text: '#dc2626' }, 
+    'công nghệ': { bg: '#d1fae5', text: '#059669' }, 
+    'kinh doanh': { bg: '#dbeafe', text: '#2563eb' }, 
+    'kinh tế': { bg: '#dbeafe', text: '#2563eb' }, 
+    'tài chính': { bg: '#fef3c7', text: '#d97706' }, 
+    'ai': { bg: '#581c87', text: '#ffffff' }, 
     'trí tuệ nhân tạo': { bg: '#581c87', text: '#ffffff' },
     'startup': { bg: '#eff6ff', text: '#1e40af' },
     'giáo dục': { bg: '#faf5ff', text: '#7c3aed' },
@@ -265,7 +255,7 @@ function getPillStyle(name) {
 function renderPills(categories = [], tags = []) {
     let html = '';
     
-    // Chuyên mục (Categories) - ưu tiên hiển thị trước
+    
     categories.slice(0, 2).forEach(cat => {
         const style = getPillStyle(cat);
         html += `
@@ -275,7 +265,7 @@ function renderPills(categories = [], tags = []) {
         `;
     });
     
-    // Thẻ (Tags) - hiển thị như các hashtag phụ
+    
     tags.slice(0, 2).forEach(tag => {
         const style = getPillStyle(tag);
         html += `
@@ -292,7 +282,7 @@ function renderCredibilityBadge(upvoteCount, downvoteCount) {
     const up = Number(upvoteCount || 0);
     const down = Number(downvoteCount || 0);
     const total = up + down;
-    if (total < 5) return ''; // Cần tối thiểu 5 lượt đánh giá để xác nhận độ tin cậy
+    if (total < 5) return ''; 
     
     const ratio = up / total;
     if (ratio >= 0.8) {
@@ -381,7 +371,7 @@ function renderHeroBlock(article) {
     const up = Number(article.upvote_count || 0);
     const down = Number(article.downvote_count || 0);
     
-    // Tự sinh badge tin cậy cao trên Hero image
+    
     const badgeHtml = renderCredibilityBadge(article.upvote_count, article.downvote_count);
     
     return `
@@ -587,13 +577,13 @@ function renderDynamicLayout() {
         return;
     }
 
-    // Chọn ngẫu nhiên layoutType: 0 (Grid), 1 (Hero), 2 (Mixed), 3 (Mixed Scroll)
-    // Bảo đảm chống trùng lặp kề nhau
+    
+    
     let layoutType;
     let attempts = 0;
     do {
         if (currentPage === 1) {
-            // Trang đầu tiên ưu tiên Hero (1), Mixed (2), hoặc Mixed Scroll (3) để luôn có bài tiêu điểm lớn ở đầu.
+            
             const r = Math.random();
             if (r < 0.33) {
                 layoutType = 1;
@@ -610,11 +600,11 @@ function renderDynamicLayout() {
 
     window.lastLayoutType = layoutType;
 
-    // Nếu chọn kiểu Mixed Scroll (3) nhưng trong buffer có ít hơn 4 bài, chuyển về Mixed thường (2) hoặc Grid (0)
+    
     if (layoutType === 3 && articlesBuffer.length < 4) {
         layoutType = articlesBuffer.length >= 3 ? 2 : 0;
     }
-    // Nếu chọn kiểu Mixed (2) nhưng trong buffer có ít hơn 3 bài, chuyển sang Grid (0)
+    
     if (layoutType === 2 && articlesBuffer.length < 3) {
         layoutType = 0;
     }
@@ -622,11 +612,11 @@ function renderDynamicLayout() {
     let html = '';
 
     if (layoutType === 3) {
-        // Mixed Scroll (Slider): Gom các bài có chung chủ đề (cùng tags hoặc categories)
+        
         const bigArticle = articlesBuffer[0];
         const remaining = articlesBuffer.slice(1);
 
-        // Lọc các bài viết cùng danh mục hoặc thẻ tag
+        
         const related = remaining.filter(art => {
             const shareCat = art.categories.some(cat => bigArticle.categories.includes(cat));
             const shareTag = art.tags.some(tag => bigArticle.tags.includes(tag));
@@ -636,15 +626,15 @@ function renderDynamicLayout() {
         const unrelated = remaining.filter(art => !related.includes(art));
         const sideArticles = related.concat(unrelated).slice(0, Math.min(7, remaining.length));
 
-        // Render layout
+        
         html += renderMixedScrollBlock(bigArticle, sideArticles);
 
-        // Cập nhật buffer (xoá những bài đã được chọn render)
+        
         const renderedIds = [bigArticle.article_id, ...sideArticles.map(a => a.article_id)];
         articlesBuffer = articlesBuffer.filter(art => !renderedIds.includes(art.article_id));
 
     } else {
-        // Các layout khác giữ nguyên renderCount truyền thống
+        
         let renderCount = 0;
         if (layoutType === 1) {
             const gridAvailable = articlesBuffer.length - 1;
@@ -721,7 +711,7 @@ async function loadVideoSegment() {
                                 ${videos.map((vid, idx) => {
                                     // Parse Youtube ID to show official thumbnail
                                     const ytId = vid.url.split('/').pop().split('?')[0];
-                                    const thumbUrl = `https://img.youtube.com/vi/${ytId}/mqdefault.jpg`;
+                                    const thumbUrl = `https:
                                     return `
                                         <div class="video-up-next-item ${idx === 0 ? 'active' : ''}" data-video-url="${vid.url}" data-video-title="${escapeHtml(vid.title)}" data-video-date="${new Date(vid.created_at).toLocaleDateString('vi-VN')}">
                                             <div class="video-thumb-container">
@@ -1243,7 +1233,7 @@ function initMoreMegaMenu() {
         }
     };
 
-    // Load first category (Tài chính) as default when hovering the "More" item
+    
     moreNavItem.addEventListener('mouseenter', () => {
         const activeLi = moreNavItem.querySelector('.more-menu-list li.active') || moreItems[0];
         if (activeLi) {
@@ -1264,7 +1254,7 @@ function initMoreMegaMenu() {
         });
     });
 
-    // Mobile menu toggle click handling
+    
     const navLink = moreNavItem.querySelector('.nav-link');
     if (navLink) {
         navLink.addEventListener('click', (e) => {
@@ -1274,7 +1264,7 @@ function initMoreMegaMenu() {
                 
                 const isActive = moreNavItem.classList.contains('active-mega');
                 
-                // Hide other mega menus
+                
                 document.querySelectorAll('.navbar-custom .nav-item').forEach(i => {
                     if (i !== moreNavItem) i.classList.remove('active-mega');
                 });

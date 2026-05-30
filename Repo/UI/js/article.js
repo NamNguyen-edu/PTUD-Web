@@ -252,7 +252,7 @@ function updateVoteButtons(userVote, upCount, downCount) {
     
     if (!btnUp || !btnDown) return;
     
-    // Reset styles
+    
     btnUp.className = "btn btn-outline-success px-4 py-2 rounded-pill d-flex align-items-center gap-2 transition-all";
     btnDown.className = "btn btn-outline-danger px-4 py-2 rounded-pill d-flex align-items-center gap-2 transition-all";
     
@@ -287,7 +287,7 @@ async function handleVoteClick(type) {
             return;
         }
         
-        // Cập nhật giao diện trực quan tức thì
+        
         updateVoteButtons(result.user_vote, result.upvotes, result.downvotes);
         updateCredibilityBadge(result.upvotes, result.downvotes);
         
@@ -331,7 +331,7 @@ async function loadArticle() {
         document.getElementById('article-views').innerHTML = article.view_count;
         document.getElementById('related-articles').innerHTML = renderRelatedArticles(result.data.related_articles);
 
-        // Nạp chỉ số upvote/downvote và trạng thái vote
+        
         const upCount = Number(article.upvote_count || 0);
         const downCount = Number(article.downvote_count || 0);
         updateVoteButtons(article.user_vote, upCount, downCount);
@@ -349,7 +349,7 @@ async function loadArticle() {
 }
 
 function bindActions() {
-    // Gắn sự kiện click cho các nút bình chọn tương tác
+    
     const btnUp = document.getElementById('btn-upvote');
     const btnDown = document.getElementById('btn-downvote');
     

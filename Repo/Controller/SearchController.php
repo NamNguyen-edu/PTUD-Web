@@ -57,7 +57,7 @@ class SearchController
         $html = str_replace('{{count}}', $resultCount, $html);
         $html = str_replace('{{results}}', $resultsHtml, $html);
 
-        // Load components
+        
         $header = $this->loadComponent('header');
         $footer = $this->loadComponent('footer');
         
@@ -104,9 +104,9 @@ class SearchController
 
     private function rewriteViewPaths(string $html): string
     {
-        $html = preg_replace('/href\s*=\s*"\.\.\/css\//i', 'href="UI/css/', $html);
-        $html = preg_replace('/src\s*=\s*"\.\.\/js\//i', 'src="UI/js/', $html);
-        $html = preg_replace('/href\s*=\s*"\.\.\/html\//i', 'href="?page=', $html);
+        $html = preg_replace('/href\s*=\s*"\.\.\/css\
+        $html = preg_replace('/src\s*=\s*"\.\.\/js\
+        $html = preg_replace('/href\s*=\s*"\.\.\/html\
 
         $html = preg_replace_callback('/href\s*=\s*"([^\"]+)\.html"/i', function ($matches) {
             $page = pathinfo($matches[1], PATHINFO_FILENAME);

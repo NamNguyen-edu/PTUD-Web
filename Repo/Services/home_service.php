@@ -189,14 +189,14 @@ class HomeService {
 
         $articles = pdo_query($sql, ...$slugs);
 
-        // Fallback cải tiến: Nếu không có bài viết nào ở trang này, nạp tiếp từ homepage feed
+        
         if (empty($articles)) {
             return $this->getHomepageFeed($page);
         }
 
-        // Lấp đầy cải tiến: Nếu số bài viết lấy ra ít hơn $limit và là trang 1,
-        // ta tự động lấy thêm các bài viết published khác từ homepage để lấp đầy cho đủ $limit bài,
-        // giúp giao diện luôn đầy đặn và nút Xem thêm xuất hiện nếu DB còn bài viết.
+        
+        
+        
         if (count($articles) < $limit && $page === 1) {
             $needed = $limit - count($articles);
             $excludeIds = array_column($articles, 'article_id');
@@ -256,7 +256,7 @@ class HomeService {
     }
 
     public function getHotNewsOfTheDay(int $limit = 4): array {
-        // Query 1: Lấy các bài viết xuất bản trong vòng 24 giờ qua có lượt xem cao nhất
+        
         $sql = "
             SELECT
                 a.article_id,
@@ -288,7 +288,7 @@ class HomeService {
         ";
         $articles = pdo_query($sql);
 
-        // Dự phòng (Fallback): Nếu không đủ $limit bài trong 24h qua, tự động lấy các bài viết có lượt xem nhiều nhất từ trước tới nay
+        
         if (count($articles) < $limit) {
             $needed = $limit - count($articles);
             $excludeIds = empty($articles) ? [0] : array_column($articles, 'article_id');
@@ -335,7 +335,7 @@ class HomeService {
             unset($article['category_names']);
         }
 
-        // Sắp xếp lại toàn bộ mảng kết quả theo lượt xem giảm dần toàn cục
+        
         usort($articles, function($a, $b) {
             return $b['view_count'] <=> $a['view_count'];
         });
