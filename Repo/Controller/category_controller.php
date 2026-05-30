@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../Services/category_service.php';
-require_once __DIR__ . '/../View/category_user_view.php';
+require_once __DIR__ . '/../View/categoryview.php';
+require_once __DIR__ . '/../Model/CategoryTagModel.php';
 
 class CategoryController
 {
@@ -18,7 +19,7 @@ class CategoryController
         $tags = $this->model->getAllTags();
 
         // 2. Khởi tạo View và truyền mảng dữ liệu vào để render HTML cứng
-        $view = new CategoryUserView();
+        $view = new CategoryView();
         echo $view->render($categories, $tags);
     }
 
