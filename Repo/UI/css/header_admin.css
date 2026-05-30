@@ -1,0 +1,251 @@
+/* UI/css/header_admin.css */
+
+.top-header {
+  height: 70px;
+  background-color: #ffffff !important;
+  border-bottom: 1px solid #e8eaed;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 260px;
+  z-index: 1060;
+  transition: all 0.3s ease;
+}
+
+@media (max-width: 991.98px) {
+  .top-header {
+    left: 0;
+    width: 100%;
+    z-index: 1100;
+  }
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.brand-text {
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 16px;
+  color: #1a73e8;
+  margin: 0;
+}
+
+.search-bar {
+  background-color: #f1f3f4 !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 8px 16px !important;
+  width: 300px;
+  font-size: 14px;
+  color: #202124;
+  outline: none;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  height: 100%;
+}
+
+.header-right .header-link-item,
+.header-right .active-tab {
+  color: #5f6368 !important;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 70px;
+  border-bottom: 3px solid transparent;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+.header-right .header-link-item:hover {
+  color: #1a73e8 !important;
+}
+
+.header-right .active-tab {
+  color: #1a73e8 !important;
+  border-bottom: 3px solid #1a73e8 !important;
+}
+
+.header-right .icon-bell {
+  color: #5f6368 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* ================= PROFILE AREA ================= */
+.profile-container-admin {
+  position: relative;
+}
+
+.profile-info-admin {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.profile-info-admin:hover {
+  background-color: #f1f3f4;
+}
+
+.profile-details-admin {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.profile-name-admin {
+  font-size: 14px;
+  font-weight: 700;
+  color: #202124;
+  line-height: 1.2;
+}
+
+.profile-email-admin {
+  font-size: 11px;
+  color: #70757a;
+  margin-top: 2px;
+}
+
+.profile-avatar-admin img {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+  border: 1px solid #e8eaed;
+  display: block;
+}
+
+.profile-menu-avatar-admin img {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+  display: block;
+}
+
+.profile-chevron-admin {
+  font-size: 8px;
+  color: #70757a;
+}
+
+/* Dropdown Menu */
+.profile-menu-admin {
+  position: absolute;
+  top: 55px;
+  right: 0;
+  width: 260px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  display: none;
+  flex-direction: column;
+  padding: 8px 0;
+  z-index: 2000;
+}
+
+.profile-container-admin.active .profile-menu-admin {
+  display: flex !important;
+}
+
+.profile-menu-header-admin {
+  padding: 12px 16px;
+}
+
+.profile-menu-user-admin {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.profile-menu-name-admin {
+  font-size: 14px;
+  font-weight: 700;
+  color: #202124;
+}
+
+.profile-menu-email-admin {
+  font-size: 12px;
+  color: #70757a;
+}
+
+.profile-menu-divider-admin {
+  height: 1px;
+  background-color: #e8eaed;
+  margin: 6px 0;
+}
+
+.profile-menu-item-admin {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 16px;
+  text-decoration: none !important;
+  color: #202124 !important;
+  transition: background-color 0.2s;
+}
+
+.profile-menu-item-admin:hover {
+  background-color: #f8f9fa;
+}
+
+.menu-icon-admin {
+  color: #5f6368;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-content-admin {
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-title-admin {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.menu-content-admin small {
+  font-size: 11px;
+  color: #70757a;
+}
+
+/* Thêm vào cuối file UI/css/header_admin.css để dùng chung toàn hệ thống */
+.avatar-letters {
+  width: 36px;
+  height: 36px;
+  border-radius: 50% !important;
+  background-color: #0052CC !important;
+  color: #ffffff !important;
+  font-weight: 700;
+  font-size: 14px;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
