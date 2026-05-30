@@ -1,20 +1,13 @@
 :root {
     --blue-newspulse: #B7D8F7;
-    /* Màu xanh nhạt bạn chọn */
     --dark-text: #0054a6;
-    /* Màu xanh đậm để làm chữ nổi bật */
     --primary-blue: #007bff;
-    /* Màu xanh thương hiệu cho nút và logo */
+    --hover-blue: #0056b3;
 }
 
-/* Reset chiều cao toàn màn hình */
+/* Reset cơ bản */
 .vh-100 {
     height: 100vh !important;
-}
-
-/* Màu chữ đặc trưng */
-.color-newspulse {
-    color: var(--dark-text) !important;
 }
 
 /* Định dạng Logo */
@@ -25,24 +18,20 @@
     font-family: 'Times New Roman', serif;
 }
 
-/* Nút bấm của hệ thống */
-.btn-newspulse {
+/* Nút bấm thương hiệu (Update lại theo class btn-newspulse) */
+.btn-primary {
     background-color: var(--primary-blue) !important;
-    border: none;
-    color: white !important;
+    border: none !important;
     transition: all 0.3s ease;
 }
 
-.btn-newspulse:hover {
-    background-color: #0056b3 !important;
-    transform: translateY(-1px);
+.btn-primary:hover {
+    background-color: var(--hover-blue) !important;
 }
 
-/* PHẦN BANNER BÊN PHẢI */
+/* BANNER BÊN PHẢI */
 .bg-banner {
     background-color: var(--blue-newspulse) !important;
-    background-image: none !important;
-    min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -53,77 +42,28 @@
     color: var(--dark-text) !important;
 }
 
-
-/* 1. Tùy chỉnh ô Checkbox (Guarantee) */
-.form-check-input {
-    cursor: pointer;
-    border: 1px solid #ced4da;
+.tracking-widest {
+    letter-spacing: 0.2em;
 }
 
-.form-check-input:checked {
-    background-color: var(--dark-text) !important;
-    border-color: var(--dark-text) !important;
-}
-
-.form-check-label {
-    cursor: pointer;
-    line-height: 1.4;
-}
-
-/* 2. Tùy chỉnh reCAPTCHA */
-.g-recaptcha {
-    margin: 15px 0;
-    /* Giúp reCAPTCHA không bị tràn trên màn hình điện thoại nhỏ */
-    max-width: 100%;
-    display: block;
-}
-
-/* 3. Đường gạch ngang "Or" */
-.divider-text {
+/* Đường gạch ngang "Or" */
+.divider {
     display: flex;
     align-items: center;
     color: #ccc;
     margin: 20px 0;
 }
 
-.divider-text::before,
-.divider-text::after {
-    content: '';
+.divider hr {
     flex: 1;
-    border-bottom: 1px solid #eee;
+    border: 0;
+    border-top: 1px solid #eee;
 }
 
-.divider-text span {
+.divider span {
     padding: 0 10px;
     font-size: 12px;
-}
-
-/* Hiệu ứng khi ô input lỗi */
-.form-control.is-invalid {
-    border-color: #dc3545 !important;
-    background-color: #fff8f8;
-}
-
-.tracking-widest {
-    letter-spacing: 4px;
-}
-
-.color-newspulse {
-    color: #007bff;
-}
-
-/* Thay đổi màu chủ đạo tại đây */
-.btn-newspulse {
-    background-color: #007bff;
-    border-color: #007bff;
-}
-
-.btn-newspulse:hover {
-    background-color: #0056b3;
-}
-
-.tracking-widest {
-    letter-spacing: 0.2em;
+    background-color: white;
 }
 
 /* Responsive cho mobile */
@@ -131,9 +71,10 @@
     .col-lg-4 {
         padding: 40px 20px !important;
     }
+}
 
-    .g-recaptcha {
-        transform: scale(0.85);
-        transform-origin: 0 0;
-    }
+/* Hiệu ứng focus cho input */
+.form-control:focus {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }

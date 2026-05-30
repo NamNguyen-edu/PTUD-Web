@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
     // Kéo cấu hình đường dẫn API 
-    const API_URL = "/PTUD-WEB/Repo/Controller/CategoryManagement_controller.php";
+    const API_URL = "index.php?action=category_api";
 
     // === 1. KHỞI TẠO BIẾN DOM ===
     const pageTitle = document.querySelector('.page-title');

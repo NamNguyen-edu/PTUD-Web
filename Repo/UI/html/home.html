@@ -82,6 +82,37 @@
         </div>
       </div>
     </div>
+
+    <div class="col nav-item" id="more-nav-item">
+      <a class="nav-link" href="#" onclick="event.preventDefault()">More ▾</a>
+      <div class="mega-menu text-start">
+        <div class="row">
+          <div class="col-md-4">
+            <h6 class="fw-bold pb-2 border-bottom text-uppercase" style="font-size: 0.85rem; letter-spacing: 0.5px; font-family: 'Lora', serif !important;">Chuyên mục khác</h6>
+            <ul class="menu-list list-unstyled more-menu-list">
+              <li onclick="loadCategory(event, 'tai-chinh')" data-more-category="tai-chinh" class="active">Tài chính</li>
+              <li onclick="loadCategory(event, 'thi-truong')" data-more-category="thi-truong">Thị trường</li>
+              <li onclick="loadCategory(event, 'startup')" data-more-category="startup">Khởi nghiệp</li>
+              <li onclick="loadCategory(event, 'the-gioi')" data-more-category="the-gioi">Thế giới</li>
+              <li onclick="loadCategory(event, 'phap-luat')" data-more-category="phap-luat">Pháp luật</li>
+              <li onclick="loadCategory(event, 'moi-truong')" data-more-category="moi-truong">Môi trường</li>
+              <li onclick="loadCategory(event, 'khoa-hoc')" data-more-category="khoa-hoc">Khoa học</li>
+              <li onclick="loadCategory(event, 'suc-khoe')" data-more-category="suc-khoe">Sức khỏe</li>
+              <li onclick="loadCategory(event, 'xe')" data-more-category="xe">Xe</li>
+              <li onclick="loadCategory(event, 'giai-tri')" data-more-category="giai-tri">Giải trí</li>
+              <li onclick="loadCategory(event, 'doi-song')" data-more-category="doi-song">Đời sống</li>
+              <li onclick="loadCategory(event, 'the-thao')" data-more-category="the-thao">Thể thao</li>
+            </ul>
+          </div>
+          <div class="col-md-8 border-start">
+            <h6 id="more-mega-title" class="fw-bold pb-2 border-bottom text-uppercase text-primary" style="font-size: 0.85rem; letter-spacing: 0.5px; font-family: 'Lora', serif !important;">Bài viết mới nhất</h6>
+            <div class="row more-mega-articles-container">
+              <div class="col text-muted">Đang tải bài viết mới nhất...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="row mt-4 mb-3">

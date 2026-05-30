@@ -57,7 +57,7 @@ class SearchController
         $html = str_replace('{{count}}', $resultCount, $html);
         $html = str_replace('{{results}}', $resultsHtml, $html);
 
-        // Load components
+        
         $header = $this->loadComponent('header');
         $footer = $this->loadComponent('footer');
         
