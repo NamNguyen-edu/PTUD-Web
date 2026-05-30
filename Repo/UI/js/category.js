@@ -399,20 +399,27 @@ function renderDynamicLayout() {
     if (!articlesBuffer.length) return;
 
     // Chọn ngẫu nhiên layoutType: 0 (Grid), 1 (Hero), 2 (Mixed), 3 (Mixed Scroll)
+    // Bảo đảm chống trùng lặp kề nhau
     let layoutType;
-    if (currentPage === 1) {
-        // Trang đầu tiên ưu tiên Hero (1), Mixed (2), hoặc Mixed Scroll (3) để luôn có bài tiêu điểm lớn ở đầu.
-        const r = Math.random();
-        if (r < 0.33) {
-            layoutType = 1;
-        } else if (r < 0.66) {
-            layoutType = 2;
+    let attempts = 0;
+    do {
+        if (currentPage === 1) {
+            // Trang đầu tiên ưu tiên Hero (1), Mixed (2), hoặc Mixed Scroll (3) để luôn có bài tiêu điểm lớn ở đầu.
+            const r = Math.random();
+            if (r < 0.33) {
+                layoutType = 1;
+            } else if (r < 0.66) {
+                layoutType = 2;
+            } else {
+                layoutType = 3;
+            }
         } else {
-            layoutType = 3;
+            layoutType = Math.floor(Math.random() * 4);
         }
-    } else {
-        layoutType = Math.floor(Math.random() * 4);
-    }
+        attempts++;
+    } while (layoutType === window.lastLayoutType && attempts < 10);
+
+    window.lastLayoutType = layoutType;
 
     // Nếu chọn kiểu Mixed Scroll (3) nhưng trong buffer có ít hơn 4 bài, chuyển về Mixed thường (2) hoặc Grid (0)
     if (layoutType === 3 && articlesBuffer.length < 4) {
@@ -423,52 +430,65 @@ function renderDynamicLayout() {
         layoutType = 0;
     }
 
-    let renderCount = 0;
-    if (layoutType === 1) {
-        // Hero: 1 Hero + 3 * N Grid
-        const gridAvailable = articlesBuffer.length - 1;
-        const gridCount = Math.floor(gridAvailable / 3) * 3;
-        renderCount = 1 + gridCount;
-    } else if (layoutType === 2) {
-        // Mixed: 3 tiêu điểm (1 lớn + 2 nhỏ) + 3 * N Grid
-        const gridAvailable = articlesBuffer.length - 3;
-        const gridCount = Math.floor(gridAvailable / 3) * 3;
-        renderCount = 3 + gridCount;
-    } else if (layoutType === 3) {
-        // Mixed Scroll: 1 bài lớn + tối đa 7 bài nhỏ bên phải cuộn dọc (không có Grid bên dưới)
-        const sideCount = Math.min(7, articlesBuffer.length - 1);
-        renderCount = 1 + sideCount;
-    } else {
-        // Grid: 3 * N Grid
-        renderCount = Math.floor(articlesBuffer.length / 3) * 3;
-    }
-
-    // Fallback nếu renderCount tính ra bằng 0 nhưng buffer vẫn còn bài viết,
-    // ta lấy toàn bộ bài viết còn lại để hiển thị nốt dạng Grid.
-    if (renderCount === 0 && articlesBuffer.length > 0) {
-        renderCount = articlesBuffer.length;
-    }
-
-    // Cắt ra số bài viết cần render
-    const toRender = articlesBuffer.slice(0, renderCount);
-    articlesBuffer = articlesBuffer.slice(renderCount);
-
     let html = '';
 
-    if (layoutType === 1 && toRender[0]) {
-        html += renderHeroBlock(toRender[0]);
-        if (toRender.slice(1).length > 0) {
-            html += renderGridBlock(toRender.slice(1));
-        }
-    } else if (layoutType === 2 && toRender.length >= 3) {
-        html += renderMixedBlock(toRender[0], toRender.slice(1, 3));
-        if (toRender.slice(3).length > 0) {
-            html += renderGridBlock(toRender.slice(3));
-        }
-    } else if (layoutType === 3 && toRender.length >= 4) {
-        html += renderMixedScrollBlock(toRender[0], toRender.slice(1));
+    if (layoutType === 3) {
+        // Mixed Scroll (Slider): Gom các bài có chung chủ đề (cùng tags hoặc categories)
+        const bigArticle = articlesBuffer[0];
+        const remaining = articlesBuffer.slice(1);
+
+        // Lọc các bài viết cùng danh mục hoặc thẻ tag
+        const related = remaining.filter(art => {
+            const shareCat = art.categories.some(cat => bigArticle.categories.includes(cat));
+            const shareTag = art.tags.some(tag => bigArticle.tags.includes(tag));
+            return shareCat || shareTag;
+        });
+
+        const unrelated = remaining.filter(art => !related.includes(art));
+        const sideArticles = related.concat(unrelated).slice(0, Math.min(7, remaining.length));
+
+        // Render layout
+        html += renderMixedScrollBlock(bigArticle, sideArticles);
+
+        // Cập nhật buffer (xoá những bài đã được chọn render)
+        const renderedIds = [bigArticle.article_id, ...sideArticles.map(a => a.article_id)];
+        articlesBuffer = articlesBuffer.filter(art => !renderedIds.includes(art.article_id));
+
     } else {
-        html += renderGridBlock(toRender);
+        // Các layout khác giữ nguyên renderCount truyền thống
+        let renderCount = 0;
+        if (layoutType === 1) {
+            const gridAvailable = articlesBuffer.length - 1;
+            const gridCount = Math.floor(gridAvailable / 3) * 3;
+            renderCount = 1 + gridCount;
+        } else if (layoutType === 2) {
+            const gridAvailable = articlesBuffer.length - 3;
+            const gridCount = Math.floor(gridAvailable / 3) * 3;
+            renderCount = 3 + gridCount;
+        } else {
+            renderCount = Math.floor(articlesBuffer.length / 3) * 3;
+        }
+
+        if (renderCount === 0 && articlesBuffer.length > 0) {
+            renderCount = articlesBuffer.length;
+        }
+
+        const toRender = articlesBuffer.slice(0, renderCount);
+        articlesBuffer = articlesBuffer.slice(renderCount);
+
+        if (layoutType === 1 && toRender[0]) {
+            html += renderHeroBlock(toRender[0]);
+            if (toRender.slice(1).length > 0) {
+                html += renderGridBlock(toRender.slice(1));
+            }
+        } else if (layoutType === 2 && toRender.length >= 3) {
+            html += renderMixedBlock(toRender[0], toRender.slice(1, 3));
+            if (toRender.slice(3).length > 0) {
+                html += renderGridBlock(toRender.slice(3));
+            }
+        } else {
+            html += renderGridBlock(toRender);
+        }
     }
 
     feed.insertAdjacentHTML('beforeend', html);
