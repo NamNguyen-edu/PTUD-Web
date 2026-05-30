@@ -589,15 +589,31 @@ window.addEventListener('scroll', () => {
 
 // Dynamic Loader Trigger on Mount
 document.addEventListener("DOMContentLoaded", () => {
-    // Set dynamic body background color based on category slug
+    // Set dynamic body background color based on category slug if not in dark mode
     const themeColors = {
         'cong-nghe': '#f4fbf7', // Soft Emerald Mint tint
         'kinh-doanh': '#fdfaf2', // Soft Amber Cream tint
         'thoi-su': '#fdf5f5'     // Soft Crimson Rose tint
     };
-    if (slug && themeColors[slug]) {
-        document.body.style.setProperty('background', themeColors[slug], 'important');
+    function updateCategoryBg() {
+        const isDark = document.body.classList.contains('theme-dark');
+        if (isDark) {
+            document.body.style.removeProperty('background');
+        } else if (slug && themeColors[slug]) {
+            document.body.style.setProperty('background', themeColors[slug], 'important');
+        }
     }
+    updateCategoryBg();
+
+    // Listen for theme toggle changes on body class
+    const themeObserver = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.attributeName === 'class') {
+                updateCategoryBg();
+            }
+        });
+    });
+    themeObserver.observe(document.body, { attributes: true });
 
     // Tải Header/Footer từ file components gốc giống các trang khác
     const BASE = "/PTUD-Web/Repo/UI";
