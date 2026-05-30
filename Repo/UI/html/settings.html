@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cài đặt — NewsPulse</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/header.css">
+    <link rel="stylesheet" href="../css/footer.css">
+    <link rel="stylesheet" href="../css/settings.css">
+</head>
+<body>
+
+<div id="header-placeholder"></div>
+
+<div class="container py-5">
+    <div class="row g-4">
+
+        <!-- SIDEBAR MENU -->
+        <div class="col-12 col-md-3">
+            <div class="settings-sidebar">
+                <div class="settings-sidebar-title">Cài đặt</div>
+                <nav class="settings-nav">
+                    <a href="#section-password" class="settings-nav-item active" data-section="section-password">
+                        <span class="settings-nav-icon">🔒</span>
+                        Bảo mật
+                    </a>
+                    <a href="#section-notifications" class="settings-nav-item" data-section="section-notifications">
+                        <span class="settings-nav-icon">🔔</span>
+                        Thông báo
+                    </a>
+                    <a href="#section-preferences" class="settings-nav-item" data-section="section-preferences">
+                        <span class="settings-nav-icon">🎨</span>
+                        Trải nghiệm
+                    </a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- NỘI DUNG CHÍNH -->
+        <div class="col-12 col-md-9">
+
+            <!-- SECTION: BẢO MẬT -->
+            <div id="section-password" class="settings-section">
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <span class="settings-card-icon">🔒</span>
+                        <div>
+                            <h5 class="mb-0">Đổi mật khẩu</h5>
+                            <small class="text-muted">Cập nhật mật khẩu để bảo vệ tài khoản</small>
+                        </div>
+                    </div>
+
+                    <div id="password-alert" class="alert d-none mt-3" role="alert"></div>
+
+                    <div class="row g-3 mt-1">
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Mật khẩu hiện tại</label>
+                            <div class="input-group">
+                                <input type="password" id="current_password" class="form-control" placeholder="Nhập mật khẩu hiện tại">
+                                <button class="btn btn-outline-secondary toggle-password" type="button" data-target="current_password">👁</button>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <label class="form-label fw-semibold">Mật khẩu mới</label>
+                            <div class="input-group">
+                                <input type="password" id="new_password" class="form-control" placeholder="Ít nhất 6 ký tự">
+                                <button class="btn btn-outline-secondary toggle-password" type="button" data-target="new_password">👁</button>
+                            </div>
+                            <div id="password-strength" class="mt-2 d-none">
+                                <div class="progress" style="height: 4px;">
+                                    <div id="strength-bar" class="progress-bar" style="width: 0%"></div>
+                                </div>
+                                <small id="strength-text" class="text-muted"></small>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <label class="form-label fw-semibold">Xác nhận mật khẩu mới</label>
+                            <div class="input-group">
+                                <input type="password" id="confirm_password" class="form-control" placeholder="Nhập lại mật khẩu mới">
+                                <button class="btn btn-outline-secondary toggle-password" type="button" data-target="confirm_password">👁</button>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <button id="btn-change-password" class="btn btn-primary px-4">
+                                Cập nhật mật khẩu
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION: THÔNG BÁO -->
+            <div id="section-notifications" class="settings-section d-none">
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <span class="settings-card-icon">🔔</span>
+                        <div>
+                            <h5 class="mb-0">Thông báo</h5>
+                            <small class="text-muted">Quản lý các thông báo bạn nhận được</small>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 d-flex flex-column gap-3">
+                        <div class="settings-toggle-row">
+                            <div>
+                                <div class="fw-semibold">Bài viết mới</div>
+                                <small class="text-muted">Nhận thông báo khi có bài viết mới trong chủ đề yêu thích</small>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input pref-toggle" type="checkbox" id="notif-new-article" checked>
+                            </div>
+                        </div>
+                        <hr class="my-1">
+                        <div class="settings-toggle-row">
+                            <div>
+                                <div class="fw-semibold">Phản hồi bình luận</div>
+                                <small class="text-muted">Nhận thông báo khi có người trả lời bình luận của bạn</small>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input pref-toggle" type="checkbox" id="notif-comment-reply" checked>
+                            </div>
+                        </div>
+                        <hr class="my-1">
+                        <div class="settings-toggle-row">
+                            <div>
+                                <div class="fw-semibold">Bản tin hàng tuần</div>
+                                <small class="text-muted">Tổng hợp tin tức nổi bật gửi qua email mỗi tuần</small>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input pref-toggle" type="checkbox" id="notif-weekly">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <button id="btn-save-notifications" class="btn btn-primary px-4">Lưu thông báo</button>
+                        <span id="notif-saved" class="ms-3 text-success d-none fw-semibold">✓ Đã lưu!</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION: TRẢI NGHIỆM -->
+            <div id="section-preferences" class="settings-section d-none">
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <span class="settings-card-icon">🎨</span>
+                        <div>
+                            <h5 class="mb-0">Trải nghiệm đọc</h5>
+                            <small class="text-muted">Tuỳ chỉnh giao diện và nội dung theo sở thích</small>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <label class="form-label fw-semibold">Chủ đề yêu thích</label>
+                        <small class="d-block text-muted mb-3">Chọn các chủ đề bạn quan tâm để feed hiển thị phù hợp hơn</small>
+                        <div class="d-flex flex-wrap gap-2" id="topic-chips">
+                            <button class="btn topic-chip" data-topic="thoi-su">🗞 Thời sự</button>
+                            <button class="btn topic-chip" data-topic="cong-nghe">💻 Công nghệ</button>
+                            <button class="btn topic-chip" data-topic="kinh-doanh">📈 Kinh doanh</button>
+                            <button class="btn topic-chip" data-topic="giao-duc">📚 Giáo dục</button>
+                            <button class="btn topic-chip" data-topic="the-thao">⚽ Thể thao</button>
+                            <button class="btn topic-chip" data-topic="giai-tri">🎬 Giải trí</button>
+                            <button class="btn topic-chip" data-topic="suc-khoe">❤️ Sức khoẻ</button>
+                            <button class="btn topic-chip" data-topic="du-lich">✈️ Du lịch</button>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <button id="btn-save-preferences" class="btn btn-primary px-4">Lưu sở thích</button>
+                        <span id="pref-saved" class="ms-3 text-success d-none fw-semibold">✓ Đã lưu!</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div id="footer-placeholder"></div>
+<script src="../js/settings.js"></script>
+</body>
+</html>

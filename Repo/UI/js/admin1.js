@@ -39,8 +39,10 @@ function disableAllActions() {
 }
 
 
-function addComment() {
-    const textarea = document.querySelector('textarea[placeholder="Thêm bình luận..."]');
+async function addComment() {
+    const textarea = document.getElementById('commentInput');
+    if (!textarea) return;
+
     const text = textarea.value.trim();
 
     if (!text) {
@@ -48,42 +50,52 @@ function addComment() {
         return;
     }
 
-    const commentSection = document.querySelector('.white-card:last-child');
+    try {
+        const result = await postApprovalAction('add_comment', { content: text });
 
-    const newComment = document.createElement('div');
-    newComment.className = 'comment-item';
+        if (!result || !result.success) {
+            throw new Error(result && result.message ? result.message : 'Gửi bình luận thất bại');
+        }
 
-    newComment.innerHTML = `
-        <img src="https://i.pravatar.cc/150?u=chief" class="comment-avatar">
-        <div class="comment-bubble active">
-            <div class="d-flex justify-content-between small mb-1">
-                <span class="fw-bold text-primary">
-                    Julian Vane
-                    <span class="fw-normal text-muted">(Tổng biên tập)</span>
-                </span>
-                <span class="text-muted" style="font-size: 10px;">
-                    ${new Date().toLocaleTimeString('vi-VN', {
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    })}
-                </span>
+        // Tạo UI cho comment mới (dựa trên giao diện hiện có)
+        const commentSection = document.querySelector('.white-card:last-child');
+        const newComment = document.createElement('div');
+        newComment.className = 'comment-item';
+
+        newComment.innerHTML = `
+            <img src="https://i.pravatar.cc/150?u=chief" class="comment-avatar">
+            <div class="comment-bubble active">
+                <div class="d-flex justify-content-between small mb-1">
+                    <span class="fw-bold text-primary">
+                        Bạn
+                    </span>
+                    <span class="text-muted" style="font-size: 10px;">
+                        ${new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                </div>
+                <p class="small mb-0">${escapeHtml(text)}</p>
             </div>
-            <p class="small mb-0">${text}</p>
-        </div>
-    `;
+        `;
 
-    const inputArea = commentSection.querySelector('.mt-4.pt-3.border-top');
+        const inputArea = commentSection.querySelector('.mt-4.pt-3.border-top');
+        commentSection.insertBefore(newComment, inputArea);
+        textarea.value = '';
+        newComment.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        showToast('Đã gửi ghi chú biên tập', 'success');
 
-    commentSection.insertBefore(newComment, inputArea);
+    } catch (err) {
+        console.error('addComment error:', err);
+        showToast(err.message || 'Lỗi khi gửi bình luận', 'reject');
+    }
+}
 
-    textarea.value = '';
-
-    newComment.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
-    });
-
-    showToast('Đã thêm ghi chú biên tập');
+function escapeHtml(unsafe) {
+    return String(unsafe)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
 }
 
 
@@ -151,7 +163,9 @@ async function postApprovalAction(action, payload = {}) {
         formData.append(key, value);
     });
 
-    const response = await fetch(getIndexPhpPath() + '?action=' + encodeURIComponent(action), {
+    // Call the service file directly so its internal AJAX entry point handles the action
+    const serviceUrl = (window.location.origin + window.location.pathname).replace(/index\.php.*$/, '') + 'Services/Approval_service.php';
+    const response = await fetch(serviceUrl + '?action=' + encodeURIComponent(action), {
         method: 'POST',
         body: formData,
         credentials: 'same-origin'
@@ -161,7 +175,13 @@ async function postApprovalAction(action, payload = {}) {
         throw new Error('Lỗi mạng: ' + response.status);
     }
 
-    return await response.json();
+    try {
+        return await response.json();
+    } catch (err) {
+        const text = await response.text();
+        console.error('postApprovalAction: non-json response', text);
+        throw new Error('Server trả về dữ liệu không hợp lệ: ' + text.slice(0, 400));
+    }
 }
 
 function setWorkflowApproved() {
@@ -436,7 +456,8 @@ async function postApprovalAction(action, payload = {}) {
         formData.append(key, value);
     });
 
-    const response = await fetch(getIndexPhpPath() + '?action=' + encodeURIComponent(action), {
+    const serviceUrl = (window.location.origin + window.location.pathname).replace(/index\.php.*$/, '') + 'Services/Approval_service.php';
+    const response = await fetch(serviceUrl + '?action=' + encodeURIComponent(action), {
         method: 'POST',
         body: formData,
         credentials: 'same-origin'
@@ -446,7 +467,13 @@ async function postApprovalAction(action, payload = {}) {
         throw new Error('Lỗi mạng: ' + response.status);
     }
 
-    return await response.json();
+    const text = await response.text();
+    try {
+        return JSON.parse(text);
+    } catch (err) {
+        console.error('Invalid JSON response from Approval_service.php', text);
+        throw new Error('Server trả về dữ liệu không hợp lệ. Vui lòng kiểm tra console.');
+    }
 }
 
 function setWorkflowApproved() {
@@ -695,24 +722,33 @@ function showModal(title, desc, icon, type) {
 }
 
 
-document.querySelector('.btn-approve')
-    .addEventListener('click', approveArticle);
+const btnApprove = document.querySelector('.btn-approve');
+if (btnApprove) {
+    btnApprove.addEventListener('click', approveArticle);
+}
 
-document.querySelector('.btn-revision')
-    .addEventListener('click', requestRevision);
+const btnRevision = document.querySelector('.btn-revision');
+if (btnRevision) {
+    btnRevision.addEventListener('click', requestRevision);
+}
 
-document.querySelector('.text-danger.fw-bold.small.cursor-pointer')
-    .addEventListener('click', rejectArticle);
+const btnReject = document.querySelector('.text-danger.fw-bold.small.cursor-pointer');
+if (btnReject) {
+    btnReject.addEventListener('click', rejectArticle);
+}
 
-document.querySelector('.btn-link')
-    .addEventListener('click', addComment);
+const btnSendComment = document.getElementById('btn-send-comment');
+if (btnSendComment) {
+    btnSendComment.addEventListener('click', addComment);
+}
 
-document.querySelector('textarea[placeholder="Thêm bình luận..."]')
-    .addEventListener('keydown', function(e) {
-
+const commentTextarea = document.getElementById('commentInput');
+if (commentTextarea) {
+    commentTextarea.addEventListener('keydown', function(e) {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             addComment();
         }
     });
+}
 
