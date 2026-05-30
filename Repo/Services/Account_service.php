@@ -1,10 +1,11 @@
 <?php
-require_once(__DIR__ . '/../Model/pdo.php');
-
+require_once __DIR__ . '/../Model/pdo.php';
 class AccountService
 {
-  // Lấy danh sách users kèm tên Role
-  public function getAllUsers()
+  /**
+   * Lấy tất cả người dùng kèm thông tin Role
+   */
+  public function getAllUsers(): array
   {
     $sql = "SELECT u.*, r.name as role_name 
                 FROM users u 
@@ -13,41 +14,68 @@ class AccountService
     return pdo_query($sql);
   }
 
-  // Tìm kiếm (tìm theo full_name hoặc email)
-  public function searchUsers($keyword)
+  /**
+   * Tìm kiếm người dùng theo tên hoặc email
+   */
+  public function searchUsers(string $keyword): array
   {
     $sql = "SELECT u.*, r.name as role_name 
                 FROM users u 
                 LEFT JOIN roles r ON u.role_id = r.role_id 
                 WHERE u.full_name LIKE ? OR u.email LIKE ? 
                 ORDER BY u.user_id DESC";
-    return pdo_query_search($sql, $keyword);
+
+    $searchTerm = "%$keyword%";
+    return pdo_query_search($sql, $searchTerm, $searchTerm);
   }
 
-  // Tạo mới (cần map role_name sang role_id nếu cần)
-  public function createUser($data)
+  /**
+   * Tạo mới người dùng
+   */
+  public function createUser(array $data): void
   {
-    // Lưu ý: $data['role'] ở đây là tên role, ta cần tìm ID của nó
+    // Lấy role_id từ tên role
     $role = pdo_query_one("SELECT role_id FROM roles WHERE name = ?", $data['role']);
-    $role_id = $role ? $role['role_id'] : 5; // Mặc định là reader (ID 5)
+    $roleId = $role ? $role['role_id'] : 5;
 
     $sql = "INSERT INTO users(full_name, email, password_hash, role_id, status) VALUES(?, ?, ?, ?, ?)";
-    // Mặc định mật khẩu là 123456 (hash) cho user mới
-    $default_pass = password_hash('123456', PASSWORD_DEFAULT);
-    pdo_execute($sql, $data['name'], $data['email'], $default_pass, $role_id, strtolower($data['status']));
+
+    $hashedPassword = password_hash('123456', PASSWORD_DEFAULT);
+
+    pdo_execute(
+      $sql,
+      $data['name'],
+      $data['email'],
+      $hashedPassword,
+      $roleId,
+      strtolower($data['status'])
+    );
   }
 
-  public function deleteUsers($ids)
+  /**
+   * Xóa danh sách người dùng (Hỗ trợ nhiều ID)
+   */
+  public function deleteUsers(array $ids): void
   {
-    $idList = implode(',', array_map('intval', $ids));
-    $sql = "DELETE FROM users WHERE user_id IN ($idList)";
+    if (empty($ids)) return;
+
+    // Ép kiểu mảng IDs thành số nguyên để tránh SQL Injection
+    $sanitizedIds = implode(',', array_map('intval', $ids));
+
+    $sql = "DELETE FROM users WHERE user_id IN ($sanitizedIds)";
     pdo_execute($sql);
   }
 
-  public function updateStatus($ids, $status)
+  /**
+   * Cập nhật trạng thái người dùng (Hỗ trợ nhiều ID)
+   */
+  public function updateStatus(array $ids, string $status): void
   {
-    $idList = implode(',', array_map('intval', $ids));
-    $sql = "UPDATE users SET status = ? WHERE user_id IN ($idList)";
+    if (empty($ids)) return;
+
+    $sanitizedIds = implode(',', array_map('intval', $ids));
+
+    $sql = "UPDATE users SET status = ? WHERE user_id IN ($sanitizedIds)";
     pdo_execute($sql, strtolower($status));
   }
 }

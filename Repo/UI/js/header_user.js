@@ -462,10 +462,8 @@
             if (isUserLoggedIn && currentUserId) {
                 localStorage.setItem(`newsPulse_theme_user_${currentUserId}`, targetTheme);
                 syncThemeToDB(targetTheme);
-                showToast(`Đã lưu giao diện ${targetTheme === 'dark' ? 'tối' : 'sáng'} vào tài khoản của bạn.`, 'success');
             } else {
                 sessionStorage.setItem('newsPulse_theme', targetTheme);
-                showToast(`Đã chuyển sang giao diện ${targetTheme === 'dark' ? 'tối' : 'sáng'}.`, 'info');
             }
         });
 

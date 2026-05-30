@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Kéo cấu hình đường dẫn API 
-    const API_URL = "index.php?action=category_api";
+    // === 1. ĐƯỜNG DẪN API CHUẨN (ĐÃ BỎ ĐUÔI .PHP SAI LỆCH) ===
+    const API_URL = "/index.php?page=api_category";
 
-    // === 1. KHỞI TẠO BIẾN DOM ===
+    // === Khởi tạo biến DOM ===
     const pageTitle = document.querySelector('.page-title');
     const tabButtons = document.querySelectorAll('button[data-bs-toggle="tab"]');
     const searchBar = document.getElementById('globalSearch');
@@ -14,7 +14,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const selectType = document.getElementById('modal-type');
     const btnSave = document.getElementById('btn-save-item');
 
-    // Thêm các biến xử lý modal Chỉnh sửa xịn bằng UI
     const editItemModalEl = document.getElementById('editItemModal');
     const editItemModal = editItemModalEl ? new bootstrap.Modal(editItemModalEl) : null;
     const inputEditName = document.getElementById('edit-modal-name');
@@ -60,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // === 5. HÀM CHÈN MỘT HÀNG VÀO BẢNG UI ===
+    // === 5. HÀM CHÈN MỘT HÀNG VÀO BẢNG UI (DÙNG KHI THÊM MỚI THÀNH CÔNG) ===
     const appendRowToTable = (type, id, name, slug, count = 0, isPrepend = false) => {
         const tbodyId = (type === 'Category') ? 'category-list-container' : 'tag-list-container';
         const targetTableBody = document.getElementById(tbodyId);
@@ -68,7 +67,6 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!targetTableBody) return;
 
         const newRow = document.createElement('tr');
-        // Lưu data attribute để biết ID thực tế trong database phục vụ Sửa/Xóa
         newRow.setAttribute('data-id', id);
         newRow.setAttribute('data-type', type);
 
@@ -98,48 +96,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     };
 
-    // === 6. ĐỌC DỮ LIỆU TỪ BACKEND PHP (FETCH DATA) ===
-    const loadCatalogData = () => {
-        document.getElementById('category-list-container').innerHTML = '';
-        document.getElementById('tag-list-container').innerHTML = '';
+    // NOTE: Đã tắt tự động chạy loadCatalogData() ở đây để nhường chỗ cho dữ liệu cứng PHP tự render sạch sẽ ban đầu.
 
-        fetch(API_URL)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Lỗi Network hệ thống: Status ${response.status}`);
-                }
-                // Đọc phản hồi dưới dạng chữ (text) trước để bẫy lỗi
-                return response.text().then(text => {
-                    try {
-                        return JSON.parse(text); // Nếu là JSON chuẩn thì parse bình thường
-                    } catch (err) {
-                        // Nếu là chữ "Lỗi kết nối..." thì ném thẳng text đó vào catch bên dưới
-                        throw new Error(`PHP trả về text lỗi, không phải JSON! Nguyên văn: \n"${text}"`);
-                    }
-                });
-            })
-            .then(data => {
-                if (data.status === "success") {
-                    data.categories.forEach(cat => appendRowToTable('Category', cat.category_id, cat.name, cat.slug, cat.count));
-                    data.tags.forEach(tag => appendRowToTable('Tag', tag.tag_id, tag.name, tag.slug, tag.count));
-                } else {
-                    console.error("Lỗi lấy dữ liệu:", data.message);
-                }
-            })
-            .catch(err => {
-                // In trực tiếp nguyên nhân chí mạng ra Console để đọc cho dễ
-                console.error("=== CHI TIẾT LỖI TỪ SERVER ===");
-                console.error(err.message);
-            });
-    };
-
-    // Chạy tải dữ liệu ngay khi mở trang
-    loadCatalogData();
-
-    // === 7. XỬ LÝ LƯU DỮ LIỆU MỚI (POST) ===
+    // === 6. XỬ LÝ LƯU DỮ LIỆU MỚI (POST) ===
     btnSave?.addEventListener('click', () => {
-        console.log("Đã kích hoạt sự kiện bấm nút Lưu!");
-
         const name = inputName.value.trim();
         const slug = inputSlug.value.trim();
         const type = selectType.value;
@@ -157,62 +117,36 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        // Gửi dữ liệu sang file PHP backend
         fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ type, name, slug })
         })
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) throw new Error("Lỗi kết nối API");
+                return res.json();
+            })
             .then(data => {
-                console.log("Kết quả PHP trả về:", data); // Kiểm tra xem PHP có báo success không
-
                 if (data.status === "success") {
-                    // Tạo hàng mới đẩy lên đầu danh sách tương ứng
-                    const newRow = document.createElement('tr');
+                    // Chèn trực tiếp hàng mới lên trên đầu bảng mà không làm mất dữ liệu cũ
+                    appendRowToTable(type, data.id, name, slug, 0, true);
 
-                    // Bổ sung các attribute để tí nữa bấm Sửa/Xóa trực tiếp không bị lỗi
-                    newRow.setAttribute('data-id', data.id);
-                    newRow.setAttribute('data-type', type);
-
-                    const iconHtml = type === 'Category'
-                        ? `<div class="cat-icon bg-tech me-3"><i class="fas fa-folder-open"></i></div>`
-                        : `<span class="text-muted fw-bold me-2">#</span>`;
-
-                    newRow.innerHTML = `
-                    <td class="ps-4">
-                        <div class="d-flex align-items-center">
-                            ${iconHtml}
-                            <div class="fw-bold item-name">${name}</div>
-                        </div>
-                    </td>
-                    <td class="text-center item-slug">${slug}</td>
-                    <td class="text-center">0</td>
-                    <td class="text-end pe-4">
-                        <button class="btn-action btn-edit me-1" title="Sửa"><i class="fas fa-edit"></i></button>
-                        <button class="btn-action btn-delete text-danger" title="Xóa"><i class="fas fa-trash"></i></button>
-                    </td>
-                `;
-
-                    targetTableBody.prepend(newRow);
-
-                    // Reset form và đóng modal
+                    // Reset form và đóng modal gọn gàng
                     inputName.value = '';
                     inputSlug.value = '';
                     if (addItemModal) addItemModal.hide();
                 } else {
-                    alert("Lỗi lưu từ DB đám mây: " + data.message);
+                    alert("Lỗi lưu dữ liệu: " + data.message);
                 }
             })
             .catch(err => {
-                console.error("Lỗi nghẽn đường truyền Fetch:", err);
-                alert("Không thể gửi dữ liệu tới file PHP. Hãy kiểm tra lại đường dẫn API_URL!");
+                console.error("Lỗi hệ thống Fetch POST:", err);
+                alert("Không thể kết nối tới máy chủ API!");
             });
     });
 
-    // === 8. SỬA & XÓA BIẾN ĐỘNG (EVENT DELEGATION) ===
+    // === 7. SỬA & XÓA BIẾN ĐỘNG (EVENT DELEGATION) ===
     document.addEventListener('click', function (e) {
-        // --- Nhấn nút hiện Modal Xóa ---
         const delBtn = e.target.closest('.btn-delete');
         if (delBtn) {
             rowToDelete = delBtn.closest('tr');
@@ -220,7 +154,6 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        // --- Nhấn nút hiện Modal Sửa xịn ---
         const editBtn = e.target.closest('.btn-edit');
         if (editBtn) {
             rowToEdit = editBtn.closest('tr');
@@ -234,7 +167,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // === 9. THỰC THI SỬA GỬI LÊN PHP (PUT) ===
+    // === 8. THỰC THI SỬA GỬI LÊN PHP (PUT) ===
     btnUpdate?.addEventListener('click', function () {
         if (!rowToEdit || inputEditName.value.trim() === "") {
             alert("Tên phân loại không được để trống!");
@@ -260,10 +193,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else {
                     alert("Lỗi cập nhật: " + data.message);
                 }
-            });
+            })
+            .catch(err => console.error("Lỗi Fetch PUT:", err));
     });
 
-    // === 10. THỰC THI XÓA GỬI LÊN PHP (DELETE) ===
+    // === 9. THỰC THI XÓA GỬI LÊN PHP (DELETE) ===
     window.executeDelete = function () {
         if (!rowToDelete) return;
 
@@ -288,10 +222,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     alert("Lỗi xóa phân loại: " + data.message);
                 }
                 if (deleteModal) deleteModal.hide();
-            });
+            })
+            .catch(err => console.error("Lỗi Fetch DELETE:", err));
     };
 
-    // === 11. BỘ LỌC TÌM KIẾM NHANH ===
+    // === 10. BỘ LỌC TÌM KIẾM NHANH TRÊN MÀN HÌNH ===
     searchBar?.addEventListener('input', function () {
         const term = this.value.toLowerCase().trim();
         const activePane = document.querySelector('.tab-pane.show.active');

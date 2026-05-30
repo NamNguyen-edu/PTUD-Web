@@ -2,7 +2,9 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 session_start();
-require_once __DIR__ . '/Controller/AuthController.php';
+
+require_once __DIR__ . '/Services/auth_service.php';
+require_once __DIR__ . '/Controller/auth_controller.php';
 require_once __DIR__ . '/Controller/DashboardController.php';
 
 function redirect(string $url): void
@@ -13,6 +15,16 @@ function redirect(string $url): void
 
 $page = trim((string)($_GET['page'] ?? 'home'));
 
+function authorize(string $action): void
+{
+    $auth = new AuthService();
+    $role = $_SESSION['role'] ?? 'guest';
+
+    if (!$auth->checkPermission($role, $action)) {
+        http_response_code(403);
+        die("<h1>403 Forbidden: Bạn không có quyền truy cập trang này.</h1>");
+    }
+}
 
 switch ($page) {
     case 'save_post':
@@ -88,6 +100,10 @@ switch ($page) {
         require_once __DIR__ . '/Controller/PageController.php';
         (new PageController())->render('article');
         break;
+    case 'post':
+        require_once __DIR__ . '/Controller/PageController.php';
+        (new PageController())->render('post');
+        break;
     case 'article_detail':
         require_once __DIR__ . '/Controller/load_articles_controller.php';
         (new ArticleController())->detail();
@@ -108,7 +124,8 @@ switch ($page) {
         (new PostnewsController())->show();
         break;
 
-   case 'version-control':
+    case 'version-control':
+        authorize('manage_version');
         require_once __DIR__ . '/Controller/Version_control_controller.php';
         (new VersionControlController())->show();
         break;
@@ -117,17 +134,17 @@ switch ($page) {
         require_once __DIR__ . '/Controller/Version_control_controller.php';
         (new VersionControlController())->restoreVersion();
         break;
-    
+
     case 'version-list':
         require_once __DIR__ . '/Controller/Version_list_controller.php';
         (new VersionListController())->index();
         break;
-    
+
     case 'approval':
         require_once __DIR__ . '/Controller/Approval_controller.php';
-         (new ApprovalController())->show();
+        (new ApprovalController())->show();
         break;
-   case 'approve_publish':
+    case 'approve_publish':
         require_once __DIR__ . '/Controller/Approval_controller.php';
         (new ApprovalController())->approvePublish();
         break;
@@ -159,7 +176,7 @@ switch ($page) {
         require_once __DIR__ . '/Controller/home_page_controller.php';
         (new HomePageController())->render();
         break;
- 
+
     case 'search':
         require_once __DIR__ . '/Controller/SearchController.php';
         (new SearchController())->search(trim((string)($_GET['keyword'] ?? '')));
