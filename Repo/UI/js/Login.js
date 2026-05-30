@@ -21,22 +21,17 @@ const langData = {
   }
 };
 
+const CONTROLLER_PATH = "index.php";
+
+
+let isGoogleInitialized = false;
+let isLoginGoogleRendered = false;
+let isSignupGoogleRendered = false;
+
 function toggleAuth(mode) {
   const loginSec = document.getElementById('login-section');
   const signupSec = document.getElementById('signup-section');
-
   document.querySelectorAll('.was-validated').forEach(form => form.classList.remove('was-validated'));
-
-  // Reset lại trạng thái ẩn mật khẩu khi chuyển form để bảo mật
-  document.querySelectorAll('.toggle-password').forEach(button => {
-    const targetId = button.getAttribute('data-target');
-    const input = document.getElementById(targetId);
-    if (input) {
-      input.type = 'password';
-      const icon = button.querySelector('i');
-      if (icon) icon.className = 'bi bi-eye';
-    }
-  });
 
   if (mode === 'signup') {
     loginSec.style.display = 'none';
@@ -45,141 +40,135 @@ function toggleAuth(mode) {
     loginSec.style.display = 'block';
     signupSec.style.display = 'none';
   }
-  renderGoogleButton();
+
+  // Trì hoãn 50ms để DOM kịp hiển thị block trước khi Google đo kích thước khung
+  setTimeout(() => renderGoogleButton(mode), 50);
 }
 
-function renderGoogleButton() {
-  if (window.google && google.accounts) {
+function renderGoogleButton(mode = 'login') {
+  // 1. Đợi thư viện Google tải xong. Nếu chưa xong, thử lại sau 200ms
+  if (!window.google || !window.google.accounts) {
+    setTimeout(() => renderGoogleButton(mode), 200);
+    return;
+  }
+
+  // 2. Chỉ khởi tạo Google 1 lần duy nhất
+  if (!isGoogleInitialized) {
     google.accounts.id.initialize({
       client_id: "124352835901-jqh4f03ga43s57qpi10pcbhatlj2pj8k.apps.googleusercontent.com",
       callback: (res) => console.log("Google User:", res.credential)
     });
-    const loginBtn = document.getElementById('google-login-btn');
-    const signupBtn = document.getElementById('google-signup-btn');
-    if (document.getElementById('login-section').style.display !== 'none') {
-      if (loginBtn) google.accounts.id.renderButton(loginBtn, { theme: "outline", size: "large", width: "350" });
-    } else {
-      if (signupBtn) google.accounts.id.renderButton(signupBtn, { theme: "outline", size: "large", width: "350" });
-    }
+    isGoogleInitialized = true;
   }
+
+  const loginBtn = document.getElementById('google-login-btn');
+  const signupBtn = document.getElementById('google-signup-btn');
+
+  // 3. Render nút Login nếu chưa render
+  if (mode === 'login' && !isLoginGoogleRendered && loginBtn) {
+    google.accounts.id.renderButton(loginBtn, { theme: "outline", size: "large", width: "350" });
+    isLoginGoogleRendered = true;
+  }
+
+  // 4. Render nút Signup nếu chưa render
+  if (mode === 'signup' && !isSignupGoogleRendered && signupBtn) {
+    google.accounts.id.renderButton(signupBtn, { theme: "outline", size: "large", width: "350" });
+    isSignupGoogleRendered = true;
+  }
+}
+
+// XỬ LÝ CHUNG: ẨN/HIỆN MẬT KHẨU
+document.addEventListener('click', function (e) {
+  if (e.target.closest('.toggle-password')) {
+    const btn = e.target.closest('.toggle-password');
+    const input = document.getElementById(btn.getAttribute('data-target'));
+    const icon = btn.querySelector('i');
+    input.type = (input.type === 'password') ? 'text' : 'password';
+    icon.className = (input.type === 'password') ? 'bi bi-eye' : 'bi bi-eye-slash';
+  }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Setup ngôn ngữ
+  const currentLang = localStorage.getItem('newsPulseLang') || 'vi';
+  applyLanguage(currentLang);
+
+  const btnVi = document.getElementById('btn-vi');
+  const btnEn = document.getElementById('btn-en');
+
+  if (btnVi) btnVi.addEventListener('click', () => applyLanguage('vi'));
+  if (btnEn) btnEn.addEventListener('click', () => applyLanguage('en'));
+
+  // Hiển thị nút Google mặc định (phần login) ngay khi vào trang
+  renderGoogleButton('login');
+
+  // Xử lý Form
+  handleFormSubmit('loginForm', '?page=login', 'login');
+  handleFormSubmit('signupForm', '?page=signup', 'signup');
+});
+
+async function handleFormSubmit(formId, url, actionType) {
+  const form = document.getElementById(formId);
+  if (!form) return;
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    if (!form.checkValidity()) {
+      form.classList.add('was-validated');
+      Swal.fire({
+        icon: 'warning',
+        title: 'Thiếu thông tin!',
+        text: 'Vui lòng điền đầy đủ các trường bắt buộc.'
+      });
+      return;
+    }
+
+    const btn = form.querySelector('button[type="submit"]');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...';
+
+    const formData = new FormData(form);
+    try {
+      const response = await fetch(url, { method: 'POST', body: formData });
+      const result = (await response.text()).trim();
+
+      if (actionType === 'login') {
+        if (['admin', 'editor', 'contributor', 'reader', 'chief editor'].includes(result)) {
+          Swal.fire({ icon: 'success', title: 'Thành công!', timer: 1000, showConfirmButton: false })
+            .then(() => window.location.href = (result === 'admin' || result === 'chief editor') ? 'index.php?page=categorymanagement' : 'index.php?page=home');
+        } else {
+          Swal.fire({ icon: 'error', title: 'Đăng nhập thất bại', text: result });
+        }
+      } else {
+        if (result === 'success') {
+          Swal.fire({ icon: 'success', title: 'Đăng ký thành công!' }).then(() => toggleAuth('login'));
+        } else {
+          Swal.fire({ icon: 'error', title: 'Lỗi đăng ký', text: result });
+        }
+      }
+    } catch (err) {
+      Swal.fire({ icon: 'error', title: 'Lỗi kết nối', text: 'Không thể kết nối đến máy chủ. Vui lòng thử lại sau.' });
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = originalText;
+    }
+  });
 }
 
 function applyLanguage(lang) {
   localStorage.setItem('newsPulseLang', lang);
+
   document.querySelectorAll('[data-key]').forEach(el => {
-    const key = el.getAttribute('data-key');
-    if (langData[lang][key]) el.innerText = langData[lang][key];
+    if (langData[lang][el.getAttribute('data-key')]) {
+      el.innerText = langData[lang][el.getAttribute('data-key')];
+    }
   });
+
   document.querySelectorAll('[data-placeholder]').forEach(el => {
-    const key = el.getAttribute('data-placeholder');
-    if (langData[lang][key]) el.placeholder = langData[lang][key];
+    if (langData[lang][el.getAttribute('data-placeholder')]) {
+      el.placeholder = langData[lang][el.getAttribute('data-placeholder')];
+    }
   });
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-  applyLanguage(localStorage.getItem('newsPulseLang') || 'vi');
-  document.getElementById('btn-vi').onclick = () => applyLanguage('vi');
-  document.getElementById('btn-en').onclick = () => applyLanguage('en');
-  setTimeout(renderGoogleButton, 500);
-
-  const CONTROLLER_PATH = "/PTUD-WEB/Repo/index.php";
-  const loginForm = document.getElementById('loginForm');
-  const signupForm = document.getElementById('signupForm');
-
-  // 🔥 CHỨC NĂNG ẨN / HIỆN MẬT KHẨU
-  document.querySelectorAll('.toggle-password').forEach(button => {
-    button.addEventListener('click', function () {
-      const targetId = this.getAttribute('data-target');
-      const passwordInput = document.getElementById(targetId);
-      const icon = this.querySelector('i');
-
-      if (passwordInput && icon) {
-        if (passwordInput.type === 'password') {
-          passwordInput.type = 'text';
-          icon.className = 'bi bi-eye-slash'; // Đổi sang icon con mắt gạch chéo
-        } else {
-          passwordInput.type = 'password';
-          icon.className = 'bi bi-eye'; // Đổi lại icon con mắt thường
-        }
-      }
-    });
-  });
-
-  // 1. XỬ LÝ FORM ĐĂNG NHẬP
-  if (loginForm) {
-    loginForm.addEventListener('submit', async function (e) {
-      e.preventDefault();
-
-      if (!loginForm.checkValidity()) {
-        e.stopPropagation();
-        loginForm.classList.add('was-validated');
-        return;
-      }
-
-      const passwordInput = document.getElementById('loginPass');
-      if (passwordInput && passwordInput.value.length < 6) {
-        Swal.fire({ icon: 'warning', title: 'Thông báo', text: 'Mật khẩu phải chứa tối thiểu 6 ký tự.', confirmButtonColor: '#0d6efd' });
-        return;
-      }
-
-      const formData = new FormData(loginForm);
-      formData.append('action', 'login');
-
-      try {
-        const response = await fetch(CONTROLLER_PATH, { method: 'POST', body: formData });
-        const result = (await response.text()).trim();
-
-        if (['admin', 'editor', 'contributor', 'reader', 'chief editor'].includes(result)) {
-          Swal.fire({ icon: 'success', title: 'Đăng nhập thành công!', text: 'Đang chuyển hướng...', timer: 1200, showConfirmButton: false })
-            .then(() => {
-              if (result === 'admin' || result === 'chief editor') {
-                window.location.href = 'index.php?page=admin_dashboard';
-              } else {
-                window.location.href = 'index.php?page=home';
-              }
-            });
-        } else {
-          Swal.fire({ icon: 'error', title: 'Thất bại', text: result, confirmButtonColor: '#dc3545' });
-        }
-      } catch (err) {
-        Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Không thể kết nối đến hệ thống!', confirmButtonColor: '#dc3545' });
-      }
-    });
-  }
-
-  // 2. XỬ LÝ FORM ĐĂNG KÝ
-  if (signupForm) {
-    signupForm.addEventListener('submit', async function (e) {
-      e.preventDefault();
-
-      if (!signupForm.checkValidity()) {
-        e.stopPropagation();
-        signupForm.classList.add('was-validated');
-        return;
-      }
-
-      const passwordInput = document.getElementById('signupPass');
-      if (passwordInput && passwordInput.value.length < 6) {
-        Swal.fire({ icon: 'warning', title: 'Thông báo', text: 'Mật khẩu đăng ký phải chứa tối thiểu 6 ký tự.', confirmButtonColor: '#0d6efd' });
-        return;
-      }
-
-      const formData = new FormData(signupForm);
-      formData.append('action', 'signup');
-
-      try {
-        const response = await fetch(CONTROLLER_PATH, { method: 'POST', body: formData });
-        const result = (await response.text()).trim();
-
-        if (result === 'success') {
-          Swal.fire({ icon: 'success', title: 'Đăng ký thành công!', text: 'Hãy tiến hành đăng nhập bằng tài khoản mới.' })
-            .then(() => toggleAuth('login'));
-        } else {
-          Swal.fire({ icon: 'error', title: 'Thất bại', text: result, confirmButtonColor: '#dc3545' });
-        }
-      } catch (err) {
-        Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Không thể kết nối đến hệ thống!', confirmButtonColor: '#dc3545' });
-      }
-    });
-  }
-});

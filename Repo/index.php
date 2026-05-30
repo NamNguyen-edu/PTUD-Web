@@ -1,109 +1,144 @@
-<!-- * CHANGE LOG (PHIÊN LÀM VIỆC HIỆN TẠI):
- * - AuthController.php: đã cập nhật để đảm bảo `logout()` và `currentUser()` dùng `session_start()` an toàn.
- * - AuthController.php: `currentUser()` trả về JSON gồm `logged` và `user` để header JS có thể hiển thị profile khi đã đăng nhập.
- * - UI/components/header.html: đã chuyển loader `header_user.js` thành script động để tránh lỗi 404 khi load header từ trang tĩnh.
- * - UI/js/header_user.js: đã sửa đường dẫn và logic để gọi `get_current_user` đúng theo page hiện tại, cả khi chạy root PHP và khi chạy từ `UI/html/`.
- * - UI/js/profile.js` và `UI/js/postnews.js`: đã thêm việc load `header_user.js` sau khi chèn header bằng `innerHTML`, giúp script được thực thi đúng.
-  -->
+  <?php
 
-<?php
-session_start();
+  /*
+  * CHANGE LOG:
+  * - Tích hợp hệ thống phân quyền động `authorize()` thay cho `checkAccess()`.
+  * - Tách các trang public (article, post, technology) khỏi nhóm admin để user bình thường đọc được.
+  * - Gắn các quyền (manage_users, manage_category, manage_version) chuẩn xác cho nhóm admin/editor.
+  */
 
-require_once __DIR__ . '/Controller/AuthController.php';
-require_once __DIR__ . '/Controller/DashboardController.php';
+  session_start();
 
-function redirect(string $url): void
-{
-  header('Location: ' . $url);
-  exit;
-}
+  require_once __DIR__ . '/Services/auth_service.php';
+  require_once __DIR__ . '/Controller/auth_controller.php';
+  require_once __DIR__ . '/Controller/DashboardController.php';
 
-$page = trim((string)($_GET['page'] ?? 'home'));
+  function redirect(string $url): void
+  {
+    header('Location: ' . $url);
+    exit;
+  }
 
-switch ($page) {
-  case 'save_post':
-    require_once __DIR__ . '/Controller/PostnewsController.php';
-    (new PostnewsController())->savePost();
-    break;
+  function authorize(string $action): void
+  {
+    $auth = new AuthService();
+    $role = $_SESSION['role'] ?? 'guest';
 
-  case 'login':
-    require_once __DIR__ . '/Controller/AuthController.php';
-    (new AuthController())->login();
-    break;
+    if (!$auth->checkPermission($role, $action)) {
+      http_response_code(403);
+      die("<h1>403 Forbidden: Bạn không có quyền truy cập trang này.</h1>");
+    }
+  }
 
-  case 'signup':
-    require_once __DIR__ . '/Controller/AuthController.php';
-    (new AuthController())->signup();
-    break;
+  $page = trim((string)($_GET['page'] ?? 'home'));
 
-  case 'logout':
-    require_once __DIR__ . '/Controller/AuthController.php';
-    (new AuthController())->logout();
-    break;
+  switch ($page) {
 
-  case 'search_suggestions':
-    require_once __DIR__ . '/Controller/SearchController.php';
-    (new SearchController())->suggestions(trim((string)($_GET['keyword'] ?? '')));
-    break;
+    case 'save_post':
+      require_once __DIR__ . '/Controller/PostnewsController.php';
+      (new PostnewsController())->savePost();
+      break;
 
-  case 'get_dashboard_data':
-    require_once __DIR__ . '/Controller/DashboardController.php';
-    (new DashboardController())->getDashboardData();
-    break;
+    case 'login':
+      (new AuthController())->login();
+      break;
 
-  case 'get_current_user':
-    require_once __DIR__ . '/Controller/AuthController.php';
-    (new AuthController())->currentUser();
-    break;
+    case 'signup':
+      (new AuthController())->signup();
+      break;
 
-  case 'home_feed':
-    require_once __DIR__ . '/Controller/home_controller.php';
-    (new HomeController())->feed();
-    break;
+    case 'logout':
+      (new AuthController())->logout();
+      break;
 
-  case 'article_detail':
-    require_once __DIR__ . '/Controller/load_articles_controller.php';
-    (new ArticleController())->detail();
-    break;
+    case 'get_current_user':
+      (new AuthController())->currentUser();
+      break;
 
-  case 'postnews':
-    require_once __DIR__ . '/Controller/PostnewsController.php';
-    (new PostnewsController())->show();
-    break;
+    case 'search_suggestions':
+      require_once __DIR__ . '/Controller/SearchController.php';
+      (new SearchController())->suggestions(trim((string)($_GET['keyword'] ?? '')));
+      break;
 
-  case 'home':
-    require_once __DIR__ . '/Controller/home_page_controller.php';
-    (new HomePageController())->render();
-    break;
+    case 'search':
+      require_once __DIR__ . '/Controller/SearchController.php';
+      (new SearchController())->search(trim((string)($_GET['keyword'] ?? '')));
+      break;
 
-  case 'article':
-  case 'post':
-  case 'technology':
-  case 'admin_dashboard':
-  case 'admin_userm':
+    case 'get_dashboard_data':
+      (new DashboardController())->getDashboardData();
+      break;
 
-  case 'accountmanagement':
-  case 'catalogmanagement':
-  case 'version-control':
-    require_once __DIR__ . '/Controller/PageController.php';
-    (new PageController())->render($page);
-    break;
+    case 'home_feed':
+      require_once __DIR__ . '/Controller/home_controller.php';
+      (new HomeController())->feed();
+      break;
 
-  case 'search':
-    require_once __DIR__ . '/Controller/SearchController.php';
-    (new SearchController())->search(trim((string)($_GET['keyword'] ?? '')));
-    break;
+    case 'article_detail':
+      require_once __DIR__ . '/Controller/load_articles_controller.php';
+      (new ArticleController())->detail();
+      break;
 
-  case 'profile':
-    require_once __DIR__ . '/Controller/ProfileController.php';
-    (new ProfileController())->show();
-    break;
+    case 'update_profile':
+      require_once __DIR__ . '/Controller/ProfileController.php';
+      (new ProfileController())->updateProfile();
+      break;
 
-  case 'dbtest':
-    require_once __DIR__ . '/Controller/DbTestController.php';
-    (new DbTestController())->test();
-    break;
+    case 'upload_avatar':
+      require_once __DIR__ . '/Controller/ProfileController.php';
+      (new ProfileController())->uploadAvatar();
+      break;
 
-  default:
-    redirect('?page=home');
-}
+    case 'dbtest':
+      require_once __DIR__ . '/Controller/DbTestController.php';
+      (new DbTestController())->test();
+      break;
+    case 'home':
+      require_once __DIR__ . '/Controller/home_page_controller.php';
+      (new HomePageController())->render();
+      break;
+
+    case 'postnews':
+      require_once __DIR__ . '/Controller/PostnewsController.php';
+      (new PostnewsController())->show();
+      break;
+
+    case 'profile':
+      require_once __DIR__ . '/Controller/ProfileController.php';
+      (new ProfileController())->show();
+      break;
+    case 'article':
+    case 'post':
+    case 'technology':
+      require_once __DIR__ . '/Controller/PageController.php';
+      (new PageController())->render($page);
+      break;
+    case 'admin_dashboard':
+    case 'admin_userm':
+
+    case 'accountmangement':
+      authorize('manage_users');
+      require_once __DIR__ . '/Controller/account_controller.php';
+      (new AccountController())->render();
+      break;
+
+    case 'categorymanagement':
+      authorize('manage_category');
+      require_once __DIR__ . '/Controller/category_controller.php';
+      (new CategoryController())->render();
+      break;
+    case 'api_category':
+      authorize('manage_category');
+      require_once __DIR__ . '/Controller/category_controller.php';
+      (new CategoryController())->handleApi();
+      break;
+
+    case 'version-control':
+      authorize('manage_version');
+      require_once __DIR__ . '/Controller/PageController.php';
+      (new PageController())->render($page);
+      break;
+
+    default:
+      redirect('?page=home');
+  }

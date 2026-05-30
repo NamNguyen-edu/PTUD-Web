@@ -1,48 +1,67 @@
 <?php
-header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
+require_once __DIR__ . '/../Services/category_service.php';
+require_once __DIR__ . '/../View/categoryview.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') exit(0);
+class CategoryController
+{
+    private CategoryTagModel $model;
 
-require_once(__DIR__ . '/../Services/category_service.php');
-$model = new CategoryTagModel();
-$method = $_SERVER['REQUEST_METHOD'];
-$data = json_decode(file_get_contents("php://input"), true);
-
-try {
-    switch ($method) {
-        case 'GET':
-            echo json_encode([
-                "status" => "success",
-                "categories" => $model->getAllCategories(),
-                "tags" => $model->getAllTags()
-            ]);
-            break;
-
-        case 'POST':
-            if (empty($data['name']) || empty($data['slug']) || empty($data['type'])) throw new Exception("Thiếu dữ liệu đầu vào");
-            $id = $model->insert($data['type'], $data['name'], $data['slug']);
-            echo json_encode(["status" => "success", "message" => "Thêm thành công", "id" => $id]);
-            break;
-
-        case 'PUT':
-            if (empty($data['id']) || empty($data['name']) || empty($data['slug']) || empty($data['type'])) throw new Exception("Thiếu thông tin cập nhật");
-            $model->update($data['type'], $data['id'], $data['name'], $data['slug']);
-            echo json_encode(["status" => "success", "message" => "Cập nhật thành công"]);
-            break;
-
-        case 'DELETE':
-            if (empty($data['id']) || empty($data['type'])) throw new Exception("Thiếu ID hoặc phân loại");
-            $model->delete($data['type'], $data['id']);
-            echo json_encode(["status" => "success", "message" => "Xóa thành công"]);
-            break;
-
-        default:
-            echo json_encode(["status" => "error", "message" => "Phương thức không hỗ trợ"]);
-            break;
+    public function __construct()
+    {
+        $this->model = new CategoryTagModel();
     }
-} catch (Exception $e) {
-    echo json_encode(["status" => "error", "message" => $e->getMessage()]);
+
+    public function render(): void
+    {
+        // 1. Gọi Model lấy dữ liệu từ Database lên trước
+        $categories = $this->model->getAllCategories();
+        $tags = $this->model->getAllTags();
+
+        // 2. Khởi tạo View và truyền mảng dữ liệu vào để render HTML cứng
+        $view = new CategoryView();
+        echo $view->render($categories, $tags);
+    }
+
+    public function handleApi(): void
+    {
+        header('Content-Type: application/json; charset=utf-8');
+        $method = $_SERVER['REQUEST_METHOD'];
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        try {
+            switch ($method) {
+                case 'GET':
+                    // Vẫn giữ lại để nếu JS có cần gọi ngầm lấy data fresh thì dùng
+                    $this->respond([
+                        'status' => 'success',
+                        'categories' => $this->model->getAllCategories(),
+                        'tags' => $this->model->getAllTags()
+                    ]);
+                    break;
+                case 'POST':
+                    $id = $this->model->insert($data['type'], $data['name'], $data['slug']);
+                    $this->respond(['status' => 'success', 'id' => $id]);
+                    break;
+                case 'PUT':
+                    $this->model->update($data['type'], $data['id'], $data['name'], $data['slug']);
+                    $this->respond(['status' => 'success']);
+                    break;
+                case 'DELETE':
+                    $this->model->delete($data['type'], $data['id']);
+                    $this->respond(['status' => 'success']);
+                    break;
+                default:
+                    throw new Exception("Phương thức không hợp lệ.");
+            }
+        } catch (Exception $e) {
+            $this->respond(['status' => 'error', 'message' => $e->getMessage()], 400);
+        }
+    }
+
+    private function respond(array $payload, int $code = 200): void
+    {
+        http_response_code($code);
+        echo json_encode($payload);
+        exit;
+    }
 }

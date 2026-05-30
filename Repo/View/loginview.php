@@ -23,7 +23,7 @@ class LoginView
     // Gộp dữ liệu mặc định với dữ liệu tùy biến truyền vào
     $mergedData = array_merge($defaultData, $data);
 
-    // Render file 'login' (tức là UI/html/login.html)
+    // Render file 'login'
     echo $this->engine->render('login', $mergedData);
   }
 }
