@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="utf-8"/>
@@ -53,11 +53,11 @@ body.sidebar-open .main-content {
         <div class="breadcrumb-custom">
           <a href="#">Bài viết</a>
           <span class="material-symbols-outlined">chevron_right</span>
-          <a href="#">Thời sự</a>
+          <a href="#">{{ARTICLE_CATEGORY}}</a>
           <span class="material-symbols-outlined">chevron_right</span>
           <span style="color: var(--color-on-surface);">So sánh lịch sử</span>
         </div>
-        <h2 class="page-title">Đánh giá Chính sách Khí hậu 2024</h2>
+        <h2 class="page-title">{{ARTICLE_TITLE}}</h2>
         <p class="page-subtitle">So sánh các bản nháp nội bộ trước khi phát hành chính thức.</p>
       </div>
       <div class="d-flex align-items-center gap-3">
@@ -65,9 +65,9 @@ body.sidebar-open .main-content {
           <button class="active">Chỉ thay đổi</button>
           <button>Hiện tất cả</button>
         </div>
-        <button class="restore-btn">
+        <button class="restore-btn" data-article-id="{{ARTICLE_ID}}">
           <span class="material-symbols-outlined" style="font-size:1rem;">restore</span>
-          Khôi phục v2.0
+          Khôi phục {{CURRENT_VERSION}}
         </button>
       </div>
     </div>
@@ -81,39 +81,36 @@ body.sidebar-open .main-content {
         <!-- Version Cards Row -->
         <div class="row g-4 mb-4">
 
-          <!-- Version 1.9 -->
-          <div class="col-6">
+          <!-- Previous Version -->
+          <div class="col-12 col-lg-6">
             <div class="version-card">
-              <div class="version-badge inactive">Phiên bản 1.9</div>
+              <div class="version-badge inactive">Phiên bản {{PREVIOUS_VERSION}}</div>
               <div class="card-header-row">
                 <div class="card-author d-flex align-items-center gap-3">
-                  <img alt="Editor" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDtJzGSZ0uMEKfNlXXRUahsRR7t7BLxIs_R5SrGiqz8-5DgsyGALtrb2MVKUVTjjWf4xoo80PXja1dHMRT4KteuYS2YXC7wXwjDL2-zVnF4VduCFVGl1kvCAlfvEE1VdyG_xQ83HxwhgmXvlm6k4CAE_gCqozgTua6NCv6L5KN1j1BrNVB2o4EYHc4bTOzQzv74l2dzVdWzbMbBu98nuUNoQwuGyIBsuSL_lKKTqL-dQ665MUuaIChAn3ibLkqMXwuZcs_46V5QvDJc"/>
+                  <img alt="Editor" src="../images/default-avatar.png"/>
                   <div>
-                    <p class="card-author-name">Sarah Jenkins</p>
-                    <p class="card-author-date">12 tháng 10, 2023 • 14:32</p>
+                    <p class="card-author-name">{{PREVIOUS_AUTHOR}}</p>
+                    <p class="card-author-date">{{PREVIOUS_DATE}}</p>
                   </div>
                 </div>
                 <span class="material-symbols-outlined" style="color:rgba(69,95,144,0.4);">history</span>
               </div>
               <div class="version-prose">
-                <h3>Bức tranh toàn cầu</h3>
-                <p>Khi chúng ta tiến gần đến cuối năm tài chính 2023, các <span class="diff-removed">mục tiêu khí hậu sơ bộ</span> được thiết lập tại Geneva đang được hội đồng xem xét lại.</p>
-                <p>Báo cáo ban đầu đề xuất mức <span class="diff-removed">giảm 12%</span> lượng phát thải carbon trên tất cả các lĩnh vực tham gia. Điều này vấp phải sự hoài nghi từ các đối tác công nghiệp với lý do hạn chế về cơ sở hạ tầng.</p>
-                <p>Hơn nữa, <span class="diff-removed">lộ trình triển khai</span> ban đầu được đặt ra cho đầu năm 2025, cho phép giai đoạn chuyển tiếp ba năm.</p>
+                {{PREVIOUS_DIFF_HTML}}
               </div>
             </div>
           </div>
 
-          <!-- Version 2.0 -->
-          <div class="col-6">
+          <!-- Current Version -->
+          <div class="col-12 col-lg-6">
             <div class="version-card active">
-              <div class="version-badge current">Phiên bản 2.0 (Hiện tại)</div>
+              <div class="version-badge current">Phiên bản {{CURRENT_VERSION}} (Hiện tại)</div>
               <div class="card-header-row">
                 <div class="card-author d-flex align-items-center gap-3">
-                  <img alt="Editor" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVNcSTGMNDMsDmzhJNdulJ-thA8uByTzTd0qW2LEUvZI_baw18OeGR2CATPNiBZWBq0qkLTLubeWe1HCvDQahnbNRRSGmPba0kuNYmeN-BpYa6uOQGJ0j0CTyMKHZ1Lj3JOckYlHc3fHmspf-a9zotP-LGI0CcibYRfNIOrkacCBLArs0qTr82-vtk2DuoH1pOQV-ukGAvXD_dZZXgB8rEdgTnD5gDGfW7yVKvbfL4RhpCBSYBcl3pAc2zCO7edc7f0XdnaQu_Glx2"/>
+                  <img alt="Editor" src="../images/default-avatar.png"/>
                   <div>
-                    <p class="card-author-name">Marcus Thorne</p>
-                    <p class="card-author-date">Hôm nay • 09:15</p>
+                    <p class="card-author-name">{{CURRENT_AUTHOR}}</p>
+                    <p class="card-author-date">{{CURRENT_DATE}}</p>
                   </div>
                 </div>
                 <div class="active-indicators">
@@ -122,10 +119,7 @@ body.sidebar-open .main-content {
                 </div>
               </div>
               <div class="version-prose">
-                <h3>Bức tranh toàn cầu</h3>
-                <p>Khi chúng ta tiến gần đến cuối năm tài chính 2023, các <span class="diff-added">khung net-zero đầy tham vọng</span> được thiết lập tại Geneva đang được hội đồng xem xét lại.</p>
-                <p>Báo cáo ban đầu đề xuất mức <span class="diff-added">giảm 15,5%</span> lượng phát thải carbon trên tất cả các lĩnh vực tham gia. Điều này vấp phải sự hoài nghi từ các đối tác công nghiệp với lý do hạn chế về cơ sở hạ tầng.</p>
-                <p>Hơn nữa, <span class="diff-added">lộ trình triển khai chiến lược</span> ban đầu được đặt ra cho đầu năm 2025, cho phép giai đoạn chuyển tiếp ba năm.</p>
+                {{CURRENT_DIFF_HTML}}
               </div>
             </div>
           </div>
@@ -133,29 +127,29 @@ body.sidebar-open .main-content {
 
         <!-- Metadata Row -->
         <div class="row g-4">
-          <div class="col-4">
+          <div class="col-12 col-md-4">
             <div class="meta-card">
               <p class="meta-card-label">Số từ</p>
               <div class="d-flex align-items-end gap-2">
-                <span class="meta-card-value">1.402</span>
-                <span class="meta-delta mb-1">+124 từ</span>
+                <span class="meta-card-value">{{WORD_COUNT}}</span>
+                <span class="meta-delta mb-1">{{WORD_DELTA}}</span>
               </div>
             </div>
           </div>
-          <div class="col-4">
+          <div class="col-12 col-md-4">
             <div class="meta-card">
               <p class="meta-card-label">Thời gian đọc</p>
               <div class="d-flex align-items-end gap-2">
-                <span class="meta-card-value">6ph 45s</span>
-                <span class="meta-delta-neutral mb-1">↑ thêm 20s</span>
+                <span class="meta-card-value">{{READ_TIME}}</span>
+                <span class="meta-delta-neutral mb-1">{{READ_TIME_DELTA}}</span>
               </div>
             </div>
           </div>
-          <div class="col-4">
+          <div class="col-12 col-md-4">
             <div class="meta-card">
               <p class="meta-card-label">Điểm SEO</p>
               <div class="d-flex align-items-end gap-2">
-                <span class="meta-card-value green">94/100</span>
+                <span class="meta-card-value green">{{SEO_SCORE}}/100</span>
                 <span class="material-symbols-outlined mb-1" style="color:#059669;">trending_up</span>
               </div>
             </div>
@@ -171,47 +165,8 @@ body.sidebar-open .main-content {
             Lịch sử phiên bản
           </h3>
 
-          <!-- v2.0 Active -->
-          <div class="version-history-item active-item">
-            <div class="d-flex justify-content-between align-items-start mb-2">
-              <span class="version-pill active-pill">v2.0</span>
-              <span class="version-item-meta">Đang hoạt động</span>
-            </div>
-            <p class="version-item-author">Marcus Thorne</p>
-            <p class="version-item-desc">Hoàn thiện từ khoá SEO và cập nhật chỉ số carbon.</p>
-          </div>
+          {{VERSION_HISTORY_HTML}}
 
-          <!-- v1.9 -->
-          <div class="version-history-item">
-            <div class="d-flex justify-content-between align-items-start mb-2">
-              <span class="version-pill inactive-pill">v1.9</span>
-              <span class="version-item-meta">12 Th10, 14:32</span>
-            </div>
-            <p class="version-item-author">Sarah Jenkins</p>
-            <p class="version-item-desc">Tích hợp phản hồi từ bộ phận Pháp lý.</p>
-          </div>
-
-          <!-- v1.8 -->
-          <div class="version-history-item">
-            <div class="d-flex justify-content-between align-items-start mb-2">
-              <span class="version-pill inactive-pill">v1.8</span>
-              <span class="version-item-meta">11 Th10, 09:10</span>
-            </div>
-            <p class="version-item-author">Sarah Jenkins</p>
-            <p class="version-item-desc">Soạn thảo các phần tóm tắt chính sách ban đầu.</p>
-          </div>
-
-          <!-- v1.7 -->
-          <div class="version-history-item opacity-low">
-            <div class="d-flex justify-content-between align-items-start mb-2">
-              <span class="version-pill inactive-pill">v1.7</span>
-              <span class="version-item-meta">10 Th10, 18:45</span>
-            </div>
-            <p class="version-item-author">David Chen</p>
-            <p class="version-item-desc">Tạo bản stub ban đầu để xem xét nội bộ.</p>
-          </div>
-
-          <!-- Info Box -->
           <div class="info-box">
             <p class="info-box-title">
               <span class="material-symbols-outlined" style="font-size:1rem;">info</span>
@@ -249,9 +204,9 @@ body.sidebar-open .main-content {
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="../js/load-sidebar.js"></script>
+<script src="../js/version_control.js"></script>
 
 <script>
-  // Toggle "Chỉ thay đổi" / "Hiện tất cả"
   document.querySelectorAll('.view-toggle button').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.view-toggle button').forEach(b => b.classList.remove('active'));
@@ -259,5 +214,6 @@ body.sidebar-open .main-content {
     });
   });
 </script>
+
 </body>
 </html>

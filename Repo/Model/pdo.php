@@ -1,7 +1,5 @@
 <?php
 
-
-// Thêm query 2 lần cho search //
 function pdo_query_search($sql, $keyword)
 {
 
@@ -25,12 +23,25 @@ function pdo_query_search($sql, $keyword)
         throw $e;
     }
 }
-// Lưu bài viết --> tạo bản ghi mới trong DB, cập nhật bản ghi cũ nếu đã tồn tại (dựa vào ID) //
 
-
-/**
- * Mở kết nối đến CSDL NewsPulse sử dụng PDO
- */
+function loadDotEnv()
+{
+    $envPath = __DIR__ . '/../.env';
+    if (file_exists($envPath)) {
+        $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        foreach ($lines as $line) {
+            if (strpos($line, '=') !== false && strpos($line, '#') !== 0) {
+                list($key, $value) = explode('=', $line, 2);
+                $key = trim($key);
+                $value = trim($value, " \t\n\r\0\x0B\"'");
+                $value = str_replace('\n', "\n", $value);
+                putenv("$key=$value");
+                $_ENV[$key] = $value;
+                $_SERVER[$key] = $value;
+            }
+        }
+    }
+}
 
 function pdo_get_connection()
 {
@@ -41,16 +52,23 @@ function pdo_get_connection()
         return $conn;
     }
 
-    $host = 'newspulsedb-newspulseg5.h.aivencloud.com';
-    $port = 18427;
-    $dbname = 'news_pulse';
-    $username = 'avnadmin';
-    $password = 'AVNS_5kpa6shKuuTPQ13VEIo';
+    loadDotEnv();
 
-    $sslCaFile = realpath(__DIR__ . '/../ca.pem');
+    // --Lấy từ file .env
+    $host = getenv('DB_HOST') ?: ($_ENV['DB_HOST'] ?? 'localhost');
+    $port = getenv('DB_PORT') ?: ($_ENV['DB_PORT'] ?? 3306);
+    $dbname = getenv('DB_NAME') ?: ($_ENV['DB_NAME'] ?? '');
+    $username = getenv('DB_USER') ?: ($_ENV['DB_USER'] ?? '');
+    $password = getenv('DB_PASS') ?: ($_ENV['DB_PASS'] ?? '');
+
+    // --Lấy từ file .env
+    $sslCaContent = getenv('DB_SSL_CA') ?: ($_ENV['DB_SSL_CA'] ?? '');
+    $sslCaFile = sys_get_temp_dir() . '/ca_pulse.pem';
+    if (!empty($sslCaContent) && !file_exists($sslCaFile)) {
+        file_put_contents($sslCaFile, $sslCaContent);
+    }
 
     try {
-
         $dburl = "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4";
 
         $options = [
@@ -59,7 +77,7 @@ function pdo_get_connection()
         ];
 
         if (
-            $sslCaFile &&
+            !empty($sslCaContent) &&
             file_exists($sslCaFile) &&
             defined('PDO::MYSQL_ATTR_SSL_CA')
         ) {
@@ -79,8 +97,7 @@ function pdo_get_connection()
 
         return $conn;
     } catch (PDOException $e) {
-
-        die('Lỗi kết nối CSDL: ' . $e->getMessage());
+        throw new PDOException('Lỗi kết nối CSDL: ' . $e->getMessage(), (int)$e->getCode(), $e);
     }
 }
 
