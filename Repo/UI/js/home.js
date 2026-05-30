@@ -711,7 +711,7 @@ async function loadVideoSegment() {
                                 ${videos.map((vid, idx) => {
                                     // Parse Youtube ID to show official thumbnail
                                     const ytId = vid.url.split('/').pop().split('?')[0];
-                                    const thumbUrl = `https:
+                                    const thumbUrl = `https://img.youtube.com/vi/${ytId}/mqdefault.jpg`;
                                     return `
                                         <div class="video-up-next-item ${idx === 0 ? 'active' : ''}" data-video-url="${vid.url}" data-video-title="${escapeHtml(vid.title)}" data-video-date="${new Date(vid.created_at).toLocaleDateString('vi-VN')}">
                                             <div class="video-thumb-container">
