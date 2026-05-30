@@ -13,6 +13,17 @@ function redirect(string $url): void
 
 $page = trim((string)($_GET['page'] ?? 'home'));
 
+function authorize(string $action): void
+{
+    $auth = new AuthService();
+    $role = $_SESSION['role'] ?? 'guest';
+
+    if (!$auth->checkPermission($role, $action)) {
+        http_response_code(403);
+        die("<h1>403 Forbidden: Bạn không có quyền truy cập trang này.</h1>");
+    }
+}
+
 
 switch ($page) {
     case 'save_post':
