@@ -2,7 +2,7 @@ const langData = {
   vi: {
     logo: "NEWSPULSE", welcome: "Chào mừng trở lại", create_account: "Tạo tài khoản",
     full_name: "Họ và tên", placeholder_full_name: "Nhập họ tên",
-    email_or_phone: "Tài khoản", placeholder_user: "Email hoặc Số điện thoại",
+    email_or_phone: "Email", placeholder_user: "email@vi-du.com",
     password: "Mật khẩu", placeholder_pass: "Tối thiểu 6 ký tự",
     log_in: "Đăng nhập", sign_up: "Đăng ký ngay", or: "Hoặc",
     no_acc: "Chưa có tài khoản?", have_acc: "Đã có tài khoản?",
@@ -12,7 +12,7 @@ const langData = {
   en: {
     logo: "NEWSPULSE", welcome: "Welcome back", create_account: "Create account",
     full_name: "Full Name", placeholder_full_name: "Enter your name",
-    email_or_phone: "Account", placeholder_user: "Email or Phone number",
+    email_or_phone: "Email", placeholder_user: "email@example.com",
     password: "Password", placeholder_pass: "At least 6 chars",
     log_in: "Log in", sign_up: "Sign Up", or: "Or",
     no_acc: "Don't have an account?", have_acc: "Already have an account?",
@@ -21,10 +21,17 @@ const langData = {
   }
 };
 
-// 1. Chuyển đổi giao diện Đăng nhập / Đăng ký
+const CONTROLLER_PATH = "index.php";
+
+
+let isGoogleInitialized = false;
+let isLoginGoogleRendered = false;
+let isSignupGoogleRendered = false;
+
 function toggleAuth(mode) {
   const loginSec = document.getElementById('login-section');
   const signupSec = document.getElementById('signup-section');
+  document.querySelectorAll('.was-validated').forEach(form => form.classList.remove('was-validated'));
 
   if (mode === 'signup') {
     loginSec.style.display = 'none';
@@ -33,23 +40,40 @@ function toggleAuth(mode) {
     loginSec.style.display = 'block';
     signupSec.style.display = 'none';
   }
-  renderGoogleButton();
+
+  // Trì hoãn 50ms để DOM kịp hiển thị block trước khi Google đo kích thước khung
+  setTimeout(() => renderGoogleButton(mode), 50);
 }
 
-function renderGoogleButton() {
-  if (window.google && google.accounts) {
+function renderGoogleButton(mode = 'login') {
+  // 1. Đợi thư viện Google tải xong. Nếu chưa xong, thử lại sau 200ms
+  if (!window.google || !window.google.accounts) {
+    setTimeout(() => renderGoogleButton(mode), 200);
+    return;
+  }
+
+  // 2. Chỉ khởi tạo Google 1 lần duy nhất
+  if (!isGoogleInitialized) {
     google.accounts.id.initialize({
       client_id: "124352835901-jqh4f03ga43s57qpi10pcbhatlj2pj8k.apps.googleusercontent.com",
-      callback: handleGoogleResponse
+      callback: (res) => console.log("Google User:", res.credential)
     });
+    isGoogleInitialized = true;
+  }
 
-    const isLogin = document.getElementById('login-section').style.display !== 'none';
-    const targetEl = document.getElementById(isLogin ? 'google-login-btn' : 'google-signup-btn');
+  const loginBtn = document.getElementById('google-login-btn');
+  const signupBtn = document.getElementById('google-signup-btn');
 
-    if (targetEl) {
-      targetEl.innerHTML = ""; // Xóa nội dung cũ để vẽ mới
-      google.accounts.id.renderButton(targetEl, { theme: "outline", size: "large", width: "350" });
-    }
+  // 3. Render nút Login nếu chưa render
+  if (mode === 'login' && !isLoginGoogleRendered && loginBtn) {
+    google.accounts.id.renderButton(loginBtn, { theme: "outline", size: "large", width: "350" });
+    isLoginGoogleRendered = true;
+  }
+
+  // 4. Render nút Signup nếu chưa render
+  if (mode === 'signup' && !isSignupGoogleRendered && signupBtn) {
+    google.accounts.id.renderButton(signupBtn, { theme: "outline", size: "large", width: "350" });
+    isSignupGoogleRendered = true;
   }
 }
 
@@ -65,13 +89,19 @@ function handleGoogleResponse(res) {
   form.submit();
 }
 
+<<<<<<<< < Temporary merge branch 1
 // 4. Đa ngôn ngữ
+=========
+>>>>>>>>> Temporary merge branch 2
 function applyLanguage(lang) {
   localStorage.setItem('newsPulseLang', lang);
+
   document.querySelectorAll('[data-key]').forEach(el => {
-    const key = el.getAttribute('data-key');
-    if (langData[lang][key]) el.innerText = langData[lang][key];
+    if (langData[lang][el.getAttribute('data-key')]) {
+      el.innerText = langData[lang][el.getAttribute('data-key')];
+    }
   });
+
   document.querySelectorAll('[data-placeholder]').forEach(el => {
     const key = el.getAttribute('data-placeholder');
     if (langData[lang][key]) el.placeholder = langData[lang][key];
@@ -112,27 +142,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+<<<<<<<<< Temporary merge branch 1
   setupForm('loginForm', 'login');
   setupForm('signupForm', 'signup');
-});
-
-// Kiểm tra và gửi form đăng nhập/đăng ký
-document.addEventListener('DOMContentLoaded', () => {
-  const loginForm = document.getElementById('loginForm');
-  const signupForm = document.getElementById('signupForm');
-
-  function validateLogin(email, password) {
-    if (!email || !password) return { ok: false, msg: 'Vui lòng nhập email và mật khẩu.' };
-    if (password.length < 6) return { ok: false, msg: 'Mật khẩu tối thiểu 6 ký tự.' };
-    return { ok: true };
-  }
-
-  function validateSignup(name, email, password) {
-    if (!name || !email || !password) return { ok: false, msg: 'Vui lòng điền đầy đủ thông tin.' };
-    if (password.length < 6) return { ok: false, msg: 'Mật khẩu tối thiểu 6 ký tự.' };
-    return { ok: true };
-  }
-
+=========
   if (loginForm) {
     loginForm.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -168,4 +181,5 @@ document.addEventListener('DOMContentLoaded', () => {
       signupForm.submit();
     });
   }
+>>>>>>>>> Temporary merge branch 2
 });
