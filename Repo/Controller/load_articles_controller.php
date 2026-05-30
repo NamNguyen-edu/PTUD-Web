@@ -68,6 +68,11 @@ class ArticleController {
                 $userVote = (new VoteService())->getUserVote($userId, intval($article['article_id']));
             }
             $article['user_vote'] = $userVote;
+            require_once __DIR__ . '/../Services/BookmarkService.php';
+$bookmarkService = new BookmarkService();
+$article['is_bookmarked'] = $userId > 0 
+    ? $bookmarkService->isBookmarked($userId, intval($article['article_id'])) 
+    : false;
 
             $currentUser = [
                 'logged' => !empty($_SESSION['user_id']),

@@ -93,7 +93,7 @@ public function saveArticle(int $userId, array $data): int
 
         // 2. Validate file type (chỉ nhận ảnh)
         $allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-        if (!in_array($file['mime_type'], $allowedTypes)) {
+        if (!in_array($file['type'], $allowedTypes)) {
             // Bạn có thể quăng Exception ở đây nếu muốn validate chặt
             return null;
         }
