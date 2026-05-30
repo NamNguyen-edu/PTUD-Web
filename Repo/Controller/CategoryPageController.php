@@ -1,14 +1,14 @@
 <?php
 
-require_once __DIR__ . '/../Services/category_service.php';
+require_once __DIR__ . '/../Services/category_user_service.php';
 require_once __DIR__ . '/../View/category_user_view.php';
 
 class CategoryPageController {
 
-    private CategoryService $categoryService;
+    private CategoryUserService $categoryService;
 
     public function __construct() {
-        $this->categoryService = new CategoryService();
+        $this->categoryService = new CategoryUserService();
     }
 
     public function show(): void {
