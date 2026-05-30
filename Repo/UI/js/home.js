@@ -335,13 +335,13 @@ function renderCardStats(article) {
 
 function renderArticleCard(article) {
     return `
-        <div class="col-md-4 mb-4">
+        <div class="col-lg-3 col-md-6 mb-4">
             <a
                 class="article-card h-100 shadow-sm d-flex flex-column p-0"
-                style="cursor:pointer; text-decoration:none; color:inherit; background:#fff; border-radius:12px; overflow:hidden !important; border:1px solid #edf2f7; transition:all 0.2s; padding: 0 !important;"
+                style="cursor:pointer; text-decoration:none; color:inherit; background:#fff; border-radius:12px; overflow:hidden !important; border:1px solid rgba(0,0,0,0.05); transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1); padding: 0 !important;"
                 href="${getArticleUrl(article.slug)}"
             >
-                <div class="overflow-hidden" style="height:220px; width:100%;">
+                <div class="overflow-hidden" style="height:180px; width:100%;">
                     <img
                         src="${getImage(article)}"
                         loading="lazy"
@@ -352,13 +352,13 @@ function renderArticleCard(article) {
                 <div class="p-3 d-flex flex-column flex-grow-1">
                     ${renderCredibilityBadge(article.upvote_count, article.downvote_count)}
                     
-                    <h5 class="fw-bold line-clamp-2 mb-2" style="font-size: 1.1rem; line-height: 1.4; color: #1a202c;">
+                    <h5 class="fw-bold line-clamp-2 mb-2" style="font-size: 1rem; line-height: 1.4; color: #1a202c; font-family: 'Lora', Georgia, serif !important;">
                         ${escapeHtml(article.title)}
                     </h5>
                     
                     ${renderPills(article.categories, article.tags)}
                     
-                    <p class="text-muted small line-clamp-3 mb-3" style="line-height: 1.5; font-size: 0.85rem;">
+                    <p class="text-muted small line-clamp-3 mb-3" style="line-height: 1.5; font-size: 0.82rem;">
                         ${escapeHtml(article.excerpt || '')}
                     </p>
                     
@@ -588,20 +588,27 @@ function renderDynamicLayout() {
     }
 
     // Chọn ngẫu nhiên layoutType: 0 (Grid), 1 (Hero), 2 (Mixed), 3 (Mixed Scroll)
+    // Bảo đảm chống trùng lặp kề nhau
     let layoutType;
-    if (currentPage === 1) {
-        // Trang đầu tiên ưu tiên Hero (1), Mixed (2), hoặc Mixed Scroll (3) để luôn có bài tiêu điểm lớn ở đầu.
-        const r = Math.random();
-        if (r < 0.33) {
-            layoutType = 1;
-        } else if (r < 0.66) {
-            layoutType = 2;
+    let attempts = 0;
+    do {
+        if (currentPage === 1) {
+            // Trang đầu tiên ưu tiên Hero (1), Mixed (2), hoặc Mixed Scroll (3) để luôn có bài tiêu điểm lớn ở đầu.
+            const r = Math.random();
+            if (r < 0.33) {
+                layoutType = 1;
+            } else if (r < 0.66) {
+                layoutType = 2;
+            } else {
+                layoutType = 3;
+            }
         } else {
-            layoutType = 3;
+            layoutType = Math.floor(Math.random() * 4);
         }
-    } else {
-        layoutType = Math.floor(Math.random() * 4);
-    }
+        attempts++;
+    } while (layoutType === window.lastLayoutType && attempts < 10);
+
+    window.lastLayoutType = layoutType;
 
     // Nếu chọn kiểu Mixed Scroll (3) nhưng trong buffer có ít hơn 4 bài, chuyển về Mixed thường (2) hoặc Grid (0)
     if (layoutType === 3 && articlesBuffer.length < 4) {
@@ -612,61 +619,253 @@ function renderDynamicLayout() {
         layoutType = 0;
     }
 
-    let renderCount = 0;
-    if (layoutType === 1) {
-        // Hero: 1 Hero + 3 * N Grid
-        const gridAvailable = articlesBuffer.length - 1;
-        const gridCount = Math.floor(gridAvailable / 3) * 3;
-        renderCount = 1 + gridCount;
-    } else if (layoutType === 2) {
-        // Mixed: 3 tiêu điểm (1 lớn + 2 nhỏ) + 3 * N Grid
-        const gridAvailable = articlesBuffer.length - 3;
-        const gridCount = Math.floor(gridAvailable / 3) * 3;
-        renderCount = 3 + gridCount;
-    } else if (layoutType === 3) {
-        // Mixed Scroll: 1 bài lớn + tối đa 7 bài nhỏ bên phải cuộn dọc (không có Grid bên dưới)
-        const sideCount = Math.min(7, articlesBuffer.length - 1);
-        renderCount = 1 + sideCount;
-    } else {
-        // Grid: 3 * N Grid
-        renderCount = Math.floor(articlesBuffer.length / 3) * 3;
-    }
-
-    // Fallback nếu renderCount tính ra bằng 0 nhưng buffer vẫn còn bài viết,
-    // ta lấy toàn bộ bài viết còn lại để hiển thị nốt dạng Grid.
-    if (renderCount === 0 && articlesBuffer.length > 0) {
-        renderCount = articlesBuffer.length;
-    }
-
-    // Cắt ra số bài viết cần render
-    const toRender = articlesBuffer.slice(0, renderCount);
-    articlesBuffer = articlesBuffer.slice(renderCount);
-
     let html = '';
 
-    if (layoutType === 1 && toRender[0]) {
-        html += renderHeroBlock(toRender[0]);
-        if (toRender.slice(1).length > 0) {
-            html += renderGridBlock(toRender.slice(1));
-        }
-    } else if (layoutType === 2 && toRender.length >= 3) {
-        html += renderMixedBlock(
-            toRender[0],
-            toRender.slice(1, 3)
-        );
-        if (toRender.slice(3).length > 0) {
-            html += renderGridBlock(toRender.slice(3));
-        }
-    } else if (layoutType === 3 && toRender.length >= 4) {
-        html += renderMixedScrollBlock(
-            toRender[0],
-            toRender.slice(1)
-        );
+    if (layoutType === 3) {
+        // Mixed Scroll (Slider): Gom các bài có chung chủ đề (cùng tags hoặc categories)
+        const bigArticle = articlesBuffer[0];
+        const remaining = articlesBuffer.slice(1);
+
+        // Lọc các bài viết cùng danh mục hoặc thẻ tag
+        const related = remaining.filter(art => {
+            const shareCat = art.categories.some(cat => bigArticle.categories.includes(cat));
+            const shareTag = art.tags.some(tag => bigArticle.tags.includes(tag));
+            return shareCat || shareTag;
+        });
+
+        const unrelated = remaining.filter(art => !related.includes(art));
+        const sideArticles = related.concat(unrelated).slice(0, Math.min(7, remaining.length));
+
+        // Render layout
+        html += renderMixedScrollBlock(bigArticle, sideArticles);
+
+        // Cập nhật buffer (xoá những bài đã được chọn render)
+        const renderedIds = [bigArticle.article_id, ...sideArticles.map(a => a.article_id)];
+        articlesBuffer = articlesBuffer.filter(art => !renderedIds.includes(art.article_id));
+
     } else {
-        html += renderGridBlock(toRender);
+        // Các layout khác giữ nguyên renderCount truyền thống
+        let renderCount = 0;
+        if (layoutType === 1) {
+            const gridAvailable = articlesBuffer.length - 1;
+            const gridCount = Math.floor(gridAvailable / 3) * 3;
+            renderCount = 1 + gridCount;
+        } else if (layoutType === 2) {
+            const gridAvailable = articlesBuffer.length - 3;
+            const gridCount = Math.floor(gridAvailable / 3) * 3;
+            renderCount = 3 + gridCount;
+        } else {
+            renderCount = Math.floor(articlesBuffer.length / 3) * 3;
+        }
+
+        if (renderCount === 0 && articlesBuffer.length > 0) {
+            renderCount = articlesBuffer.length;
+        }
+
+        const toRender = articlesBuffer.slice(0, renderCount);
+        articlesBuffer = articlesBuffer.slice(renderCount);
+
+        if (layoutType === 1 && toRender[0]) {
+            html += renderHeroBlock(toRender[0]);
+            if (toRender.slice(1).length > 0) {
+                html += renderGridBlock(toRender.slice(1));
+            }
+        } else if (layoutType === 2 && toRender.length >= 3) {
+            html += renderMixedBlock(toRender[0], toRender.slice(1, 3));
+            if (toRender.slice(3).length > 0) {
+                html += renderGridBlock(toRender.slice(3));
+            }
+        } else {
+            html += renderGridBlock(toRender);
+        }
     }
 
     feed.insertAdjacentHTML('beforeend', html);
+}
+
+async function loadVideoSegment() {
+    const feed = document.getElementById('feed');
+    if (!feed) return;
+
+    try {
+        const response = await fetch(getAppUrl('?page=video_feed'));
+        const result = await response.json();
+        if (result.success && result.items && result.items.length > 0) {
+            const videos = result.items;
+            const activeVideo = videos[0];
+
+            const videoBlockHtml = `
+                <div class="video-block my-5">
+                    <div class="video-block-title mb-4">
+                        <span>Top Video News</span>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-8 mb-4 mb-lg-0">
+                            <div class="video-player-container position-relative" style="padding-top: 56.25%;">
+                                <iframe 
+                                    id="main-video-player"
+                                    class="position-absolute top-0 start-0 w-100 h-100 border-0"
+                                    src="${activeVideo.url}" 
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                    allowfullscreen
+                                ></iframe>
+                            </div>
+                            <div class="video-caption">
+                                <h4 id="main-video-title" class="video-caption-title">${escapeHtml(activeVideo.title)}</h4>
+                                <p class="video-caption-desc text-muted small">Thời gian đăng: ${new Date(activeVideo.created_at).toLocaleDateString('vi-VN')}</p>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <h6 class="video-up-next-title">Up next</h6>
+                            <div class="video-up-next-list d-flex flex-column gap-2">
+                                ${videos.map((vid, idx) => {
+                                    // Parse Youtube ID to show official thumbnail
+                                    const ytId = vid.url.split('/').pop().split('?')[0];
+                                    const thumbUrl = `https://img.youtube.com/vi/${ytId}/mqdefault.jpg`;
+                                    return `
+                                        <div class="video-up-next-item ${idx === 0 ? 'active' : ''}" data-video-url="${vid.url}" data-video-title="${escapeHtml(vid.title)}" data-video-date="${new Date(vid.created_at).toLocaleDateString('vi-VN')}">
+                                            <div class="video-thumb-container">
+                                                <img src="${thumbUrl}" onerror="this.src='https://picsum.photos/100/60'">
+                                                <div class="video-play-icon">▶</div>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <div class="video-item-title line-clamp-2">${escapeHtml(vid.title)}</div>
+                                                <small class="video-item-meta">${new Date(vid.created_at).toLocaleDateString('vi-VN')}</small>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            feed.insertAdjacentHTML('beforeend', videoBlockHtml);
+
+            // Bind switches
+            const items = feed.querySelectorAll('.video-up-next-item');
+            const player = document.getElementById('main-video-player');
+            const mainTitle = document.getElementById('main-video-title');
+            const mainDate = feed.querySelector('.video-caption-desc');
+
+            items.forEach(item => {
+                item.addEventListener('click', () => {
+                    items.forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+
+                    const url = item.getAttribute('data-video-url');
+                    const title = item.getAttribute('data-video-title');
+                    const dateStr = item.getAttribute('data-video-date');
+
+                    if (player) player.src = url;
+                    if (mainTitle) mainTitle.textContent = title;
+                    if (mainDate) mainDate.textContent = `Thời gian đăng: ${dateStr}`;
+                });
+            });
+        }
+    } catch (e) {
+        console.error("Error loading video feed:", e);
+    }
+}
+
+async function loadCategorySpotlight() {
+    const feed = document.getElementById('feed');
+    if (!feed) return;
+
+    // Only load spotlight on homepage (when category is for-you or trending)
+    if (currentCategory !== 'for-you' && currentCategory !== 'trending') {
+        return;
+    }
+
+    const categoriesToLoad = [
+        { slug: 'thoi-su', name: 'Thời sự' },
+        { slug: 'cong-nghe', name: 'Công nghệ' },
+        { slug: 'kinh-doanh', name: 'Kinh doanh' },
+        { slug: 'tai-chinh', name: 'Tài chính' }
+    ];
+
+    try {
+        const columnsHtml = await Promise.all(categoriesToLoad.map(async (cat) => {
+            try {
+                const response = await fetch(getAppUrl(`?page=mega_menu&category=${cat.slug}`));
+                const result = await response.json();
+                
+                if (result.success && result.items && result.items.length > 0) {
+                    const articles = result.items;
+                    const featured = articles[0];
+                    const listArticles = articles.slice(1, 4);
+
+                    let listHtml = '';
+                    if (listArticles.length > 0) {
+                        listHtml = `
+                            <ul class="spotlight-list list-unstyled mt-3 pt-2 border-top border-secondary-subtle">
+                                ${listArticles.map(art => `
+                                    <li class="mb-2">
+                                        <a href="${getArticleUrl(art.slug)}" class="text-decoration-none text-dark-emphasis hover-blue small fw-semibold d-block line-clamp-2" style="font-size: 0.85rem; line-height: 1.35;">
+                                            • ${escapeHtml(art.title)}
+                                        </a>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        `;
+                    }
+
+                    return `
+                        <div class="col-lg-3 col-md-6 mb-4 spotlight-column">
+                            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-2 border-dark-subtle">
+                                <h5 class="fw-bold m-0 text-uppercase" style="font-size: 0.95rem; letter-spacing: 0.5px; font-family: 'Lora', serif !important;">
+                                    ${cat.name}
+                                </h5>
+                                <a href="?page=category&slug=${cat.slug}" class="text-decoration-none text-primary small fw-semibold hover-underline" style="font-size: 0.78rem;">
+                                    Xem tất cả →
+                                </a>
+                            </div>
+                            <div class="spotlight-card">
+                                <a href="${getArticleUrl(featured.slug)}" class="text-decoration-none text-dark d-block">
+                                    <div class="overflow-hidden rounded-2 mb-2" style="height: 140px; width: 100%;">
+                                        <img src="${featured.thumbnail_url || 'https://picsum.photos/300/200'}" class="w-100 h-100 object-fit-cover hover-scale" style="transition: transform 0.3s;" alt="${escapeHtml(featured.title)}">
+                                    </div>
+                                    <h6 class="fw-bold line-clamp-2 mb-1" style="font-size: 0.9rem; line-height: 1.35; color: #1a202c; font-family: 'Lora', Georgia, serif !important;">
+                                        ${escapeHtml(featured.title)}
+                                    </h6>
+                                    <small class="text-muted" style="font-size: 0.72rem;">${featured.published_time_ago || 'Vừa xong'}</small>
+                                </a>
+                            </div>
+                            ${listHtml}
+                        </div>
+                    `;
+                } else {
+                    return `
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="pb-2 border-bottom border-2 border-dark-subtle mb-3">
+                                <h5 class="fw-bold m-0 text-uppercase" style="font-size: 0.95rem; font-family: 'Lora', serif !important;">${cat.name}</h5>
+                            </div>
+                            <p class="text-muted small">Không có bài viết mới.</p>
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                console.error(`Error loading spotlight category ${cat.slug}:`, err);
+                return '';
+            }
+        }));
+
+        const spotlightSectionHtml = `
+            <div class="category-spotlight-section my-5 pt-4 border-top" style="border-color: rgba(0,0,0,0.08) !important;">
+                <h3 class="fw-bold mb-4" style="font-size: 1.5rem; letter-spacing: -0.3px; font-family: 'Lora', Georgia, serif !important;">
+                    Tiêu điểm chuyên mục
+                </h3>
+                <div class="row">
+                    ${columnsHtml.join('')}
+                </div>
+            </div>
+        `;
+
+        feed.insertAdjacentHTML('beforeend', spotlightSectionHtml);
+    } catch (e) {
+        console.error("Error generating category spotlight:", e);
+    }
 }
 
 /* =========================================================
@@ -768,6 +967,11 @@ async function loadMore() {
         articlesBuffer = articlesBuffer.concat(articles);
 
         renderDynamicLayout();
+        
+        if (currentPage === 1) {
+            await loadVideoSegment();
+            await loadCategorySpotlight();
+        }
 
         currentPage++;
 
@@ -919,6 +1123,7 @@ if (document.getElementById('feed')) {
     loadHotNews();
     loadMore();
     initMegaMenu();
+    initMoreMegaMenu();
 }
 
 /* =========================================================
@@ -990,4 +1195,102 @@ function initMegaMenu() {
             }
         }
     });
+}
+
+function initMoreMegaMenu() {
+    const moreNavItem = document.getElementById('more-nav-item');
+    if (!moreNavItem) return;
+
+    const moreItems = moreNavItem.querySelectorAll('.more-menu-list li');
+    const container = moreNavItem.querySelector('.more-mega-articles-container');
+    const title = document.getElementById('more-mega-title');
+    
+    let loadedCategories = {};
+
+    const loadCategoryData = async (slug, name) => {
+        if (loadedCategories[slug]) {
+            container.innerHTML = loadedCategories[slug];
+            if (title) title.textContent = `Bài viết ${name} mới nhất`;
+            return;
+        }
+        
+        container.innerHTML = `<div class="col text-muted small">Đang tải bài viết...</div>`;
+        if (title) title.textContent = `Bài viết ${name} mới nhất`;
+
+        try {
+            const response = await fetch(getAppUrl(`?page=mega_menu&category=${slug}`));
+            const result = await response.json();
+            if (result.success && result.items && result.items.length > 0) {
+                const html = result.items.map(article => `
+                    <div class="col-md-4 mb-3">
+                        <a href="${getArticleUrl(article.slug)}" class="text-decoration-none text-dark d-block mega-item-card" style="transition: transform 0.2s;">
+                            <img src="${article.thumbnail_url || 'https://picsum.photos/120/80'}" class="img-fluid rounded mb-2" style="height: 100px; width: 100%; object-fit: cover;">
+                            <div class="fw-bold small line-clamp-2" style="font-size: 0.85rem; line-height: 1.3; color: #1e293b;">${escapeHtml(article.title)}</div>
+                            <small class="text-muted" style="font-size: 0.75rem;">${article.published_time_ago}</small>
+                        </a>
+                    </div>
+                `).join('');
+                loadedCategories[slug] = html;
+                container.innerHTML = html;
+            } else {
+                const emptyHtml = `<div class="col text-muted small">Không có bài viết mới nào.</div>`;
+                loadedCategories[slug] = emptyHtml;
+                container.innerHTML = emptyHtml;
+            }
+        } catch (err) {
+            console.error(err);
+            container.innerHTML = `<div class="col text-danger small">Lỗi tải dữ liệu.</div>`;
+        }
+    };
+
+    // Load first category (Tài chính) as default when hovering the "More" item
+    moreNavItem.addEventListener('mouseenter', () => {
+        const activeLi = moreNavItem.querySelector('.more-menu-list li.active') || moreItems[0];
+        if (activeLi) {
+            const slug = activeLi.dataset.moreCategory;
+            const name = activeLi.textContent;
+            loadCategoryData(slug, name);
+        }
+    });
+
+    moreItems.forEach(item => {
+        item.addEventListener('mouseenter', () => {
+            moreItems.forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+            
+            const slug = item.dataset.moreCategory;
+            const name = item.textContent;
+            loadCategoryData(slug, name);
+        });
+    });
+
+    // Mobile menu toggle click handling
+    const navLink = moreNavItem.querySelector('.nav-link');
+    if (navLink) {
+        navLink.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const isActive = moreNavItem.classList.contains('active-mega');
+                
+                // Hide other mega menus
+                document.querySelectorAll('.navbar-custom .nav-item').forEach(i => {
+                    if (i !== moreNavItem) i.classList.remove('active-mega');
+                });
+                
+                if (!isActive) {
+                    moreNavItem.classList.add('active-mega');
+                    const activeLi = moreNavItem.querySelector('.more-menu-list li.active') || moreItems[0];
+                    if (activeLi) {
+                        const slug = activeLi.dataset.moreCategory;
+                        const name = activeLi.textContent;
+                        loadCategoryData(slug, name);
+                    }
+                } else {
+                    moreNavItem.classList.remove('active-mega');
+                }
+            }
+        });
+    }
 }

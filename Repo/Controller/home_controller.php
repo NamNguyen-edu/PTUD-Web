@@ -20,21 +20,13 @@ class HomeController {
                 ? (int) $_GET['page_num']
                 : 1;
 
-            // // Simple File Cache
-            // $cacheDir = __DIR__ . '/../cache';
-            // if (!is_dir($cacheDir)) {
-            //     @mkdir($cacheDir, 0777, true);
-            // }
-            // $cacheFile = $cacheDir . '/feed_page_' . $page . '.json';
-            // $cacheTtl = 30; // 30 seconds
-
-            // if (file_exists($cacheFile) && (time() - filemtime($cacheFile) < $cacheTtl)) {
-            //     echo file_get_contents($cacheFile);
-            //     return;
-            // }
+            $category = isset($_GET['category']) ? trim((string)$_GET['category']) : null;
+            if (empty($category)) {
+                $category = null;
+            }
 
             $data = $this->homeService
-                ->getHomepageFeed($page);
+                ->getHomepageFeed($page, $category);
 
             $response = json_encode([
                 'success' => true,
@@ -167,6 +159,23 @@ class HomeController {
         header('Content-Type: application/json; charset=utf-8');
         try {
             $data = $this->homeService->getHotNewsOfTheDay(4);
+            echo json_encode([
+                'success' => true,
+                'items' => $data
+            ]);
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function videoFeed(): void {
+        header('Content-Type: application/json; charset=utf-8');
+        try {
+            $data = $this->homeService->getVideoFeed();
             echo json_encode([
                 'success' => true,
                 'items' => $data
