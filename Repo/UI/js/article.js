@@ -329,6 +329,8 @@ async function loadArticle() {
         document.getElementById('article-tags').innerHTML = renderTags(article.tags);
         document.getElementById('article-content').innerHTML = article.content;
         document.getElementById('article-views').innerHTML = article.view_count;
+        const articleId = article.article_id;
+        renderBookmarkBtn(articleId, article.is_bookmarked || false);
         document.getElementById('related-articles').innerHTML = renderRelatedArticles(result.data.related_articles);
 
         
@@ -350,6 +352,9 @@ async function loadArticle() {
 
 function bindActions() {
     // Gắn sự kiện click cho các nút bình chọn tương tác
+document.addEventListener('click', e => {
+    if (e.target.matches('#bookmark-btn')) handleBookmark();
+});
     const btnUp = document.getElementById('btn-upvote');
     const btnDown = document.getElementById('btn-downvote');
     
@@ -384,10 +389,53 @@ function bindActions() {
             const container = document.getElementById(`reply-form-${parentId}`);
             if (container) container.innerHTML = '';
         }
-    });
+    }
+);
+    
 }
-
 (async function () {
     await loadArticle();
     bindActions();
 })();
+
+function renderBookmarkBtn(articleId, isBookmarked) {
+    const meta = document.querySelector('.meta');
+    if (!meta) return;
+
+    let btn = document.getElementById('bookmark-btn');
+    if (!btn) {
+        btn = document.createElement('button');
+        btn.id = 'bookmark-btn';
+        btn.style.cssText = 'background:none;border:none;cursor:pointer;font-size:1.4rem;padding:0;';
+        meta.appendChild(btn);
+    }
+
+    btn.innerHTML = isBookmarked ? '🔖' : '🏷️';
+    btn.title = isBookmarked ? 'Bỏ lưu' : 'Lưu bài viết';
+    btn.dataset.articleId = articleId;
+    btn.dataset.bookmarked = isBookmarked ? '1' : '0';
+}
+
+async function handleBookmark() {
+    if (!currentUser || !currentUser.logged) {
+        alert('Bạn cần đăng nhập để lưu bài viết.');
+        return;
+    }
+
+    const btn = document.getElementById('bookmark-btn');
+    if (!btn) return;
+
+    const articleId = parseInt(btn.dataset.articleId);
+    const res = await fetch('?page=bookmark_toggle', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ article_id: articleId })
+    });
+
+    const result = await res.json();
+    if (result.success) {
+        btn.innerHTML = result.is_bookmarked ? '🔖' : '🏷️';
+        btn.title = result.is_bookmarked ? 'Bỏ lưu' : 'Lưu bài viết';
+        btn.dataset.bookmarked = result.is_bookmarked ? '1' : '0';
+    }
+}
