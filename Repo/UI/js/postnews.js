@@ -5,19 +5,8 @@
 
 // MODULE TỰ ĐỘNG LOAD COMPONENT (HEADER/FOOTER) TỪ TEAM
 document.addEventListener("DOMContentLoaded", function() {
-
-    const existingThumbUrl = document.getElementById('currentThumbUrl');
-    const previewZone = document.getElementById('thumbPreview');
     
-    // Nếu biến có chứa đường dẫn thật (không phải trống và không chứa chữ {{THUMBNAIL_URL}} nguyên bản)
-    if (existingThumbUrl && existingThumbUrl.value.trim() !== '' && !existingThumbUrl.value.includes('{{')) {
-        let finalUrl = existingThumbUrl.value;
-        
-        // Nếu ảnh không phải link mạng mà là file upload, nhớ chèn đường dẫn gốc (Nếu cần)
-        // finalUrl = '../' + finalUrl; (Mở comment dòng này nếu ảnh bị lỗi hiển thị do sai đường dẫn tương đối)
-
-        previewZone.innerHTML = `<img src="${finalUrl}" style="width:100%; height:100%; object-fit:cover; border-radius: 8px;">`;
-    }
+    // Tải Header
     // Tải Header
 const hiddenCat = document.getElementById('hiddenCategory');
 if (hiddenCat && hiddenCat.value) {
