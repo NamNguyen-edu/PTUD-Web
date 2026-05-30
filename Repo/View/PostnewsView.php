@@ -12,13 +12,15 @@ class PostnewsView
 
     public function render(?array $article): void
     {
-        $data = [
-            'ARTICLE_ID' => $article['article_id'] ?? '',
-            'TITLE'      => $article['title'] ?? '',
-            'CONTENT'    => $article['content'] ?? '',
-            'SLUG'       => $article['slug'] ?? '',
-            'EXCERPT'    => $article['excerpt'] ?? ''
-        ];
+$data = [
+    'ARTICLE_ID'    => $article['article_id'] ?? '',
+    'TITLE'         => $article['title'] ?? '',
+    'CONTENT'       => $article['content'] ?? '',
+    'SLUG'          => $article['slug'] ?? '',
+    'EXCERPT'       => $article['excerpt'] ?? '',
+    'CATEGORY_SLUG' => $article['category_slug'] ?? '',
+    'TAGS'          => $article['tags_string'] ?? ''
+];
 
         echo $this->engine->render('postnews', $data);
     }

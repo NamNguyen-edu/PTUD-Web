@@ -1,12 +1,12 @@
 <?php
 
-require_once __DIR__ . '/../View/ViewEngine.php';
+require_once __DIR__ . '/../View/HomeView.php';
 
 class HomePageController
 {
     public function render(): void
     {
-        $engine = new ViewEngine();
-        echo $engine->render('home');
+        $view = new HomeView();
+        $view->render();
     }
 }

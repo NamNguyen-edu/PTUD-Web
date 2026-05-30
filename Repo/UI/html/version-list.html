@@ -1,0 +1,60 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài viết chờ duyệt – Kiểm soát phiên bản</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&display=swap" rel="stylesheet"> -->
+    <link rel="stylesheet" href="../css/Version_List.css">
+</head>
+<body>
+
+    <div class="page-header">
+        <div>
+            <h1>Bài viết chờ duyệt</h1>
+            <p>Nhấp vào từng hàng để xem lịch sử phiên bản</p>
+        </div>
+        <div class="badge-count">
+            <span class="dot"></span>
+            {{PENDING_COUNT}} bài đang chờ
+        </div>
+    </div>
+
+    <div class="table-card">
+        <table>
+            <colgroup>
+                <col class="col-title">
+                <col class="col-category">
+                <col class="col-author">
+                <col class="col-updated">
+                <col class="col-versions">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>Tiêu đề</th>
+                    <th>Danh mục</th>
+                    <th>Tác giả</th>
+                    <th>Cập nhật</th>
+                    <th style="text-align:right">Phiên bản</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{ARTICLES_TABLE}}
+            </tbody>
+        </table>
+    </div>
+
+    <p class="table-footer">
+        Chỉ hiển thị bài viết có trạng thái <strong>pending</strong>
+    </p>
+
+    <script>
+        function goToVersionControl(articleId) {
+            window.location.href = '?page=version-control&article_id=' + articleId;
+        }
+    </script>
+
+</body>
+</html>

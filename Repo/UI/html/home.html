@@ -13,92 +13,89 @@
 <div id="header-placeholder"></div>
 <div class="container-fluid">
   <div class="row navbar-custom text-center">
-    <div class="col"><a class="nav-link active" onclick="loadCategory(event, 'world')">For You</a></div>
-    <div class="col"><a class="nav-link">Trending</a></div>
-    <div class="col"><a class="nav-link">Verified</a></div>
-    <div class="col"><a class="nav-link">World</a></div>
+    <div class="col"><a class="nav-link active" onclick="loadCategory(event, 'for-you')">Dành cho bạn</a></div>
+    <div class="col"><a class="nav-link" onclick="loadCategory(event, 'trending')">Tin thịnh hành</a></div>
     
-    <div class="col nav-item">
-      <a class="nav-link" href="technology.html">Technology ▾</a>
+    <div class="col nav-item" data-category="thoi-su">
+      <a class="nav-link" href="?page=category&slug=thoi-su">Thời sự ▾</a>
       <div class="mega-menu text-start">
         <div class="row">
           <div class="col-md-4">
-            <h6>Browse Technology</h6>
+            <h6>Chuyên mục Thời sự</h6>
             <ul class="menu-list list-unstyled">
-              <li>Artificial Intelligence</li>
-              <li>Cybersecurity</li>
-              <li>Space</li>
-              <li>Startups</li>
+              <li onclick="loadCategory(event, 'thoi-su')">Trong nước</li>
+              <li onclick="loadCategory(event, 'thoi-su')">Quốc tế</li>
+              <li onclick="loadCategory(event, 'thoi-su')">Xem tất cả Thời sự</li>
             </ul>
           </div>
-          <div class="col-md-4">
-            <h6>Latest</h6>
-            <div class="mega-article">
-              <div>AI regulations expand globally</div>
-              <small class="text-muted">2 hours ago</small>
+          <div class="col-md-8 border-start">
+            <h6>Bài viết Thời sự mới nhất</h6>
+            <div class="row mega-articles-container">
+              <div class="col text-muted">Đang tải bài viết mới nhất...</div>
             </div>
-            <div class="mega-article">
-              <div>Chip war intensifies</div>
-              <small class="text-muted">5 hours ago</small>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <h6>Editor Picks</h6>
-            <div class="mega-article highlight">China humanoid robot marathon shocks investors</div>
           </div>
         </div>
       </div>
     </div>
-
-    <div class="col nav-item">
-      <a class="nav-link">Business ▾</a>
+    
+    <div class="col nav-item" data-category="cong-nghe">
+      <a class="nav-link" href="?page=category&slug=cong-nghe">Công nghệ ▾</a>
       <div class="mega-menu text-start">
         <div class="row">
-          <div class="col-md-6">
-            <strong>Browse Business</strong>
-            <ul class="list-unstyled mt-2">
-              <li>Finance</li>
-              <li>Markets</li>
-              <li>Energy</li>
-              <li>Startups</li>
+          <div class="col-md-4">
+            <h6>Chuyên mục Công nghệ</h6>
+            <ul class="menu-list list-unstyled">
+              <li onclick="loadCategory(event, 'ai-news')">Trí tuệ nhân tạo</li>
+              <li onclick="loadCategory(event, 'dien-thoai-tablet')">Điện thoại & Tablet</li>
+              <li onclick="loadCategory(event, 'review-san-pham')">Đánh giá sản phẩm</li>
+              <li onclick="loadCategory(event, 'cong-nghe')">Xem tất cả Công nghệ</li>
             </ul>
           </div>
-          <div class="col-md-6">
-            <strong>Latest</strong>
-            <div class="article-mini border-bottom py-1">AI regulations expand globally</div>
-            <div class="article-mini py-1">Markets react to inflation signals</div>
+          <div class="col-md-8 border-start">
+            <h6>Bài viết Công nghệ mới nhất</h6>
+            <div class="row mega-articles-container">
+              <div class="col text-muted">Đang tải bài viết mới nhất...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col nav-item" data-category="kinh-doanh">
+      <a class="nav-link" href="?page=category&slug=kinh-doanh">Kinh doanh ▾</a>
+      <div class="mega-menu text-start">
+        <div class="row">
+          <div class="col-md-4">
+            <h6>Chuyên mục Kinh doanh</h6>
+            <ul class="menu-list list-unstyled">
+              <li onclick="loadCategory(event, 'kinh-doanh')">Thị trường tài chính</li>
+              <li onclick="loadCategory(event, 'kinh-doanh')">Khởi nghiệp (Startups)</li>
+              <li onclick="loadCategory(event, 'kinh-doanh')">Xem tất cả Kinh doanh</li>
+            </ul>
+          </div>
+          <div class="col-md-8 border-start">
+            <h6>Bài viết Kinh doanh mới nhất</h6>
+            <div class="row mega-articles-container">
+              <div class="col text-muted">Đang tải bài viết mới nhất...</div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="row mt-4">
-    <div class="col"><h5><strong>Trending Now</strong></h5></div>
+  <div class="row mt-4 mb-3">
+    <div class="col">
+      <h3 class="fw-bold mb-0" style="font-size: 1.7rem; color: #1e293b; letter-spacing: -0.5px;">Tin nóng trong ngày</h3>
+    </div>
   </div>
-  <div class="row">
-    <div class="col-md-3"><div class="article-card shadow-sm">AI chips shortage<div class="vote-box small">▲ 500 ▼ 40</div></div></div>
-    <div class="col-md-3"><div class="article-card shadow-sm">Global layoffs rise<div class="vote-box small">▲ 420 ▼ 30</div></div></div>
-    <div class="col-md-3"><div class="article-card shadow-sm">Crypto rebounds<div class="vote-box small">▲ 390 ▼ 25</div></div></div>
-    <div class="col-md-3"><div class="article-card shadow-sm">EV war heats up<div class="vote-box small">▲ 360 ▼ 20</div></div></div>
+  <div class="row" id="hot-news-container">
+    <div class="col text-muted small">Đang tải tin nóng...</div>
   </div>
+  
+  <hr class="my-5" style="border-top: 1px solid #cbd5e1; opacity: 0.6;">
 
-  <div class="row mt-3">
-    <div class="col-lg-8 hero">
-      <div class="trust-score high d-inline-block px-3 py-1 rounded-pill mb-2">✔ High Trust</div>
-      <h1 class="hero-title">The Future of AI in Global Economy</h1>
-      <div class="tags my-3">
-        <span class="tag" style="background: #1e3a8a; color: white;">AI</span>
-        <span class="tag">Economy</span>
-      </div>
-      <p>Artificial intelligence is transforming industries and reshaping how global markets operate.</p>
-      <div class="vote-box"><span class="vote up">▲ 1.2k</span> <span class="vote down">▼ 120</span></div>
-    </div>
-    <div class="col-lg-4">
-      <div class="article-card small shadow-sm">Oil prices stabilize <div class="vote-box small">▲ 210 ▼ 30</div></div>
-      <div class="article-card small shadow-sm">Startup funding declines <div class="vote-box small">▲ 180 ▼ 25</div></div>
-    </div>
-  </div>
+
 
   <div id="feed" class="mt-5"></div>  
   <div id="pagination-wrapper" class="text-center my-4 d-none">
@@ -110,7 +107,6 @@
 </div>
 <div id="footer-placeholder"></div>
 <script src="../js/home.js"></script>
-<script src = "../js/main.js"></script>
 </div>
 </body>
 </html>

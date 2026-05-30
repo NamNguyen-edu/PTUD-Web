@@ -39,6 +39,8 @@ CREATE TABLE IF NOT EXISTS users (
     avatar_url        TEXT,
     bio               TEXT,
     role_id           INT           NOT NULL DEFAULT 5,  
+    -- [UPDATE] Cột mới thêm: Lưu danh sách kỹ năng chuyên môn dưới dạng chuỗi JSON
+    skills            TEXT          NULL,
     status            ENUM('active', 'banned', 'pending') NOT NULL DEFAULT 'pending',
     email_verified_at DATETIME      NULL,
     created_at        DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -86,9 +88,13 @@ CREATE TABLE IF NOT EXISTS articles (
     thumbnail_url TEXT,
     user_id       INT           NOT NULL,
     approved_by   INT           NULL,
-    status        ENUM('draft', 'pending', 'published', 'archived') NOT NULL DEFAULT 'draft',
+    status        ENUM('draft', 'pending', 'published', 'revision', 'rejected') NOT NULL DEFAULT 'draft',
     is_featured   TINYINT(1)    NOT NULL DEFAULT 0,
+    -- [UPDATE] Cột mới thêm: xoá mềm
+    is_deleted    TINYINT(1)    NOT NULL DEFAULT 0,
     view_count    INT           NOT NULL DEFAULT 0,
+    upvote_count  INT           NOT NULL DEFAULT 0,
+    downvote_count INT           NOT NULL DEFAULT 0,
     published_at  DATETIME      NULL,
     created_at    DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at    DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -185,3 +191,79 @@ CREATE TABLE IF NOT EXISTS media (
     CONSTRAINT FK_media_uploader FOREIGN KEY (uploaded_by) 
         REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE RESTRICT
 ) ENGINE=InnoDB;
+
+-- 10. Quản lý yêu cầu - THêm mới
+CREATE TABLE IF NOT EXISTS takedown_requests (
+    request_id INT AUTO_INCREMENT PRIMARY KEY,
+    article_id INT NOT NULL,
+    user_id INT NOT NULL,
+    reason TEXT NOT NULL,
+    status ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending',
+    admin_note TEXT,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    -- Ràng buộc dữ liệu (Chặt chẽ: xóa bài thì xóa luôn yêu cầu gỡ bài liên quan)
+    CONSTRAINT FK_takedown_article FOREIGN KEY (article_id) REFERENCES articles(article_id) ON DELETE CASCADE,
+    CONSTRAINT FK_takedown_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+-- 10. ARTICLE_VERSIONS — Lưu trữ phiên bản bài viết
+CREATE TABLE article_versions (
+    version_id      INT AUTO_INCREMENT PRIMARY KEY,
+    article_id      INT NOT NULL,
+    title           VARCHAR(500),
+    content         LONGTEXT,
+    version_name    VARCHAR(50),
+    edited_by       INT,
+    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (article_id)
+        REFERENCES articles(article_id)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (edited_by)
+        REFERENCES users(user_id)
+        ON DELETE SET NULL
+);
+-- 11. USER_READ_HISTORY — Lưu trữ lịch sử đọc của người dùng
+CREATE TABLE user_read_history (
+    history_id INT AUTO_INCREMENT PRIMARY KEY,
+
+    user_id INT NOT NULL,
+    article_id INT NOT NULL,
+
+    read_count INT NOT NULL DEFAULT 1,
+
+    first_read_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    last_read_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    UNIQUE KEY uq_user_article (
+        user_id,
+        article_id
+    ),
+
+    CONSTRAINT fk_history_user
+        FOREIGN KEY (user_id)
+        REFERENCES users(user_id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_history_article
+        FOREIGN KEY (article_id)
+        REFERENCES articles(article_id)
+        ON DELETE CASCADE
+);
+
+
+-- 12. ARTICLE_VOTES — Lưu trữ bình chọn kiểm chứng
+CREATE TABLE IF NOT EXISTS article_votes (
+    vote_id     INT NOT NULL AUTO_INCREMENT,
+    article_id  INT NOT NULL,
+    user_id     INT NOT NULL,
+    vote_type   ENUM('up', 'down') NOT NULL,
+    created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (vote_id),
+    UNIQUE KEY uq_user_article_vote (user_id, article_id),
+    CONSTRAINT fk_votes_article FOREIGN KEY (article_id) REFERENCES articles(article_id) ON DELETE CASCADE,
+    CONSTRAINT fk_votes_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+

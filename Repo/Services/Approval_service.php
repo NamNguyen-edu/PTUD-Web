@@ -1,5 +1,6 @@
+
 <?php
-require_once "../model/pdo.php";
+require_once __DIR__ . '/../Model/pdo.php';
 
 /**
  * Workflow Approval Service
@@ -93,11 +94,12 @@ function approveAndPublish(int $article_id, int $approver_id): bool {
     if (!$article || $article['status'] !== 'pending') return false;
 
     pdo_execute("
-        UPDATE articles
-        SET status      = 'published',
-            approved_by = ?,
-            published_at = NOW()
-        WHERE article_id = ?
+    UPDATE articles
+    SET status       = 'published',
+        approved_by  = ?,
+        published_at = NOW(),
+        updated_at   = NOW()
+    WHERE article_id = ?
     ", $approver_id, $article_id);
 
     return true;
@@ -127,7 +129,10 @@ function requestRevision(int $article_id, int $editor_id, string $revision_note)
 
     // Trả bài về draft
     pdo_execute("
-        UPDATE articles SET status = 'draft' WHERE article_id = ?
+    UPDATE articles
+    SET status = 'revision',
+    updated_at = NOW()
+    WHERE article_id = ?
     ", $article_id);
 
     // Lưu ghi chú chỉnh sửa vào comments (dùng status = 'approved' để phân biệt editorial note)
@@ -145,7 +150,7 @@ function requestRevision(int $article_id, int $editor_id, string $revision_note)
 
 /**
  * Tổng biên tập từ chối bài viết
- * - Đổi status → 'archived'
+ * - Đổi status → 'rejected'
  * - Ghi lại người từ chối vào approved_by
  *
  * @param int $article_id
@@ -162,7 +167,7 @@ function rejectArticle(int $article_id, int $editor_id): bool {
 
     pdo_execute("
         UPDATE articles
-        SET status      = 'archived',
+        SET status      = 'rejected',
             approved_by = ?
         WHERE article_id = ?
     ", $editor_id, $article_id);

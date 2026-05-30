@@ -13,6 +13,17 @@ class ViewEngine
     {
         $filePath = $this->basePath . '/UI/html/' . $viewName . '.html';
 
+            // // Simple file cache for heavy pages (short TTL)
+            // $cacheDir = $this->basePath . '/tmp_cache';
+            // if (!is_dir($cacheDir)) {
+            //     @mkdir($cacheDir, 0755, true);
+            // }
+            // $cacheFile = $cacheDir . '/' . $viewName . '.html';
+            // $cacheTtl = 15; // seconds
+            // if ($viewName === 'home' && file_exists($cacheFile) && (time() - filemtime($cacheFile) < $cacheTtl)) {
+            //     return file_get_contents($cacheFile) . "\n<!-- RENDERED_BY_ViewEngine (cache) -->";
+            // }
+
         if (!file_exists($filePath)) {
             http_response_code(404);
             return '<h1>404 - Trang không tìm thấy (view)</h1>';
@@ -29,9 +40,24 @@ class ViewEngine
         $header = $this->loadComponent('header');
         $footer = $this->loadComponent('footer');
 
-        $html = str_replace('<div id="header-placeholder"></div>', $header, $html);
-        $html = str_replace('<div id="footer-placeholder" class="mt-auto w-100"></div>', $footer, $html);
-        $html = str_replace('<div id="footer-placeholder"></div>', $footer, $html);
+        $html = preg_replace(
+    '/<div id="header-placeholder"><\/div>/i',
+    $header,
+    $html,
+    1
+    );
+        $html = preg_replace(
+    '/<div id="footer-placeholder" class="mt-auto w-100"><\/div>/i',
+    $footer,
+    $html,
+    1
+    );
+        $html = preg_replace(
+    '/<div id="footer-placeholder"><\/div>/i',
+    $footer,
+    $html,
+    1
+    );
 
         // Rewrite asset and internal links to work from index.php
         $html = $this->rewriteViewPaths($html);
@@ -54,11 +80,11 @@ class ViewEngine
         $html = preg_replace('/src\s*=\s*"\.\.\/js\//i', 'src="UI/js/', $html);
         $html = preg_replace('/href\s*=\s*"\.\.\/html\//i', 'href="?page=', $html);
 
-        $html = preg_replace_callback('/href\s*=\s*"([^\"]+)\.html"/i', function ($matches) {
-            $page = pathinfo($matches[1], PATHINFO_FILENAME);
-            $page = str_replace(' ', '_', $page);
-            return 'href="?page=' . urlencode($page) . '"';
-        }, $html);
+        // $html = preg_replace_callback('/href\s*=\s*"([^\"]+)\.html"/i', function ($matches) {
+        //     $page = pathinfo($matches[1], PATHINFO_FILENAME);
+        //     $page = str_replace(' ', '_', $page);
+        //     return 'href="?page=' . urlencode($page) . '"';
+        // }, $html);
 
         return $html;
     }

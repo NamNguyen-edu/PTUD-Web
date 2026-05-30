@@ -115,3 +115,57 @@ document.addEventListener('DOMContentLoaded', () => {
   setupForm('loginForm', 'login');
   setupForm('signupForm', 'signup');
 });
+
+// Kiểm tra và gửi form đăng nhập/đăng ký
+document.addEventListener('DOMContentLoaded', () => {
+  const loginForm = document.getElementById('loginForm');
+  const signupForm = document.getElementById('signupForm');
+
+  function validateLogin(email, password) {
+    if (!email || !password) return { ok: false, msg: 'Vui lòng nhập email và mật khẩu.' };
+    if (password.length < 6) return { ok: false, msg: 'Mật khẩu tối thiểu 6 ký tự.' };
+    return { ok: true };
+  }
+
+  function validateSignup(name, email, password) {
+    if (!name || !email || !password) return { ok: false, msg: 'Vui lòng điền đầy đủ thông tin.' };
+    if (password.length < 6) return { ok: false, msg: 'Mật khẩu tối thiểu 6 ký tự.' };
+    return { ok: true };
+  }
+
+  if (loginForm) {
+    loginForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const emailEl = document.getElementById('loginUser');
+      const passEl = document.getElementById('loginPass');
+      const email = emailEl?.value?.trim() ?? '';
+      const password = passEl?.value ?? '';
+      const v = validateLogin(email, password);
+      if (!v.ok) { alert(v.msg); return; }
+
+      // Submit the form to server so PHP can redirect on success
+      loginForm.action = '?page=login';
+      loginForm.method = 'POST';
+      loginForm.submit();
+    });
+  }
+
+  if (signupForm) {
+    signupForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const nameEl = document.getElementById('fullName');
+      const emailEl = document.getElementById('signupUser');
+      const passEl = document.getElementById('signupPass');
+      const name = nameEl?.value?.trim() ?? '';
+      const email = emailEl?.value?.trim() ?? '';
+      const password = passEl?.value ?? '';
+      const v = validateSignup(name, email, password);
+      if (!v.ok) { alert(v.msg); return; }
+
+      // Submit the signup form to server
+      signupForm.action = '?page=signup';
+      signupForm.method = 'POST';
+      signupForm.submit();
+    });
+  }
+});

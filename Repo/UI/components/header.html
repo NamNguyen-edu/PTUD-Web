@@ -1,15 +1,35 @@
-<div class="row topbar align-items-center">
-    <div class="col-3 logo">NewsPulse</div>
-    <div class="col-6 p-0">
-        <form action="?page=search" method="get" class="d-flex search-form">
-            <input id="search-box" type="text" name="keyword" class="search-box" placeholder="Search news, topics..." autocomplete="off">
-            <button type="submit" class="btn btn-search">Search</button>
+<div class="row topbar align-items-center g-0 px-3">
+
+    <!-- LOGO -->
+    <div class="col-2 d-flex align-items-center">
+        <a href="?page=home" class="logo">
+            <span class="logo-icon"></span>
+            <span class="logo-text">News</span><span class="logo-pulse">Pulse</span>
+        </a>
+    </div>
+
+    <!-- SEARCH -->
+    <div class="col-6 d-flex justify-content-center align-items-center px-2">
+        <form action="" method="get" class="search-form w-100 position-relative">
+            <input type="hidden" name="page" value="search">
+            <div class="input-group search-input-group">
+                <span class="input-group-text search-icon-wrap">
+                    <svg width="14" height="14" fill="none" stroke="#6b7280" stroke-width="2" viewBox="0 0 24 24">
+                        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                    </svg>
+                </span>
+                <input id="search-box" type="text" name="keyword" class="form-control search-box" placeholder="Tìm kiếm tin tức, chủ đề..." autocomplete="off">
+                <button type="submit" class="btn btn-search">Tìm kiếm</button>
+            </div>
             <div id="search-dropdown" class="search-dropdown d-none" aria-live="polite" aria-label="Search suggestions"></div>
         </form>
     </div>
-    <div class="col-3 text-end actions" id="user-actions">
+
+    <!-- USER ACTIONS -->
+    <div class="col-4 d-flex justify-content-end align-items-center" id="user-actions">
+
         <!-- Login Section -->
-        <div id="login-section" class="d-flex gap-2 justify-content-end align-items-center">
+        <div id="login-section" class="d-none gap-2 align-items-center">
             <a href="?page=login" class="btn btn-login">Đăng nhập</a>
             <a href="?page=signup" class="btn btn-signup">Đăng ký</a>
         </div>
@@ -24,9 +44,7 @@
                     <div class="profile-name" id="profile-name">Người dùng</div>
                     <small class="profile-email" id="profile-email">user</small>
                 </div>
-                <div class="profile-chevron">
-                    <span>▼</span>
-                </div>
+                <div class="profile-chevron">▼</div>
             </div>
             <div class="profile-menu">
                 <div class="profile-menu-header">
@@ -42,21 +60,21 @@
                 </div>
                 <div class="profile-menu-divider"></div>
                 <a href="?page=profile" class="profile-menu-item">
-                    <span class="menu-icon"></span>
+                    <span class="menu-icon">👤</span>
                     <div class="menu-content">
                         <div class="menu-title">Hồ sơ</div>
                         <small>Quản lý thông tin cá nhân</small>
                     </div>
                 </a>
                 <a href="#" class="profile-menu-item">
-                    <span class="menu-icon"></span>
+                    <span class="menu-icon">⚙️</span>
                     <div class="menu-content">
                         <div class="menu-title">Cài đặt</div>
                         <small>Tùy chọn và quyền riêng tư</small>
                     </div>
                 </a>
                 <a href="#" class="profile-menu-item">
-                    <span class="menu-icon"></span>
+                    <span class="menu-icon">🔖</span>
                     <div class="menu-content">
                         <div class="menu-title">Yêu thích</div>
                         <small>Những bài viết bạn lưu</small>
@@ -64,13 +82,14 @@
                 </a>
                 <div class="profile-menu-divider"></div>
                 <a href="#" id="logout-btn" class="profile-menu-item logout-item">
-                    <span class="menu-icon logout-icon">→</span>
+                    <span class="menu-icon">🚪</span>
                     <div class="menu-content">
                         <div class="menu-title">Đăng xuất</div>
                     </div>
                 </a>
             </div>
         </div>
+
     </div>
 </div>
-<script src="UI/js/header_user.js"></script>
+<script src="../js/header_user.js"></script>
