@@ -4,23 +4,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NewsPulse - Quản lý Phân loại</title>
+    <title>NewPulse - Quản lý Phân loại</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <link rel="stylesheet" href="UI/css/categorymanagement.css">
+    <link rel="stylesheet" href="UI/css/CatagoryManagement.css">
     <link rel="stylesheet" href="UI/css/sidebar.css">
     <link rel="stylesheet" href="UI/css/header_nav.css">
 </head>
 
 <body>
-    {{SIDEBAR_COMPONENT}}
+    <div id="sidebar-placeholder"></div>
 
     <div class="main-wrapper">
-        {{HEADER_COMPONENT}}
+        <div id="header_admin"></div>
 
         <main class="content-area p-4">
+
             <ul class="nav nav-tabs mb-3" id="managementTab" role="tablist">
                 <li class="nav-item">
                     <button class="nav-link active" id="category-tab-btn" data-bs-toggle="tab"
@@ -53,7 +54,6 @@
                                 </tr>
                             </thead>
                             <tbody id="category-list-container">
-                                {{CATEGORY_ROWS}}
                             </tbody>
                         </table>
                     </div>
@@ -71,7 +71,6 @@
                                 </tr>
                             </thead>
                             <tbody id="tag-list-container">
-                                {{TAG_ROWS}}
                             </tbody>
                         </table>
                     </div>
@@ -80,6 +79,7 @@
         </main>
     </div>
 
+    <!-- Modals for Add, Edit, Delete actions -->
     <div class="modal fade" id="addItemModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg">
@@ -166,21 +166,8 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const sidebar = document.querySelector('.sidebar');
-            const toggleBtn = document.querySelector('#sidebarToggle');
-            if (toggleBtn && sidebar) {
-                toggleBtn.addEventListener('click', () => {
-                    sidebar.classList.toggle('show');
-                    document.body.classList.toggle('sidebar-open');
-                });
-            }
-        });
-    </script>
-
-    <script src="UI/js/categorymanagement.js"></script>
+    <script src="UI/js/loadsidebar.js"></script>
+    <script src="UI/js/CategoryManagement.js"></script>
 </body>
 
 </html>
