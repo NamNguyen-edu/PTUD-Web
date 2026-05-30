@@ -52,7 +52,7 @@ class="bg-light-custom d-flex flex-column min-vh-100">
                                     <small class="text-muted">Bài viết</small>
                                 </div>
                                 <div class="stat-item border-left border-right px-3 text-center">
-                                    <span class="d-block font-weight-bold h5 mb-0" id="statBookmarks">15</span>
+                            <span class="d-block font-weight-bold h5 mb-0" id="statBookmarks">0</span>
                                     <small class="text-muted">Đã lưu</small>
                                 </div>
                                 <div class="stat-item text-center">
@@ -123,7 +123,7 @@ class="bg-light-custom d-flex flex-column min-vh-100">
                         <div class="tab-content p-4" id="profileTabContent">
                             <div class="tab-pane fade show active" id="bookmarks" role="tabpanel">
                                 <div class="d-flex justify-content-between align-items-center mb-4">
-                                    <h5 class="font-weight-bold mb-0">Bài viết đã lưu (15)</h5>
+<h5 class="font-weight-bold mb-0">Bài viết đã lưu (<span id="bookmarkCount">0</span>)</h5>
                                     <div class="dropdown">
                                         <button class="btn btn-light btn-sm dropdown-toggle" type="button"
                                             data-toggle="dropdown">
@@ -138,39 +138,9 @@ class="bg-light-custom d-flex flex-column min-vh-100">
                                 </div>
 
                                 <div class="row" id="bookmarkContainer">
-                                    <div class="col-md-6 mb-4">
-                                        <div class="card h-100 border-0 shadow-sm article-card-mini">
-                                            <img src="https://images.unsplash.com/photo-1504711432869-5d39a142ad5c?w=400"
-                                                class="card-img-top" alt="News">
-                                            <div class="card-body p-3">
-                                                <span class="badge badge-soft-primary mb-2">Công nghệ</span>
-                                                <h6 class="font-weight-bold line-clamp-2">Tương lai của AI trong phân tích
-                                                    nghiệp vụ Business Analyst năm 2026</h6>
-                                                <div class="d-flex justify-content-between align-items-center mt-3">
-                                                    <small class="text-muted"><i class="far fa-clock mr-1"></i> 2 giờ
-                                                        trước</small>
-                                                    <button class="btn btn-link btn-sm text-danger p-0" title="Bỏ lưu"><i
-                                                            class="fas fa-bookmark"></i></button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 mb-4">
-                                        <div class="card h-100 border-0 shadow-sm article-card-mini">
-                                            <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400"
-                                                class="card-img-top" alt="News">
-                                            <div class="card-body p-3">
-                                                <span class="badge badge-soft-success mb-2">Kinh tế</span>
-                                                <h6 class="font-weight-bold line-clamp-2">Thị trường Startup Việt Nam: Cơ
-                                                    hội và thách thức cho Gen Z</h6>
-                                                <div class="d-flex justify-content-between align-items-center mt-3">
-                                                    <small class="text-muted"><i class="far fa-clock mr-1"></i> Hôm
-                                                        qua</small>
-                                                    <button class="btn btn-link btn-sm text-danger p-0" title="Bỏ lưu"><i
-                                                            class="fas fa-bookmark"></i></button>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <div class="col-12 text-center text-muted py-4" id="bookmarkEmpty">
+                                        <i class="fas fa-bookmark fa-2x mb-2 d-block"></i>
+                                        Bạn chưa lưu bài viết nào.
                                     </div>
                                 </div>
                                 <button class="btn btn-light btn-block font-weight-bold text-primary py-2 mt-2">XEM THÊM

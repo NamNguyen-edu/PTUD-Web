@@ -215,6 +215,18 @@ switch ($page) {
         require_once __DIR__ . '/Controller/NotificationController.php';
         (new NotificationController())->checkNewComments();
         break;
+    case 'bookmark_toggle':
+        require_once __DIR__ . '/Controller/BookmarkController.php';
+        (new BookmarkController())->toggle();
+        break;
+    case 'bookmark_list':
+        require_once __DIR__ . '/Controller/BookmarkController.php';
+        (new BookmarkController())->list();
+        break;
+    case 'get_bookmarks':
+        require_once __DIR__ . '/Controller/ProfileController.php';
+        (new ProfileController())->getBookmarks();
+        break;
     default:
         redirect('?page=home');
 }
