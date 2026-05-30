@@ -386,38 +386,4 @@
 
 /* =============================================
    MOBILE RESPONSIVE
-============================================= */
-@media (max-width: 768px) {
-    .topbar {
-        padding: 8px 12px;
-        min-height: auto;
-    }
-
-    .topbar .col-2 {
-        flex: 0 0 auto !important;
-        width: auto !important;
-    }
-
-    .topbar .col-6 {
-        flex: 1 1 0 !important;
-        width: auto !important;
-        min-width: 0;
-    }
-
-    .topbar .col-4 {
-        flex: 0 0 auto !important;
-        width: auto !important;
-    }
-
-    .logo { font-size: 1.2rem; }
-    .logo-icon { display: none; }
-
-    .btn-login, .btn-signup {
-        padding: 6px 12px;
-        font-size: 0.8rem;
-    }
-
-    .profile-email { display: none; }
-    .profile-name { font-size: 0.8rem; }
-    .profile-menu { right: -10px; min-width: 260px; }
 }
