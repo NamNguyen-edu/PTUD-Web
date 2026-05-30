@@ -77,86 +77,22 @@ function renderGoogleButton(mode = 'login') {
   }
 }
 
-// XỬ LÝ CHUNG: ẨN/HIỆN MẬT KHẨU
-document.addEventListener('click', function (e) {
-  if (e.target.closest('.toggle-password')) {
-    const btn = e.target.closest('.toggle-password');
-    const input = document.getElementById(btn.getAttribute('data-target'));
-    const icon = btn.querySelector('i');
-    input.type = (input.type === 'password') ? 'text' : 'password';
-    icon.className = (input.type === 'password') ? 'bi bi-eye' : 'bi bi-eye-slash';
-  }
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-  // Setup ngôn ngữ
-  const currentLang = localStorage.getItem('newsPulseLang') || 'vi';
-  applyLanguage(currentLang);
-
-  const btnVi = document.getElementById('btn-vi');
-  const btnEn = document.getElementById('btn-en');
-
-  if (btnVi) btnVi.addEventListener('click', () => applyLanguage('vi'));
-  if (btnEn) btnEn.addEventListener('click', () => applyLanguage('en'));
-
-  // Hiển thị nút Google mặc định (phần login) ngay khi vào trang
-  renderGoogleButton('login');
-
-  // Xử lý Form
-  handleFormSubmit('loginForm', '?page=login', 'login');
-  handleFormSubmit('signupForm', '?page=signup', 'signup');
-});
-
-async function handleFormSubmit(formId, url, actionType) {
-  const form = document.getElementById(formId);
-  if (!form) return;
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    if (!form.checkValidity()) {
-      form.classList.add('was-validated');
-      Swal.fire({
-        icon: 'warning',
-        title: 'Thiếu thông tin!',
-        text: 'Vui lòng điền đầy đủ các trường bắt buộc.'
-      });
-      return;
-    }
-
-    const btn = form.querySelector('button[type="submit"]');
-    const originalText = btn.innerHTML;
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...';
-
-    const formData = new FormData(form);
-    try {
-      const response = await fetch(url, { method: 'POST', body: formData });
-      const result = (await response.text()).trim();
-
-      if (actionType === 'login') {
-        if (['admin', 'editor', 'contributor', 'reader', 'chief editor'].includes(result)) {
-          Swal.fire({ icon: 'success', title: 'Thành công!', timer: 1000, showConfirmButton: false })
-            .then(() => window.location.href = (result === 'admin' || result === 'chief editor') ? 'index.php?page=categorymanagement' : 'index.php?page=home');
-        } else {
-          Swal.fire({ icon: 'error', title: 'Đăng nhập thất bại', text: result });
-        }
-      } else {
-        if (result === 'success') {
-          Swal.fire({ icon: 'success', title: 'Đăng ký thành công!' }).then(() => toggleAuth('login'));
-        } else {
-          Swal.fire({ icon: 'error', title: 'Lỗi đăng ký', text: result });
-        }
-      }
-    } catch (err) {
-      Swal.fire({ icon: 'error', title: 'Lỗi kết nối', text: 'Không thể kết nối đến máy chủ. Vui lòng thử lại sau.' });
-    } finally {
-      btn.disabled = false;
-      btn.innerHTML = originalText;
-    }
-  });
+// 3. Callback Google
+function handleGoogleResponse(res) {
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = '?action=google_login';
+  const input = document.createElement('input');
+  input.type = 'hidden'; input.name = 'google_credential'; input.value = res.credential;
+  form.appendChild(input);
+  document.body.appendChild(form);
+  form.submit();
 }
 
+<<<<<<<< < Temporary merge branch 1
+// 4. Đa ngôn ngữ
+=========
+>>>>>>>>> Temporary merge branch 2
 function applyLanguage(lang) {
   localStorage.setItem('newsPulseLang', lang);
 
@@ -167,8 +103,83 @@ function applyLanguage(lang) {
   });
 
   document.querySelectorAll('[data-placeholder]').forEach(el => {
-    if (langData[lang][el.getAttribute('data-placeholder')]) {
-      el.placeholder = langData[lang][el.getAttribute('data-placeholder')];
-    }
+    const key = el.getAttribute('data-placeholder');
+    if (langData[lang][key]) el.placeholder = langData[lang][key];
   });
 }
+
+// 5. Khởi tạo mọi thứ khi DOM load xong
+document.addEventListener('DOMContentLoaded', () => {
+  // Ngôn ngữ
+  applyLanguage(localStorage.getItem('newsPulseLang') || 'vi');
+  document.getElementById('btn-vi').onclick = () => applyLanguage('vi');
+  document.getElementById('btn-en').onclick = () => applyLanguage('en');
+
+  // Google
+  setTimeout(renderGoogleButton, 500);
+
+  // Xử lý Form Submit (Sử dụng 1 handler chung để gọn code)
+  const setupForm = (formId, action) => {
+    const form = document.getElementById(formId);
+    if (form) {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        // Validate đơn giản
+        const inputs = this.querySelectorAll('input');
+        for (let input of inputs) {
+          if (input.value.trim() === '') {
+            alert("Vui lòng điền đầy đủ thông tin!");
+            return;
+          }
+        }
+
+        // Gửi form
+        this.action = '?action=' + action;
+        this.method = 'POST';
+        this.submit();
+      });
+    }
+  };
+
+<<<<<<<<< Temporary merge branch 1
+  setupForm('loginForm', 'login');
+  setupForm('signupForm', 'signup');
+=========
+  if (loginForm) {
+    loginForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const emailEl = document.getElementById('loginUser');
+      const passEl = document.getElementById('loginPass');
+      const email = emailEl?.value?.trim() ?? '';
+      const password = passEl?.value ?? '';
+      const v = validateLogin(email, password);
+      if (!v.ok) { alert(v.msg); return; }
+
+      // Submit the form to server so PHP can redirect on success
+      loginForm.action = '?page=login';
+      loginForm.method = 'POST';
+      loginForm.submit();
+    });
+  }
+
+  if (signupForm) {
+    signupForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const nameEl = document.getElementById('fullName');
+      const emailEl = document.getElementById('signupUser');
+      const passEl = document.getElementById('signupPass');
+      const name = nameEl?.value?.trim() ?? '';
+      const email = emailEl?.value?.trim() ?? '';
+      const password = passEl?.value ?? '';
+      const v = validateSignup(name, email, password);
+      if (!v.ok) { alert(v.msg); return; }
+
+      // Submit the signup form to server
+      signupForm.action = '?page=signup';
+      signupForm.method = 'POST';
+      signupForm.submit();
+    });
+  }
+>>>>>>>>> Temporary merge branch 2
+});
