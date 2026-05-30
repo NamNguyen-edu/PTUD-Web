@@ -1,80 +1,50 @@
 <?php
+
 require_once __DIR__ . '/../Model/pdo.php';
 
 class AuthService
 {
-  // Định nghĩa quyền hạn cụ thể cho từng role
-  private array $permissions = [
-    'admin'        => ['all'], // 'all' là quyền đặc biệt
-    'chief editor' => ['manage_category', 'manage_version', 'approve_post', 'manage_users'],
-    'editor'       => ['manage_version', 'approve_post'],
-    'contributor'  => ['manage_post', 'manage_profile'],
-    'reader'       => ['manage_profile', 'read_post']
-  ];
-
-  /**
-   * Hàm xác thực người dùng đăng nhập
-   */
-  public function authenticate($identifier, $password)
-  {
-    // Đã nâng cấp SQL: Dùng LEFT JOIN để lấy thẳng `name` từ bảng `roles` và gán thành `role_name`
-    $sql = "SELECT u.*, r.name AS role_name 
-            FROM users u 
-            LEFT JOIN roles r ON u.role_id = r.role_id 
-            WHERE u.username = ? OR u.email = ? 
-            LIMIT 1";
-
-    $user = pdo_query_one($sql, $identifier, $identifier);
-
-    if ($user && password_verify($password, $user['password_hash'])) {
-      return $user; // Lúc này $user đã có sẵn key 'role_name' (ví dụ: 'admin')
-    }
-    return false;
-  }
-
-  /**
-   * Hàm kiểm tra quyền truy cập
-   */
-  public function checkPermission(string $role, string $action): bool
-  {
-    // 1. Nếu role không tồn tại hoặc không được định nghĩa, chặn ngay lập tức
-    if (!isset($this->permissions[$role])) {
-      return false;
+    public function findUserByLogin(string $login): ?array
+{
+    return pdo_query_one(
+        'SELECT * FROM users WHERE email = ? OR username = ? LIMIT 1',
+        $login,
+        $login
+    ) ?: null;
+}
+    public function existsUserByEmail(string $email): bool
+    {
+        return (bool) pdo_query_one('SELECT 1 FROM users WHERE email = ? LIMIT 1', $email);
     }
 
-    // 2. Quyền 'all' dành riêng cho Admin hoặc Super User
-    if (in_array('all', $this->permissions[$role])) {
-      return true;
+    public function verifyPassword(array $user, string $password): bool
+    {
+        $dbPassword = $user['password_hash'] ?? $user['password'] ?? '';
+
+        if (empty($dbPassword)) {
+            return false;
+        }
+
+        if (password_verify($password, $dbPassword)) {
+            return true;
+        }
+
+        if (md5($password) === $dbPassword) {
+            return true;
+        }
+
+        return $password === $dbPassword;
     }
 
-    // 3. Kiểm tra xem hành động có nằm trong danh sách quyền của role không
-    return in_array($action, $this->permissions[$role]);
-  }
+    public function registerUser(string $fullname, string $emailOrPhone, string $password): int
+    {
+        $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
-  /**
-   * Kiểm tra email đã tồn tại chưa
-   */
-  public function emailExists(string $email): bool
-  {
-    $sql = "SELECT COUNT(*) as count FROM users WHERE email = ?";
-    $result = pdo_query_one($sql, $email);
-    return ($result && $result['count'] > 0);
-  }
-
-  /**
-   * Tạo tài khoản mới
-   */
-  public function createAccount(string $fullname, string $email, string $password)
-  {
-    if ($this->emailExists($email)) {
-      throw new Exception("Email này đã được đăng ký!");
+        return pdo_execute_return_last_id(
+            'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
+            $fullname,
+            $emailOrPhone,
+            $passwordHash
+        );
     }
-
-    $hash = password_hash($password, PASSWORD_DEFAULT);
-    $username = explode('@', $email)[0] . rand(1000, 9999);
-
-    // Mặc định insert role_id = 5 (tương ứng với 'reader' theo Database seed của m)
-    $sql = "INSERT INTO users (username, email, password_hash, full_name, role_id, status) VALUES (?, ?, ?, ?, 5, 'active')";
-    return pdo_execute($sql, $username, $email, $hash, $fullname);
-  }
 }
