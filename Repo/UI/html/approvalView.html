@@ -33,7 +33,8 @@
                     <div
                         class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-end mb-5 gap-3">
                         <div>
-                            <span class="text-primary fw-bold small text-uppercase">Giai đoạn: Phê duyệt của Tổng biên tập</span>
+                            <span class="text-primary fw-bold small text-uppercase">Giai đoạn: Phê duyệt của Tổng biên
+                                tập</span>
                             <h2 class="display-6 fw-bold mt-1">{{ARTICLE_TITLE}}</h2>
                         </div>
                         <div
@@ -47,15 +48,18 @@
                         <div class="pipeline-line"></div>
                         <div class="d-flex justify-content-between position-relative z-2">
                             <div class="text-center {{STEP_PENDING_CLASS}}">
-                                <div class="step-box" {{STEP_PENDING_BOX_STYLE}}><span class="material-symbols-outlined">radio_button_checked</span></div>
+                                <div class="step-box" {{STEP_PENDING_BOX_STYLE}}><span
+                                        class="material-symbols-outlined">radio_button_checked</span></div>
                                 <p class="small fw-bold mt-2 mb-0 d-none d-md-block">Tổng biên tập phê duyệt</p>
                             </div>
                             <div class="text-center {{STEP_APPROVED_CLASS}}">
-                                <div class="step-box" {{STEP_APPROVED_BOX_STYLE}}><span class="material-symbols-outlined">check_circle</span></div>
+                                <div class="step-box" {{STEP_APPROVED_BOX_STYLE}}><span
+                                        class="material-symbols-outlined">check_circle</span></div>
                                 <p class="small fw-bold mt-2 mb-0 d-none d-md-block">Đã duyệt</p>
                             </div>
                             <div class="text-center {{STEP_PUBLISHED_CLASS}}">
-                                <div class="step-box" {{STEP_PUBLISHED_BOX_STYLE}}><span class="material-symbols-outlined">rocket_launch</span></div>
+                                <div class="step-box" {{STEP_PUBLISHED_BOX_STYLE}}><span
+                                        class="material-symbols-outlined">rocket_launch</span></div>
                                 <p class="small fw-bold mt-2 mb-0 d-none d-md-block">Đã xuất bản</p>
                             </div>
                         </div>
@@ -68,8 +72,11 @@
                             <div class="d-flex justify-content-between align-items-start mb-4">
                                 <h3 class="h4 fw-bold mb-0">Chi tiết biên tập</h3>
                                 <div class="d-flex gap-2">
-                                    <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">{{WORD_COUNT}} từ</span>
-                                    <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2">{{PRIMARY_CATEGORY}}</span>
+                                    <span
+                                        class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">{{WORD_COUNT}}
+                                        từ</span>
+                                    <span
+                                        class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2">{{PRIMARY_CATEGORY}}</span>
                                 </div>
                             </div>
 
@@ -126,8 +133,10 @@
 
                             <div class="white-card" id="revisionForm" style="display:none;">
                                 <h6 class="fw-bold mb-3">Nội dung yêu cầu chỉnh sửa</h6>
-                                <textarea id="revisionText" class="form-control rounded-4 border-0 bg-light p-3 mb-3" rows="5" placeholder="Nhập nội dung cần chỉnh sửa..."></textarea>
-                                <button onclick="submitRevision()" class="btn btn-warning w-100 rounded-pill fw-bold text-dark">
+                                <textarea id="revisionText" class="form-control rounded-4 border-0 bg-light p-3 mb-3"
+                                    rows="5" placeholder="Nhập nội dung cần chỉnh sửa..."></textarea>
+                                <button onclick="submitRevision()"
+                                    class="btn btn-warning w-100 rounded-pill fw-bold text-dark">
                                     Gửi yêu cầu chỉnh sửa
                                 </button>
                             </div>
