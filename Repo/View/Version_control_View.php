@@ -56,7 +56,7 @@ class VersionControlView
         $data = [
 
             'ARTICLE_ID'       => $article['article_id'],
-            'ARTICLE_TITLE'    => htmlspecialchars($article['title']),
+            'ARTICLE_TITLE'    => htmlspecialchars($article['title'] ?? ''),
             'ARTICLE_CATEGORY' => htmlspecialchars(
                 $article['category_name'] ?? 'Chung'
             ),
@@ -134,11 +134,11 @@ class VersionControlView
                 </div>
 
                 <div class="fw-bold">
-                    ' . htmlspecialchars($v['full_name']) . '
+                    ' . htmlspecialchars($v['full_name'] ?? '') . '
                 </div>
 
                 <div class="small text-muted">
-                    ' . htmlspecialchars($v['summary']) . '
+                    ' . htmlspecialchars($v['summary'] ?? '') . '
                 </div>
 
             </div>';

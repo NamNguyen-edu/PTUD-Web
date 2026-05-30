@@ -30,14 +30,14 @@ class CategoryPageController {
 
         $breadcrumbHtml = '<li class="breadcrumb-item"><a href="?page=home" class="text-decoration-none text-muted">Trang chủ</a></li>';
         if (isset($category['parent_name']) && $category['parent_name'] !== '') {
-            $breadcrumbHtml .= '<li class="breadcrumb-item"><a href="?page=category&slug=' . htmlspecialchars($category['parent_slug']) . '" class="text-decoration-none text-muted">' . htmlspecialchars($category['parent_name']) . '</a></li>';
+            $breadcrumbHtml .= '<li class="breadcrumb-item"><a href="?page=category&slug=' . htmlspecialchars($category['parent_slug'] ?? '') . '" class="text-decoration-none text-muted">' . htmlspecialchars($category['parent_name'] ?? '') . '</a></li>';
         }
-        $breadcrumbHtml .= '<li class="breadcrumb-item active text-theme font-weight-bold" aria-current="page">' . htmlspecialchars($category['name']) . '</li>';
+        $breadcrumbHtml .= '<li class="breadcrumb-item active text-theme font-weight-bold" aria-current="page">' . htmlspecialchars($category['name'] ?? '') . '</li>';
 
         $view = new CategoryView();
         $view->render([
-            'CATEGORY_NAME' => htmlspecialchars($category['name']),
-            'CATEGORY_SLUG' => htmlspecialchars($category['slug']),
+            'CATEGORY_NAME' => htmlspecialchars($category['name'] ?? ''),
+            'CATEGORY_SLUG' => htmlspecialchars($category['slug'] ?? ''),
             'CATEGORY_DESC' => htmlspecialchars($category['description'] ?? ''),
             'THEME_CLASS' => $themeClass,
             'BREADCRUMBS' => $breadcrumbHtml
