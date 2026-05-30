@@ -39,10 +39,10 @@ class SearchController
                     $resultsHtml = '<div class="alert alert-info">Không tìm thấy bài viết nào phù hợp với từ khóa.</div>';
                 } else {
                     foreach ($articles as $article) {
-                        $title = htmlspecialchars($article['title']);
-                        $excerpt = htmlspecialchars($article['excerpt']);
-                        $slug = htmlspecialchars($article['slug']);
-                        $thumbnail = htmlspecialchars($article['thumbnail_url'] ?: 'https://via.placeholder.com/320x180?text=No+Image');
+                        $title = htmlspecialchars($article['title'] ?? '');
+                        $excerpt = htmlspecialchars($article['excerpt'] ?? '');
+                        $slug = htmlspecialchars($article['slug'] ?? '');
+                        $thumbnail = htmlspecialchars(($article['thumbnail_url'] ?? '') ?: 'https://via.placeholder.com/320x180?text=No+Image');
                         $resultsHtml .= '<div class="col-12"><div class="card mb-3 shadow-sm"><div class="row g-0"><div class="col-md-4"><img src="' . $thumbnail . '" class="img-fluid rounded-start" style="height:180px; object-fit:cover; width:100%;"></div><div class="col-md-8"><div class="card-body"><h5 class="card-title">' . $title . '</h5><p class="card-text text-muted">' . $excerpt . '</p><p class="card-text"><small class="text-secondary">Lượt xem: ' . intval($article['view_count']) . '</small></p><a href="?page=article&slug=' . $slug . '" class="btn btn-primary btn-sm">Xem bài viết</a></div></div></div></div></div>';
                     }
                 }
