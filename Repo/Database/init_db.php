@@ -4,13 +4,38 @@
  * Cơ chế: Auto-create DB -> Schema -> Migration -> Seed (Chỉ lần đầu tiên)
  */
 
+function loadDotEnv()
+{
+    $envPath = __DIR__ . '/../.env';
+    if (file_exists($envPath)) {
+        $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        foreach ($lines as $line) {
+            if (strpos($line, '=') !== false && strpos($line, '#') !== 0) {
+                list($key, $value) = explode('=', $line, 2);
+                $key = trim($key);
+                $value = trim($value, " \t\n\r\0\x0B\"'");
+                $value = str_replace('\n', "\n", $value);
+                putenv("$key=$value");
+                $_ENV[$key] = $value;
+                $_SERVER[$key] = $value;
+            }
+        }
+    }
+}
+loadDotEnv();
+
 // 1. Cấu hình kết nối (Aiven Cloud + SSL nếu cần)
-$host = 'newspulsedb-newspulseg5.h.aivencloud.com';
-$port = 18427;
-$user = 'avnadmin';
-$pass = 'AVNS_5kpa6shKuuTPQ13VEIo';
-$dbname = 'news_pulse'; // Tên database chính thức sau khi tạo
-$sslCaFile = realpath(__DIR__ . '/../ca.pem');
+$host = getenv('DB_HOST') ?: ($_ENV['DB_HOST'] ?? 'localhost');
+$port = getenv('DB_PORT') ?: ($_ENV['DB_PORT'] ?? 3306);
+$user = getenv('DB_USER') ?: ($_ENV['DB_USER'] ?? '');
+$pass = getenv('DB_PASS') ?: ($_ENV['DB_PASS'] ?? '');
+$dbname = getenv('DB_NAME') ?: ($_ENV['DB_NAME'] ?? 'news_pulse'); // Tên database chính thức sau khi tạo
+
+$sslCaContent = getenv('DB_SSL_CA') ?: ($_ENV['DB_SSL_CA'] ?? '');
+$sslCaFile = sys_get_temp_dir() . '/ca_pulse.pem';
+if (!empty($sslCaContent)) {
+    file_put_contents($sslCaFile, $sslCaContent);
+}
 
 // CHECK: Xem database đã được khởi tạo lần nào chưa (kiểm tra bảng users)
 try {
@@ -18,7 +43,7 @@ try {
     $optionsCheck = [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
     ];
-    if ($sslCaFile && file_exists($sslCaFile) && defined('PDO::MYSQL_ATTR_SSL_CA')) {
+    if (!empty($sslCaContent) && file_exists($sslCaFile) && defined('PDO::MYSQL_ATTR_SSL_CA')) {
         $optionsCheck[PDO::MYSQL_ATTR_SSL_CA] = $sslCaFile;
         if (defined('PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT')) {
             $optionsCheck[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false;

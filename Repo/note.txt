@@ -1,0 +1,70 @@
+File cần sửa: [header_user.js]
+
+1. TÌM ĐOẠN NÀY:
+const avatarUrl = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(name) + '&background=0d6efd&color=fff';
+avatars.forEach(img => img.src = avatarUrl);
+
+2. SỬA THÀNH ĐOẠN NÀY:
+const avatarUrl = (data.user && data.user.avatar_url) 
+                        ? data.user.avatar_url 
+                        : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(name) + '&background=0d6efd&color=fff';
+                    
+avatars.forEach(img => img.src = avatarUrl);
+
+
+
+
+File cần sửa: AuthController.php (bên trong hàm currentUser)
+
+1. TÌM ĐOẠN NÀY:
+        $logged = isset($_SESSION['user_id']) && $_SESSION['user_id'];
+        $user = [
+            'id' => $logged ? ($_SESSION['user_id'] ?? null) : null,
+            'name' => $logged ? ($_SESSION['user_name'] ?? ($_SESSION['user_fullname'] ?? '')) : null,
+            'email' => $logged ? ($_SESSION['user_email'] ?? null) : null,
+        ];
+
+        echo json_encode(['logged' => $logged, 'user' => $user]);
+
+2. SỬA THÀNH ĐOẠN NÀY:
+        $logged = isset($_SESSION['user_id']) && $_SESSION['user_id'];
+        
+        // CHỈ CHÈN THÊM ĐOẠN NÀY: Lấy avatar và đồng bộ tên mới nhất từ DB
+        $avatarUrl = '';
+        if ($logged) {
+            require_once __DIR__ . '/../Services/profile_service.php';
+            $userInfo = (new ProfileService())->getUserInfo(intval($_SESSION['user_id']));
+            if ($userInfo) {
+                $avatarUrl = $userInfo['avatar_url'] ?? '';
+                if (!empty($userInfo['full_name'])) {
+                    $_SESSION['user_name'] = $userInfo['full_name']; // Cập nhật lại session tên nếu có đổi
+                }
+            }
+        }
+        $user = [
+            'id' => $logged ? ($_SESSION['user_id'] ?? null) : null,
+            'name' => $logged ? ($_SESSION['user_name'] ?? ($_SESSION['user_fullname'] ?? '')) : null,
+            'email' => $logged ? ($_SESSION['user_email'] ?? null) : null,
+            'avatar_url' => $avatarUrl // Thêm trường này cho JS nhận diện
+        ];
+CẬP NHẬT MỚI NHẤT (SỬA LỖI TRANG PROFILE & LỊCH SỬ ĐỌC):
+
+1. Sửa lỗi Fatal Error trong ProfileController.php:
+   - TÌM: $alertArticles = $profileService->getAlertArticles($userId);
+   - SỬA THÀNH: $alertArticles = $this->getAlertArticles($userId); (vì hàm getAlertArticles nằm trực tiếp bên trong ProfileController chứ không phải Service).
+
+2. Kích hoạt tính năng lưu lịch sử đọc trong Services/load_articles.php:
+   - TÌM trong getArticleBySlug:
+     $this->increaseViewCount($article['article_id']);
+     return $article;
+   - SỬA THÀNH:
+     $this->increaseViewCount($article['article_id']);
+     if (!empty($_SESSION['user_id'])) {
+         $this->saveReadHistory((int)$_SESSION['user_id'], (int)$article['article_id']);
+     }
+     return $article;
+
+3. Sửa lỗi JavaScript cú pháp và lồng DOMContentLoaded trong UI/js/profile.js:
+   - Đóng dấu ngoặc nhọn } của hàm checkArticleAlerts() bị thiếu.
+   - Di chuyển dấu đóng }); của DOMContentLoaded đầu tiên (dòng 4) lên dòng 80 để tránh lồng nhau.
+   - Thay thế việc lắng nghe DOMContentLoaded thứ hai bằng việc kiểm tra document.readyState để đảm bảo hàm initProfile() luôn luôn chạy độc lập, từ đó loadReadingHistory() luôn được thực thi chính xác.

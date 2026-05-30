@@ -17,6 +17,8 @@ class ArticleService {
                 a.excerpt,
                 a.thumbnail_url,
                 a.view_count,
+                a.upvote_count,
+                a.downvote_count,
                 a.published_at,
                 u.full_name AS author_name
             FROM articles a
@@ -69,7 +71,13 @@ class ArticleService {
         $this->increaseViewCount(
             $article['article_id']
         );
+        if (!empty($_SESSION['user_id'])) {
 
+        $this->saveReadHistory(
+            (int) $_SESSION['user_id'],
+            (int) $article['article_id']
+        );
+        }
         return $article;
     }
 
@@ -83,6 +91,23 @@ class ArticleService {
 
         pdo_execute($sql, $articleId);
     }
+    private function saveReadHistory(int $userId,int $articleId): void {
+        $sql = "
+            INSERT INTO user_read_history (
+                user_id,
+                article_id,
+                read_count,
+                first_read_at,
+                last_read_at
+            )
+            VALUES (?, ?, 1, NOW(), NOW())
+
+            ON DUPLICATE KEY UPDATE
+                read_count = read_count + 1,
+                last_read_at = NOW()
+        ";
+        pdo_execute( $sql, $userId, $articleId);
+    }  
 
     public function getRelatedArticles(
         int $articleId,
