@@ -80,8 +80,8 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }); // Đóng DOMContentLoaded ở dòng 4
 
-    function checkArticleAlerts() {
-        const el = document.getElementById('alertArticlesData');
+function checkArticleAlerts() {
+ const el = document.getElementById('alertArticlesData');
         if (!el || !el.value || el.value === '{{ALERT_ARTICLES_JSON}}') return;
 
         let articles = [];
@@ -93,6 +93,35 @@ document.addEventListener("DOMContentLoaded", function() {
             'revision':  { label: 'Cần sửa lại', cls: 'warning',  icon: 'fa-edit' },
             'rejected':  { label: 'Bị từ chối',  cls: 'danger',   icon: 'fa-times-circle' }
         };
+
+        const listContainer = document.getElementById('alertArticlesList');
+        if (!listContainer) return;
+
+        let listHtml = '<ul class="list-group mb-0 border-0">';
+
+        // Lặp qua bài viết lỗi và CHỈ TẠO HTML CƠ BẢN (Đã bỏ dòng lý do)
+        articles.forEach(art => {
+            let st = statusMap[art.status] || { label: art.status, cls: 'secondary', icon: 'fa-info' };
+
+            listHtml += `
+                <li class="list-group-item border-left-${st.cls} shadow-sm mb-3 rounded" style="border-width: 0 0 0 4px !important;">
+                    <div class="d-flex w-100 justify-content-between align-items-center">
+                        <h6 class="mb-0 font-weight-bold text-truncate" style="max-width: 70%;">${art.title}</h6>
+                        <span class="badge badge-${st.cls} p-1"><i class="fas ${st.icon} mr-1"></i>${st.label}</span>
+                    </div>
+                </li>
+            `;
+        });
+
+        listHtml += '</ul>';
+        
+        // Bơm dữ liệu vào thẻ div chờ sẵn trong HTML
+        listContainer.innerHTML = listHtml;
+
+        // Gọi Bootstrap kích hoạt Popup
+        setTimeout(() => {
+            $('#articleAlertModal').modal('show');
+        }, 500);
     } // Đóng checkArticleAlerts
 
     // 2. KHỞI TẠO KHI TRANG LOAD XONG (Phần logic cũ của Profile)

@@ -349,7 +349,7 @@ async function loadArticle() {
 }
 
 function bindActions() {
-    
+    // Gắn sự kiện click cho các nút bình chọn tương tác
     const btnUp = document.getElementById('btn-upvote');
     const btnDown = document.getElementById('btn-downvote');
     
