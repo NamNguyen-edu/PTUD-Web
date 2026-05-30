@@ -90,7 +90,7 @@
       break;
     case 'article':
     case 'post':
-    case 'technology':
+
       require_once __DIR__ . '/Controller/PageController.php';
       (new PageController())->render($page);
       break;
@@ -119,7 +119,19 @@
       require_once __DIR__ . '/Controller/PageController.php';
       (new PageController())->render($page);
       break;
-
+    case 'technology':
+        require_once __DIR__ . '/Controller/CategoryPageController.php';
+        $_GET['slug'] = 'cong-nghe';
+        (new CategoryPageController())->show();
+        break;
+    case 'settings':
+        require_once __DIR__ . '/Controller/SettingsController.php';
+        (new SettingsController())->show();
+        break;
+    case 'change_password':
+        require_once __DIR__ . '/Controller/SettingsController.php';
+        (new SettingsController())->changePassword();
+        break;    
     default:
       redirect('?page=home');
   }
