@@ -225,6 +225,24 @@ switch ($page) {
         (new SettingsController())->changePassword();
         break;
 
+    // --- CÁC CASE CHỨC NĂNG BOOKMARK & NOTIFICATION (RESTORED FROM BAO1 BRANCH) ---
+    case 'toggle_bookmark':
+        require_once __DIR__ . '/Controller/BookmarkController.php';
+        (new BookmarkController())->toggle();
+        break;
+    case 'get_bookmarks':
+        require_once __DIR__ . '/Controller/BookmarkController.php';
+        (new BookmarkController())->list();
+        break;
+    case 'check_new_articles':
+        require_once __DIR__ . '/Controller/NotificationController.php';
+        (new NotificationController())->checkNewArticles();
+        break;
+    case 'check_new_comments':
+        require_once __DIR__ . '/Controller/NotificationController.php';
+        (new NotificationController())->checkNewComments();
+        break;
+
     // --- CÁC CASE QUẢN TRỊ ADMIN (BỊ THIẾU TỪ REPO GỐC ĐƯỢC TÍCH HỢP LẠI) ---
     case 'admin_dashboard':
     case 'admin_userm':
