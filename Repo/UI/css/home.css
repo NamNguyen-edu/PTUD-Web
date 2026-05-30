@@ -465,7 +465,8 @@ body.theme-dark .hot-news-card,
 body.theme-dark .comment-box,
 body.theme-dark .reply-box,
 body.theme-dark .vote-interactive-box,
-body.theme-dark .sidebar-box {
+body.theme-dark .sidebar-box,
+body.theme-dark .card {
     background: #161616 !important;
     border-color: #262626 !important;
     color: #f5f5f5 !important;
