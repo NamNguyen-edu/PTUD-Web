@@ -65,28 +65,9 @@
       (new SearchController())->search(trim((string)($_GET['keyword'] ?? '')));
       break;
 
-    case 'get_dashboard_data':
-      (new DashboardController())->getDashboardData();
-      break;
-
-    case 'home_feed':
-      require_once __DIR__ . '/Controller/home_controller.php';
-      (new HomeController())->feed();
-      break;
-
-    case 'article_detail':
-      require_once __DIR__ . '/Controller/load_articles_controller.php';
-      (new ArticleController())->detail();
-      break;
-
-    case 'update_profile':
+    case 'profile':
       require_once __DIR__ . '/Controller/ProfileController.php';
-      (new ProfileController())->updateProfile();
-      break;
-
-    case 'upload_avatar':
-      require_once __DIR__ . '/Controller/ProfileController.php';
-      (new ProfileController())->uploadAvatar();
+      (new ProfileController())->show();
       break;
 
     case 'dbtest':

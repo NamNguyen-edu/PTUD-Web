@@ -107,23 +107,28 @@ class AuthController
 
     $logged = isset($_SESSION['user_id']) && $_SESSION['user_id'];
 
+    // CHỈ CHÈN THÊM ĐOẠN NÀY: Lấy avatar và đồng bộ tên mới nhất từ DB
     $avatarUrl = '';
+    $settings = null;
     if ($logged) {
       require_once __DIR__ . '/../Services/profile_service.php';
       $userInfo = (new ProfileService())->getUserInfo(intval($_SESSION['user_id']));
       if ($userInfo) {
         $avatarUrl = $userInfo['avatar_url'] ?? '';
+        $settings = !empty($userInfo['settings']) ? json_decode($userInfo['settings'], true) : null;
         if (!empty($userInfo['full_name'])) {
-          $_SESSION['user_name'] = $userInfo['full_name'];
+          $_SESSION['user_name'] = $userInfo['full_name']; // Cập nhật lại session tên nếu có đổi
         }
       }
     }
 
+    // Giữ nguyên cấu trúc mảng cũ của bạn, chỉ thêm trường avatar_url và settings
     $user = [
       'id' => $logged ? ($_SESSION['user_id'] ?? null) : null,
       'name' => $logged ? ($_SESSION['user_name'] ?? ($_SESSION['user_fullname'] ?? '')) : null,
       'email' => $logged ? ($_SESSION['user_email'] ?? null) : null,
-      'avatar_url' => $avatarUrl
+      'avatar_url' => $avatarUrl, // Thêm trường này cho JS nhận diện
+      'settings' => $settings
     ];
 
     echo json_encode(['logged' => $logged, 'user' => $user]);
