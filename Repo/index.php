@@ -199,6 +199,14 @@ switch ($page) {
         $_GET['slug'] = 'cong-nghe';
         (new CategoryPageController())->show();
         break;
+    case 'settings':
+        require_once __DIR__ . '/Controller/SettingsController.php';
+        (new SettingsController())->show();
+        break;
+    case 'change_password':
+        require_once __DIR__ . '/Controller/SettingsController.php';
+        (new SettingsController())->changePassword();
+        break;    
     default:
         redirect('?page=home');
 }
