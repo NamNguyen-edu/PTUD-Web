@@ -199,7 +199,6 @@
             } else {
                 // SessionStorage temporary save for guests
                 sessionStorage.setItem('newsPulse_theme', targetTheme);
-                showToast(`Đã chuyển sang giao diện ${targetTheme === 'dark' ? 'tối' : 'sáng'}.`, 'info');
             }
         });
 
