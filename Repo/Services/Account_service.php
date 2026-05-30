@@ -1,41 +1,53 @@
 <?php
-require_once '../Model/pdo.php';
+require_once(__DIR__ . '/../Model/pdo.php');
 
-class UserService
+class AccountService
 {
-
-  public function getAllUsers($search = '')
+  // Lấy danh sách users kèm tên Role
+  public function getAllUsers()
   {
-    if ($search) {
-      $sql = "SELECT * FROM users WHERE name LIKE ? OR email LIKE ?";
-      return pdo_query_search($sql, $search);
-    } else {
-      return pdo_query("SELECT * FROM users ORDER BY id DESC");
-    }
+    $sql = "SELECT u.*, r.name as role_name 
+                FROM users u 
+                LEFT JOIN roles r ON u.role_id = r.role_id 
+                ORDER BY u.user_id DESC";
+    return pdo_query($sql);
   }
 
+  // Tìm kiếm (tìm theo full_name hoặc email)
+  public function searchUsers($keyword)
+  {
+    $sql = "SELECT u.*, r.name as role_name 
+                FROM users u 
+                LEFT JOIN roles r ON u.role_id = r.role_id 
+                WHERE u.full_name LIKE ? OR u.email LIKE ? 
+                ORDER BY u.user_id DESC";
+    return pdo_query_search($sql, $keyword);
+  }
+
+  // Tạo mới (cần map role_name sang role_id nếu cần)
   public function createUser($data)
   {
-    $sql = "INSERT INTO users (name, email, role, status, lastActive) VALUES (?, ?, ?, ?, NOW())";
-    pdo_execute($sql, $data['name'], $data['email'], $data['role'], $data['status']);
-    return true;
+    // Lưu ý: $data['role'] ở đây là tên role, ta cần tìm ID của nó
+    $role = pdo_query_one("SELECT role_id FROM roles WHERE name = ?", $data['role']);
+    $role_id = $role ? $role['role_id'] : 5; // Mặc định là reader (ID 5)
+
+    $sql = "INSERT INTO users(full_name, email, password_hash, role_id, status) VALUES(?, ?, ?, ?, ?)";
+    // Mặc định mật khẩu là 123456 (hash) cho user mới
+    $default_pass = password_hash('123456', PASSWORD_DEFAULT);
+    pdo_execute($sql, $data['name'], $data['email'], $default_pass, $role_id, strtolower($data['status']));
   }
 
   public function deleteUsers($ids)
   {
-    // Tạo chuỗi placeholder (?, ?, ?) dựa trên số lượng id
-    $placeholders = implode(',', array_fill(0, count($ids), '?'));
-    $sql = "DELETE FROM users WHERE id IN ($placeholders)";
-    // Truyền mảng $ids vào hàm pdo_execute
-    return pdo_execute($sql, ...$ids);
+    $idList = implode(',', array_map('intval', $ids));
+    $sql = "DELETE FROM users WHERE user_id IN ($idList)";
+    pdo_execute($sql);
   }
 
   public function updateStatus($ids, $status)
   {
-    $placeholders = implode(',', array_fill(0, count($ids), '?'));
-    $sql = "UPDATE users SET status = ? WHERE id IN ($placeholders)";
-    // Trộn $status vào đầu mảng $ids
-    array_unshift($ids, $status);
-    return pdo_execute($sql, ...$ids);
+    $idList = implode(',', array_map('intval', $ids));
+    $sql = "UPDATE users SET status = ? WHERE user_id IN ($idList)";
+    pdo_execute($sql, strtolower($status));
   }
 }

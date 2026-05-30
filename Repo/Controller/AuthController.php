@@ -97,26 +97,63 @@ public function currentUser(): void
         
         // CHỈ CHÈN THÊM ĐOẠN NÀY: Lấy avatar và đồng bộ tên mới nhất từ DB
         $avatarUrl = '';
+        $settings = null;
         if ($logged) {
             require_once __DIR__ . '/../Services/profile_service.php';
             $userInfo = (new ProfileService())->getUserInfo(intval($_SESSION['user_id']));
             if ($userInfo) {
                 $avatarUrl = $userInfo['avatar_url'] ?? '';
+                $settings = !empty($userInfo['settings']) ? json_decode($userInfo['settings'], true) : null;
                 if (!empty($userInfo['full_name'])) {
                     $_SESSION['user_name'] = $userInfo['full_name']; // Cập nhật lại session tên nếu có đổi
                 }
             }
         }
 
-        // Giữ nguyên cấu trúc mảng cũ của bạn, chỉ thêm trường avatar_url
+        // Giữ nguyên cấu trúc mảng cũ của bạn, chỉ thêm trường avatar_url và settings
         $user = [
             'id' => $logged ? ($_SESSION['user_id'] ?? null) : null,
             'name' => $logged ? ($_SESSION['user_name'] ?? ($_SESSION['user_fullname'] ?? '')) : null,
             'email' => $logged ? ($_SESSION['user_email'] ?? null) : null,
-            'avatar_url' => $avatarUrl // Thêm trường này cho JS nhận diện
+            'avatar_url' => $avatarUrl, // Thêm trường này cho JS nhận diện
+            'settings' => $settings
         ];
 
         echo json_encode(['logged' => $logged, 'user' => $user]);
+    }
+
+    public function updateSettings(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        header('Content-Type: application/json; charset=utf-8');
+
+        if (!isset($_SESSION['user_id'])) {
+            echo json_encode(['success' => false, 'message' => 'Người dùng chưa đăng nhập']);
+            return;
+        }
+
+        $userId = intval($_SESSION['user_id']);
+        $input = json_decode(file_get_contents('php://input'), true);
+        $settings = $input['settings'] ?? null;
+
+        if ($settings === null) {
+            echo json_encode(['success' => false, 'message' => 'Dữ liệu settings không hợp lệ']);
+            return;
+        }
+
+        $settingsJson = json_encode($settings);
+
+        try {
+            $db = pdo_get_connection();
+            $stmt = $db->prepare("UPDATE users SET settings = ? WHERE user_id = ?");
+            $success = $stmt->execute([$settingsJson, $userId]);
+            echo json_encode(['success' => $success, 'message' => $success ? 'Cập nhật cài đặt thành công' : 'Không thể cập nhật cài đặt']);
+        } catch (PDOException $e) {
+            echo json_encode(['success' => false, 'message' => 'Lỗi kết nối cơ sở dữ liệu: ' . $e->getMessage()]);
+        }
     }
 
     private function renderLogin(string $message = '', string $type = 'info'): void

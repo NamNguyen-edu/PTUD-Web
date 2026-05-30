@@ -1,4 +1,6 @@
 <?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 session_start();
 require_once __DIR__ . '/Controller/AuthController.php';
 require_once __DIR__ . '/Controller/DashboardController.php';
@@ -35,6 +37,16 @@ switch ($page) {
     case 'logout':
         require_once __DIR__ . '/Controller/AuthController.php';
         (new AuthController())->logout();
+        break;
+
+    case 'update_settings':
+        require_once __DIR__ . '/Controller/AuthController.php';
+        (new AuthController())->updateSettings();
+        break;
+
+    case 'video_feed':
+        require_once __DIR__ . '/Controller/home_controller.php';
+        (new HomeController())->videoFeed();
         break;
 
     case 'search_suggestions':
