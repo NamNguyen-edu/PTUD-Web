@@ -3,6 +3,8 @@ const langData = {
     logo: "NEWSPULSE", welcome: "Chào mừng trở lại", create_account: "Tạo tài khoản",
     full_name: "Họ và tên", placeholder_full_name: "Nhập họ tên",
     email_or_phone: "Email", placeholder_user: "email@vi-du.com",
+    login_user: "Tài khoản", placeholder_login_user: "Nhập Username hoặc Email...",
+    username_label: "Tên đăng nhập", placeholder_username: "Nhập tên đăng nhập của bạn...",
     password: "Mật khẩu", placeholder_pass: "Tối thiểu 6 ký tự",
     log_in: "Đăng nhập", sign_up: "Đăng ký ngay", or: "Hoặc",
     no_acc: "Chưa có tài khoản?", have_acc: "Đã có tài khoản?",
@@ -13,6 +15,8 @@ const langData = {
     logo: "NEWSPULSE", welcome: "Welcome back", create_account: "Create account",
     full_name: "Full Name", placeholder_full_name: "Enter your name",
     email_or_phone: "Email", placeholder_user: "email@example.com",
+    login_user: "Username", placeholder_login_user: "Enter Username or Email...",
+    username_label: "Username", placeholder_username: "Enter your username...",
     password: "Password", placeholder_pass: "At least 6 chars",
     log_in: "Log in", sign_up: "Sign Up", or: "Or",
     no_acc: "Don't have an account?", have_acc: "Already have an account?",
@@ -27,8 +31,10 @@ const CONTROLLER_PATH = "index.php";
 let isGoogleInitialized = false;
 let isLoginGoogleRendered = false;
 let isSignupGoogleRendered = false;
+let currentAuthMode = 'login';
 
 function toggleAuth(mode) {
+  currentAuthMode = mode;
   const loginSec = document.getElementById('login-section');
   const signupSec = document.getElementById('signup-section');
   document.querySelectorAll('.was-validated').forEach(form => form.classList.remove('was-validated'));
@@ -36,9 +42,19 @@ function toggleAuth(mode) {
   if (mode === 'signup') {
     loginSec.style.display = 'none';
     signupSec.style.display = 'block';
+    if(document.getElementById('forgot-section')) document.getElementById('forgot-section').style.display = 'none';
+  } else if (mode === 'forgot') {
+    loginSec.style.display = 'none';
+    signupSec.style.display = 'none';
+    if(document.getElementById('forgot-section')) {
+      document.getElementById('forgot-section').style.display = 'block';
+      document.getElementById('forgotRequestForm').style.display = 'block';
+      document.getElementById('forgotResetForm').style.display = 'none';
+    }
   } else {
     loginSec.style.display = 'block';
     signupSec.style.display = 'none';
+    if(document.getElementById('forgot-section')) document.getElementById('forgot-section').style.display = 'none';
   }
 
   // Trì hoãn 50ms để DOM kịp hiển thị block trước khi Google đo kích thước khung
@@ -56,7 +72,7 @@ function renderGoogleButton(mode = 'login') {
   if (!isGoogleInitialized) {
     google.accounts.id.initialize({
       client_id: "124352835901-jqh4f03ga43s57qpi10pcbhatlj2pj8k.apps.googleusercontent.com",
-      callback: (res) => console.log("Google User:", res.credential)
+      callback: handleGoogleResponse
     });
     isGoogleInitialized = true;
   }
@@ -72,7 +88,7 @@ function renderGoogleButton(mode = 'login') {
 
   // 4. Render nút Signup nếu chưa render
   if (mode === 'signup' && !isSignupGoogleRendered && signupBtn) {
-    google.accounts.id.renderButton(signupBtn, { theme: "outline", size: "large", width: "350" });
+    google.accounts.id.renderButton(signupBtn, { theme: "outline", size: "large", width: "350", text: "signup_with" });
     isSignupGoogleRendered = true;
   }
 }
@@ -165,6 +181,33 @@ async function handleFormSubmit(formId, url, actionType) {
   });
 }
 
+async function handleGoogleResponse(res) {
+  try {
+    const response = await fetch('?page=google_auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'credential=' + encodeURIComponent(res.credential) + '&mode=' + currentAuthMode
+    });
+    const result = (await response.text()).trim();
+    if (['admin', 'editor', 'contributor', 'reader', 'chief editor'].includes(result)) {
+      Swal.fire({ icon: 'success', title: currentAuthMode === 'signup' ? 'Đăng ký Google thành công!' : 'Đăng nhập Google thành công!', timer: 1000, showConfirmButton: false })
+        .then(() => {
+          if (result === 'admin') window.location.href = 'index.php?page=admin_dashboard';
+          else if (result === 'chief editor') window.location.href = 'index.php?page=categorymanagement';
+          else window.location.href = 'index.php?page=home';
+        });
+    } else {
+      let errorMsg = result;
+      if (result === 'EMAIL_EXISTS') errorMsg = 'Email này đã tồn tại trong hệ thống. Vui lòng chuyển sang Đăng nhập!';
+      if (result === 'EMAIL_NOT_FOUND') errorMsg = 'Email này chưa được đăng ký. Vui lòng chuyển sang Đăng ký!';
+      if (result === 'BANNED') errorMsg = 'Tài khoản của bạn đã bị khóa! Không thể đăng nhập.';
+      Swal.fire({ icon: 'error', title: currentAuthMode === 'signup' ? 'Lỗi đăng ký Google' : 'Lỗi đăng nhập Google', text: errorMsg });
+    }
+  } catch (err) {
+    Swal.fire({ icon: 'error', title: 'Lỗi kết nối', text: 'Không thể kết nối đến máy chủ.' });
+  }
+}
+
 function applyLanguage(lang) {
   localStorage.setItem('newsPulseLang', lang);
 
@@ -180,3 +223,73 @@ function applyLanguage(lang) {
     }
   });
 }
+
+// XỬ LÝ FORGOT PASSWORD
+document.addEventListener('DOMContentLoaded', () => {
+  const reqForm = document.getElementById('forgotRequestForm');
+  const resetForm = document.getElementById('forgotResetForm');
+
+  if (reqForm) {
+    reqForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!reqForm.checkValidity()) {
+        reqForm.classList.add('was-validated');
+        return;
+      }
+
+      const btn = document.getElementById('btn-send-otp');
+      const originalText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Đang gửi...';
+
+      try {
+        const res = await fetch('?page=forgot_password_request', { method: 'POST', body: new FormData(reqForm) });
+        const data = await res.json();
+        if (data.success) {
+          Swal.fire({ icon: 'success', title: 'Thành công', text: data.message });
+          reqForm.style.display = 'none';
+          resetForm.style.display = 'block';
+        } else {
+          Swal.fire({ icon: 'error', title: 'Thất bại', text: data.message });
+        }
+      } catch (err) {
+        Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Không thể kết nối đến máy chủ.' });
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
+    });
+  }
+
+  if (resetForm) {
+    resetForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!resetForm.checkValidity()) {
+        resetForm.classList.add('was-validated');
+        return;
+      }
+
+      const btn = document.getElementById('btn-reset-pass');
+      const originalText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Đang xử lý...';
+
+      try {
+        const res = await fetch('?page=forgot_password_reset', { method: 'POST', body: new FormData(resetForm) });
+        const data = await res.json();
+        if (data.success) {
+          Swal.fire({ icon: 'success', title: 'Thành công', text: data.message }).then(() => {
+            toggleAuth('login');
+          });
+        } else {
+          Swal.fire({ icon: 'error', title: 'Thất bại', text: data.message });
+        }
+      } catch (err) {
+        Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Không thể kết nối đến máy chủ.' });
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
+    });
+  }
+});

@@ -45,8 +45,8 @@ async function loadUsersFromBackend() {
 
 function updateKPIs() {
     const total = currentUsersList.length;
-    const active = currentUsersList.filter(u => u.status === "Active").length;
-    const pending = currentUsersList.filter(u => u.status === "Pending").length;
+    const active = currentUsersList.filter(u => u.status && u.status.toLowerCase() === "active").length;
+    const pending = currentUsersList.filter(u => u.status && u.status.toLowerCase() === "pending").length;
 
     document.getElementById("kpi-total-users").innerText = total.toLocaleString();
     document.getElementById("kpi-active-users").innerText = active;
@@ -57,25 +57,36 @@ function updateKPIs() {
 // ĐOẠN 2: DỰNG GIAO DIỆN BẢNG HTML VÀ PHÂN TRANG ĐỘNG
 // =========================================================================
 function formatTimeAgo(dateString) {
-    if (!dateString || dateString === 'Never') return 'Never';
+    if (!dateString || dateString === 'Never') return 'Chưa bao giờ';
     const date = new Date(dateString.replace(/-/g, "/"));
     const now = new Date();
     const secondsPast = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-    if (secondsPast < 0 || secondsPast < 60) return 'Just now';
+    if (secondsPast < 0 || secondsPast < 60) return 'Vừa xong';
     if (secondsPast < 3600) {
         const minutes = Math.floor(secondsPast / 60);
-        return `${minutes} min${minutes > 1 ? 's' : ''} ago`;
+        return `${minutes} phút trước`;
     }
     if (secondsPast < 86400) {
         const hours = Math.floor(secondsPast / 3600);
-        return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+        return `${hours} giờ trước`;
     }
     if (secondsPast < 2592000) {
         const days = Math.floor(secondsPast / 86400);
-        return `${days} day${days > 1 ? 's' : ''} ago`;
+        return `${days} ngày trước`;
     }
-    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    return date.toLocaleDateString('vi-VN', { year: 'numeric', month: 'short', day: 'numeric' });
+}
+
+function translateRole(role) {
+    if (!role) return "";
+    const lower = role.toLowerCase();
+    if (lower === "admin") return "Quản trị viên";
+    if (lower === "editor") return "Biên tập viên";
+    if (lower === "chief editor") return "Tổng biên tập";
+    if (lower === "contributor") return "Cộng tác viên";
+    if (lower === "reader") return "Độc giả";
+    return role;
 }
 
 function renderTable() {
@@ -96,12 +107,25 @@ function renderTable() {
     // Vẽ từng dòng <tr> dựa trên mảng cắt ra (Đã khớp hoàn toàn với 7 cột ở HTML)
     paginatedItems.forEach(user => {
         let statusBadge = "";
-        if (user.status === "Active") {
+        const statusLower = user.status ? user.status.toLowerCase() : "";
+        if (statusLower === "active") {
             statusBadge = '<span class="badge bg-success bg-opacity-10 text-success">Active</span>';
-        } else if (user.status === "Pending") {
+        } else if (statusLower === "pending") {
             statusBadge = '<span class="badge bg-warning bg-opacity-10 text-warning">Pending</span>';
         } else {
-            statusBadge = '<span class="badge bg-secondary bg-opacity-10 text-secondary">Suspended</span>';
+            statusBadge = '<span class="badge bg-danger bg-opacity-10 text-danger">Banned</span>';
+        }
+
+        let suspendActionText = 'Suspend';
+        let suspendActionCode = 'suspend';
+        let suspendIcon = 'block';
+        let suspendColor = 'text-warning';
+
+        if (statusLower === 'pending') {
+            suspendActionText = 'Activate';
+            suspendActionCode = 'active';
+            suspendIcon = 'check_circle';
+            suspendColor = 'text-success';
         }
 
         const tr = document.createElement("tr");
@@ -119,7 +143,7 @@ function renderTable() {
             
             <td class="align-middle text-secondary small">${user.email}</td>
             
-            <td class="align-middle fw-medium text-dark">${user.role}</td>
+            <td class="align-middle fw-medium text-dark">${translateRole(user.role)}</td>
             
             <td class="align-middle">${statusBadge}</td>
             
@@ -130,9 +154,11 @@ function renderTable() {
                     <button class="btn btn-light btn-sm border-0 bg-transparent" data-bs-toggle="dropdown">
                         <span class="material-symbols-outlined fs-5">more_vert</span>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item small fw-bold" href="#" onclick="updateSingleStatus(${user.id}, 'Suspended')">Suspend</a></li>
-                        <li><a class="dropdown-item small text-danger fw-bold" href="#" onclick="deleteSingleUser(${user.id})">Delete</a></li>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                        <li><a class="dropdown-item small fw-bold py-2" href="javascript:void(0)" onclick="openAssignRoleModal(${user.id}, '${user.role}')"><span class="material-symbols-outlined fs-6 align-middle me-1 text-primary">edit</span> Edit Role</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item small ${suspendColor} fw-bold py-2" href="javascript:void(0)" onclick="updateSingleStatus(${user.id}, '${suspendActionCode}')"><span class="material-symbols-outlined fs-6 align-middle me-1">${suspendIcon}</span> ${suspendActionText}</a></li>
+                        <li><a class="dropdown-item small text-danger fw-bold py-2" href="javascript:void(0)" onclick="deleteSingleUser(${user.id})"><span class="material-symbols-outlined fs-6 align-middle me-1">delete</span> Delete</a></li>
                     </ul>
                 </div>
             </td>
@@ -152,14 +178,14 @@ function updatePaginationControls(currentRowsCount) {
 
     const startItem = totalItems === 0 ? 0 : (currentPage - 1) * rowsPerPage + 1;
     const endItem = Math.min(currentPage * rowsPerPage, totalItems);
-    document.getElementById("pagination-info").innerText = `Showing ${startItem}-${endItem} of ${totalItems} users`;
+    document.getElementById("pagination-info").innerText = `Hiển thị ${startItem}-${endItem} trên ${totalItems} người dùng`;
 
     const container = document.getElementById("pagination-container");
     container.innerHTML = "";
 
     container.innerHTML += `
         <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-            <a class="page-link" href="#" onclick="changePage(${currentPage - 1})">Previous</a>
+            <a class="page-link" href="#" onclick="changePage(${currentPage - 1})">Trước</a>
         </li>
     `;
 
@@ -173,7 +199,7 @@ function updatePaginationControls(currentRowsCount) {
 
     container.innerHTML += `
         <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-            <a class="page-link" href="#" onclick="changePage(${currentPage + 1})">Next</a>
+            <a class="page-link" href="#" onclick="changePage(${currentPage + 1})">Sau</a>
         </li>
     `;
 }
@@ -183,8 +209,54 @@ function changePage(page) {
     renderTable();
 }
 
+function openAssignRoleModal(id, currentRole) {
+    document.getElementById('assign-user-id').value = id;
+    const roleSelect = document.getElementById('assign-role-select');
+
+    Array.from(roleSelect.options).forEach(opt => {
+        if (opt.value.toLowerCase() === (currentRole || '').toLowerCase()) {
+            opt.selected = true;
+        }
+    });
+
+    const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('assignRoleModal'));
+    modal.show();
+}
+
+async function submitAssignRoleForm() {
+    const id = document.getElementById('assign-user-id').value;
+    const role = document.getElementById('assign-role-select').value;
+
+    if (!role) return;
+
+    const modalElement = document.getElementById('assignRoleModal');
+    const modalInstance = bootstrap.Modal.getOrCreateInstance(modalElement);
+    modalInstance.hide();
+
+    await updateUserRole(id, role);
+}
+
+async function updateUserRole(userId, newRole) {
+    try {
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: 'change_role', ids: [userId], role: newRole })
+        });
+        const result = await response.json();
+        if (result.success) {
+            await loadUsersFromBackend();
+            showToast(result.message || "Đã phân quyền thành công!", 'success');
+        } else {
+            showToast(result.message || "Không thể phân quyền!", "danger");
+        }
+    } catch (error) {
+        showToast("Lỗi hệ thống khi cập nhật quyền!", "danger");
+    }
+}
+
 // =========================================================================
-// ĐOẠN 3: XỬ LÝ BIỂU MẪU (FORM TẠO USER MỚI)
+// ĐOẠN 4: THAO TÁC ĐƠN LẺ TRÊN TỪNG DÒNG (CSDL REAL-TIME)
 // =========================================================================
 
 async function submitCreateUserForm() {
@@ -234,31 +306,62 @@ async function submitCreateUserForm() {
 // =========================================================================
 
 async function deleteSingleUser(userId) {
-    if (!confirm("Bạn có chắc chắn muốn xóa thành viên này vĩnh viễn khỏi CSDL?")) return;
+    const confirmResult = await Swal.fire({
+        title: 'Xóa thành viên?',
+        text: "Xóa?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Xóa vĩnh viễn'
+    });
+
+    if (!confirmResult.isConfirmed) return;
     try {
-        const response = await fetch(`${API_URL}?id=${userId}`, { method: "DELETE" });
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: 'delete', ids: [userId] })
+        });
         const result = await response.json();
         if (result.success) {
             await loadUsersFromBackend();
-            showToast(result.message, 'danger');
+            showToast(result.message || "Đã xóa thành viên thành công!", 'danger');
         }
     } catch (error) {
         showToast("Lỗi khi thực hiện xóa!", "danger");
     }
 }
 
-async function updateSingleStatus(userId, newStatus) {
+async function updateSingleStatus(userId, actionCode) {
+    const isSuspend = actionCode === 'suspend';
+    if (typeof Swal !== 'undefined') {
+        const confirmResult = await Swal.fire({
+            title: isSuspend ? 'Đình chỉ tài khoản?' : 'Kích hoạt tài khoản?',
+            text: isSuspend ? "Bạn có chắc chắn muốn vô hiệu hóa người dùng này?" : "Tài khoản này sẽ được phép hoạt động trở lại.",
+            icon: isSuspend ? 'warning' : 'info',
+            showCancelButton: true,
+            confirmButtonColor: isSuspend ? '#ffc107' : '#198754',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: isSuspend ? 'Đình chỉ' : 'Kích hoạt'
+        });
+        if (!confirmResult.isConfirmed) return;
+    } else {
+        if (!confirm(isSuspend ? "Bạn có chắc chắn muốn vô hiệu hóa người dùng này?" : "Kích hoạt lại người dùng này?")) return;
+    }
+
     try {
-        // Tận dụng API Bulk Action chạy cho 1 người để tiết kiệm dung lượng code backend
         const response = await fetch(API_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ action: 'suspend', ids: [userId] })
+            body: JSON.stringify({ action: actionCode, ids: [userId] })
         });
         const result = await response.json();
         if (result.success) {
             await loadUsersFromBackend();
-            showToast("Đã đình bản thành viên thành công!", 'warning');
+            showToast(result.message || (isSuspend ? "Đã đình bản thành công!" : "Đã kích hoạt thành công!"), isSuspend ? 'warning' : 'success');
+        } else {
+            showToast(result.message || "Lỗi khi cập nhật trạng thái", "danger");
         }
     } catch (error) {
         showToast("Gặp lỗi khi cập nhật trạng thái!", "danger");
@@ -297,11 +400,22 @@ function initBulkActions() {
         const actionText = actionBtn.textContent.trim().toLowerCase();
         let actionType = '';
 
-        if (actionText.includes('suspend')) actionType = 'suspend';
-        else if (actionText.includes('delete')) actionType = 'delete';
-        else if (actionText.includes('invite')) actionType = 'invite';
+        if (actionText.includes('suspend') || actionText.includes('đình chỉ')) actionType = 'suspend';
+        else if (actionText.includes('delete') || actionText.includes('xóa')) actionType = 'delete';
+        else if (actionText.includes('invite') || actionText.includes('mới')) actionType = 'invite';
 
-        if (actionType === 'delete' && !confirm(`Bạn có chắc muốn XÓA VĨNH VIỄN ${checkedBoxes.length} thành viên đã chọn?`)) return;
+        if (actionType === 'delete') {
+            const confirmResult = await Swal.fire({
+                title: 'Xóa hàng loạt?',
+                text: `Bạn có chắc muốn XÓA VĨNH VIỄN ${checkedBoxes.length} thành viên đã chọn?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Xóa vĩnh viễn'
+            });
+            if (!confirmResult.isConfirmed) return;
+        }
 
         const ids = Array.from(checkedBoxes).map(cb => parseInt(cb.value));
 
@@ -343,7 +457,7 @@ function initSearch() {
         typingTimer = setTimeout(async () => {
             const keyword = e.target.value.trim();
             try {
-                const response = await fetch(`${API_URL}?search=${encodeURIComponent(keyword)}`);
+                const response = await fetch(`${API_URL}&search=${encodeURIComponent(keyword)}`);
                 const result = await response.json();
                 if (result.success) {
                     filteredData = result.data;
@@ -358,17 +472,26 @@ function initSearch() {
 }
 
 // =========================================================================
-// ĐOẠN 7: HIỂN THỊ HỘP TOAST THÔNG BÁO THEO BANNER MÀU BOOTSTRAP
+// ĐOẠN 7: HIỂN THỊ HỘP TOAST/POPUP THÔNG BÁO (SWEETALERT2)
 // =========================================================================
 
 function showToast(message, type = 'success') {
-    const toastEl = document.getElementById('actionToast');
-    const toastBody = document.getElementById('toastMessage');
+    let iconType = 'success';
+    let title = 'Success';
 
-    // Reset lại màu nền lớp phủ trước khi gán màu mới
-    toastEl.className = `toast align-items-center border-0 text-white bg-${type}`;
-    toastBody.innerText = message;
+    if (type === 'danger') {
+        iconType = 'error';
+        title = 'Error';
+    } else if (type === 'warning') {
+        iconType = 'warning';
+        title = 'Warning';
+    }
 
-    const bootstrapToast = bootstrap.Toast.getOrCreateInstance(toastEl);
-    bootstrapToast.show();
+    Swal.fire({
+        title: title,
+        text: message,
+        icon: iconType,
+        confirmButtonColor: '#3085d6',
+        confirmButtonText: 'OK'
+    });
 }

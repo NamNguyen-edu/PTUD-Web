@@ -19,7 +19,7 @@ class AccountController
 
     $view = new AccountView();
     $view->render([
-      'TITLE' => 'Account Management',
+      'TITLE' => 'Quản lý Người dùng',
       'USERS' => $mappedUsers
     ]);
   }
@@ -58,21 +58,21 @@ class AccountController
     $action = $input['action'] ?? 'create';
 
     return match ($action) {
-      'create'  => $this->createUser($input),
-      'delete'  => $this->deleteUsers($input['ids'] ?? []),
-      'suspend' => $this->updateStatus($input['ids'] ?? [], 'suspended'),
-      'active'  => $this->updateStatus($input['ids'] ?? [], 'active'),
+      'change_role' => $this->changeRole($input),
+      'delete'      => $this->deleteUsers($input['ids'] ?? []),
+      'suspend'     => $this->updateStatus($input['ids'] ?? [], 'pending'),
+      'active'      => $this->updateStatus($input['ids'] ?? [], 'active'),
       default   => throw new Exception("Hành động không hợp lệ."),
     };
   }
 
-  private function createUser(array $data): array
+  private function changeRole(array $input): array
   {
-    if (empty($data['name']) || empty($data['email']) || empty($data['role']) || empty($data['status'])) {
-      throw new Exception("Vui lòng điền đủ thông tin người dùng!");
+    if (empty($input['ids']) || empty($input['role'])) {
+      throw new Exception("Thông tin phân quyền không đầy đủ.");
     }
-    $this->model->createUser($data);
-    return ['message' => 'Tạo mới tài khoản thành công!'];
+    $this->model->changeRole($input['ids'], $input['role']);
+    return ['message' => 'Cập nhật phân quyền thành công.'];
   }
 
   private function deleteUsers(array $ids): array
