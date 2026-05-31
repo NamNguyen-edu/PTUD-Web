@@ -114,6 +114,10 @@ switch ($page) {
         require_once __DIR__ . '/Controller/PageController.php';
         (new PageController())->render('article');
         break;
+    case 'post':
+        require_once __DIR__ . '/Controller/PageController.php';
+        (new PageController())->render('post');
+        break;
     case 'article_detail':
         require_once __DIR__ . '/Controller/load_articles_controller.php';
         (new ArticleController())->detail();
@@ -135,6 +139,7 @@ switch ($page) {
         break;
 
     case 'version-control':
+        authorize('manage_version');
         require_once __DIR__ . '/Controller/Version_control_controller.php';
         (new VersionControlController())->show();
         break;
@@ -233,6 +238,45 @@ switch ($page) {
         require_once __DIR__ . '/Controller/SettingsController.php';
         (new SettingsController())->changePassword();
         break;
+
+    // --- CÁC CASE CHỨC NĂNG BOOKMARK & NOTIFICATION (RESTORED FROM BAO1 BRANCH) ---
+    case 'toggle_bookmark':
+        require_once __DIR__ . '/Controller/BookmarkController.php';
+        (new BookmarkController())->toggle();
+        break;
+    case 'get_bookmarks':
+        require_once __DIR__ . '/Controller/BookmarkController.php';
+        (new BookmarkController())->list();
+        break;
+    case 'check_new_articles':
+        require_once __DIR__ . '/Controller/NotificationController.php';
+        (new NotificationController())->checkNewArticles();
+        break;
+    case 'check_new_comments':
+        require_once __DIR__ . '/Controller/NotificationController.php';
+        (new NotificationController())->checkNewComments();
+        break;
+
+    // --- CÁC CASE QUẢN TRỊ ADMIN (BỊ THIẾU TỪ REPO GỐC ĐƯỢC TÍCH HỢP LẠI) ---
+    case 'admin_dashboard':
+    case 'admin_userm':
+    case 'accountmangement':
+        authorize('manage_users');
+        require_once __DIR__ . '/Controller/account_controller.php';
+        (new AccountController())->render();
+        break;
+
+    case 'categorymanagement':
+        authorize('manage_category');
+        require_once __DIR__ . '/Controller/category_controller.php';
+        (new CategoryController())->render();
+        break;
+    case 'api_category':
+        authorize('manage_category');
+        require_once __DIR__ . '/Controller/category_controller.php';
+        (new CategoryController())->handleApi();
+        break;
+
     default:
         redirect('?page=home');
 }

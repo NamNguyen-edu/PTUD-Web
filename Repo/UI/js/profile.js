@@ -80,8 +80,8 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }); // Đóng DOMContentLoaded ở dòng 4
 
-    function checkArticleAlerts() {
-        const el = document.getElementById('alertArticlesData');
+function checkArticleAlerts() {
+ const el = document.getElementById('alertArticlesData');
         if (!el || !el.value || el.value === '{{ALERT_ARTICLES_JSON}}') return;
 
         let articles = [];
@@ -93,6 +93,35 @@ document.addEventListener("DOMContentLoaded", function() {
             'revision':  { label: 'Cần sửa lại', cls: 'warning',  icon: 'fa-edit' },
             'rejected':  { label: 'Bị từ chối',  cls: 'danger',   icon: 'fa-times-circle' }
         };
+
+        const listContainer = document.getElementById('alertArticlesList');
+        if (!listContainer) return;
+
+        let listHtml = '<ul class="list-group mb-0 border-0">';
+
+        // Lặp qua bài viết lỗi và CHỈ TẠO HTML CƠ BẢN (Đã bỏ dòng lý do)
+        articles.forEach(art => {
+            let st = statusMap[art.status] || { label: art.status, cls: 'secondary', icon: 'fa-info' };
+
+            listHtml += `
+                <li class="list-group-item border-left-${st.cls} shadow-sm mb-3 rounded" style="border-width: 0 0 0 4px !important;">
+                    <div class="d-flex w-100 justify-content-between align-items-center">
+                        <h6 class="mb-0 font-weight-bold text-truncate" style="max-width: 70%;">${art.title}</h6>
+                        <span class="badge badge-${st.cls} p-1"><i class="fas ${st.icon} mr-1"></i>${st.label}</span>
+                    </div>
+                </li>
+            `;
+        });
+
+        listHtml += '</ul>';
+        
+        // Bơm dữ liệu vào thẻ div chờ sẵn trong HTML
+        listContainer.innerHTML = listHtml;
+
+        // Gọi Bootstrap kích hoạt Popup
+        setTimeout(() => {
+            $('#articleAlertModal').modal('show');
+        }, 500);
     } // Đóng checkArticleAlerts
 
     // 2. KHỞI TẠO KHI TRANG LOAD XONG (Phần logic cũ của Profile)
@@ -538,5 +567,84 @@ window.processArticleAction = function(articleId, actionType, successMsg, extraD
     .catch(error => {
         console.error('Error during fetch:', error);
         alert("❌ Đã xảy ra lỗi kết nối hoặc xử lý phía máy chủ.");
-    });
-};
+    });}
+window.loadBookmarks = async function() {
+    try {
+        const res = await fetch('?page=get_bookmarks');
+        const result = await res.json();
+
+        const container = document.getElementById('bookmarkContainer');
+        const empty = document.getElementById('bookmarkEmpty');
+        const count = document.getElementById('bookmarkCount');
+        const statCount = document.getElementById('statBookmarks');
+
+        if (!result.success || !result.data.length) {
+            count.textContent = '0';
+            statCount.textContent = '0';
+            return;
+        }
+
+        const bookmarks = result.data;
+        count.textContent = bookmarks.length;
+        statCount.textContent = bookmarks.length;
+        empty.classList.add('d-none');
+
+        container.innerHTML = bookmarks.map(b => `
+            <div class="col-md-6 mb-4" id="bookmark-card-${b.article_id}">
+                <div class="card h-100 border-0 shadow-sm article-card-mini">
+                    <img src="${b.thumbnail_url || 'https://picsum.photos/400/200'}" class="card-img-top" alt="${b.title}" style="height:160px;object-fit:cover;">
+                    <div class="card-body p-3">
+                        <h6 class="font-weight-bold line-clamp-2">${b.title}</h6>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <small class="text-muted">
+                                <i class="far fa-clock mr-1"></i>${timeAgoProfile(b.bookmarked_at)}
+                            </small>
+                            <button class="btn btn-link btn-sm text-danger p-0" title="Bỏ lưu" onclick="removeBookmark(${b.article_id})">
+                                <i class="fas fa-bookmark"></i>
+                            </button>
+                        </div>
+                        <a href="?page=article&slug=${b.slug}" class="stretched-link"></a>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+    } catch (e) {
+        console.error('Lỗi load bookmark:', e);
+    }
+}
+window.removeBookmark = async function(articleId) {
+    try {
+        const res = await fetch('?page=bookmark_toggle', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ article_id: articleId })
+        });
+        const result = await res.json();
+        if (result.success && !result.is_bookmarked) {
+            document.getElementById(`bookmark-card-${articleId}`)?.remove();
+            const count = document.getElementById('bookmarkCount');
+            const statCount = document.getElementById('statBookmarks');
+            const newCount = parseInt(count.textContent) - 1;
+            count.textContent = newCount;
+            statCount.textContent = newCount;
+            if (newCount === 0) {
+                document.getElementById('bookmarkEmpty')?.classList.remove('d-none');
+            }
+        }
+    } catch (e) {
+        console.error('Lỗi bỏ bookmark:', e);
+    }
+}
+
+window.timeAgoProfile = function(dateStr) {
+    const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000);
+    if (diff < 60) return 'Vừa xong';
+    if (diff < 3600) return Math.floor(diff / 60) + ' phút trước';
+    if (diff < 86400) return Math.floor(diff / 3600) + ' giờ trước';
+    return Math.floor(diff / 86400) + ' ngày trước';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadBookmarks();
+});

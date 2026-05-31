@@ -55,14 +55,20 @@ body {
 
 
 .article-image {
-  position: relative;
-  height: 320px;
+position: relative;
+  width: fit-content;
+  margin: 0 auto 25px auto;
   border-radius: 14px;
   background: linear-gradient(135deg, #B7D8F7, #dbeafe);
-  margin-bottom: 25px;
   overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
-
+#article-thumbnail {
+    max-height: 400px;
+    max-width: 100%; 
+    width: auto;
+    display: block;
+}
 .article-image::after {
   content: "";
   position: absolute;
