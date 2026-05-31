@@ -1,4 +1,13 @@
 <?php
+// Tự động khởi tạo tệp cấu hình .env từ tệp mẫu .env.example nếu khởi chạy lần đầu
+$envPath = __DIR__ . '/.env';
+if (!file_exists($envPath)) {
+    $examplePath = __DIR__ . '/.env.example';
+    if (file_exists($examplePath)) {
+        @copy($examplePath, $envPath);
+    }
+}
+
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 session_start();
