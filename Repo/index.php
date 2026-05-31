@@ -4,35 +4,37 @@ error_reporting(E_ALL);
 session_start();
 
 
-  require_once __DIR__ . '/Services/auth_service.php';
-  require_once __DIR__ . '/Controller/auth_controller.php';
-  require_once __DIR__ . '/Controller/DashboardController.php';
+require_once __DIR__ . '/Services/auth_service.php';
+require_once __DIR__ . '/Controller/auth_controller.php';
+require_once __DIR__ . '/Controller/DashboardController.php';
 
-  function redirect(string $url): void
-  {
+function redirect(string $url): void
+{
     header('Location: ' . $url);
     exit;
-  }
+}
 
-  function authorize(string $action): void
-  {
+function authorize(string $action): void
+{
     $auth = new AuthService();
     $role = $_SESSION['role'] ?? 'guest';
 
     if (!$auth->checkPermission($role, $action)) {
-      http_response_code(403);
-      die("<h1>403 Forbidden: Bạn không có quyền truy cập trang này. (Vai trò hiện tại: " . htmlspecialchars($role) . ", Quyền yêu cầu: " . htmlspecialchars($action) . ")</h1>");
+        http_response_code(403);
+        die("<h1>403 Forbidden: Bạn không có quyền truy cập trang này. (Vai trò hiện tại: " . htmlspecialchars($role) . ", Quyền yêu cầu: " . htmlspecialchars($action) . ")</h1>");
     }
-  }
+}
 
-  $page = trim((string)($_GET['page'] ?? 'home'));
+$page = trim((string)($_GET['page'] ?? 'home'));
 
 switch ($page) {
     case 'save_post':
+        authorize('manage_own_posts');
         require_once __DIR__ . '/Controller/PostnewsController.php';
         (new PostnewsController())->savePost();
         break;
     case 'postnews_action':
+        authorize('manage_own_posts');
         require_once __DIR__ . '/Controller/PostnewsController.php';
         (new PostnewsController())->handleAction();
         break;
@@ -40,6 +42,12 @@ switch ($page) {
     case 'login':
         require_once __DIR__ . '/Controller/auth_controller.php';
         (new AuthController())->login();
+        break;
+
+    case 'update_settings':
+        authorize('manage_profile');
+        require_once __DIR__ . '/Controller/auth_controller.php';
+        (new AuthController())->updateSettings();
         break;
 
     case 'google_auth':
@@ -56,12 +64,6 @@ switch ($page) {
         require_once __DIR__ . '/Controller/auth_controller.php';
         (new AuthController())->logout();
         break;
-
-    case 'update_settings':
-        require_once __DIR__ . '/Controller/auth_controller.php';
-        (new AuthController())->updateSettings();
-        break;
-
     case 'video_feed':
         require_once __DIR__ . '/Controller/home_controller.php';
         (new HomeController())->videoFeed();
@@ -126,16 +128,19 @@ switch ($page) {
         break;
 
     case 'postnews':
+        authorize('manage_own_posts');
         require_once __DIR__ . '/Controller/PostnewsController.php';
         (new PostnewsController())->show();
         break;
 
     case 'version-control':
+        authorize('manage_content');
         require_once __DIR__ . '/Controller/Version_control_controller.php';
         (new VersionControlController())->show();
         break;
 
     case 'version_restore':
+        authorize('manage_content');
         require_once __DIR__ . '/Controller/Version_control_controller.php';
         (new VersionControlController())->restoreVersion();
         break;
@@ -153,35 +158,42 @@ switch ($page) {
         break;
 
     case 'version-list':
+        authorize('manage_content');
         require_once __DIR__ . '/Controller/Version_list_controller.php';
         (new VersionListController())->index();
         break;
 
     case 'approval':
+        authorize('manage_content');
         require_once __DIR__ . '/Controller/Approval_controller.php';
         (new ApprovalController())->show();
         break;
     case 'approve_publish':
+        authorize('manage_content');
         require_once __DIR__ . '/Controller/Approval_controller.php';
         (new ApprovalController())->approvePublish();
         break;
 
     case 'request_revision':
+        authorize('manage_content');
         require_once __DIR__ . '/Controller/Approval_controller.php';
         (new ApprovalController())->requestRevision();
         break;
 
     case 'reject_article':
+        authorize('manage_content');
         require_once __DIR__ . '/Controller/Approval_controller.php';
         (new ApprovalController())->reject();
         break;
 
     case 'get_comments':
+        authorize('manage_content');
         require_once __DIR__ . '/Controller/Approval_controller.php';
         (new ApprovalController())->getComments();
         break;
 
     case 'add_comment':
+        authorize('manage_content');
         require_once __DIR__ . '/Controller/Approval_controller.php';
         (new ApprovalController())->addComment();
         break;
@@ -209,10 +221,12 @@ switch ($page) {
         (new DbTestController())->test();
         break;
     case 'update_profile':
+        authorize('manage_profile');
         require_once __DIR__ . '/Controller/ProfileController.php';
         (new ProfileController())->updateProfile();
         break;
     case 'upload_avatar':
+        authorize('manage_profile');
         require_once __DIR__ . '/Controller/ProfileController.php';
         (new ProfileController())->uploadAvatar();
         break;
@@ -234,10 +248,12 @@ switch ($page) {
         (new CategoryPageController())->show();
         break;
     case 'settings':
+        authorize('manage_profile');
         require_once __DIR__ . '/Controller/SettingsController.php';
         (new SettingsController())->show();
         break;
     case 'change_password':
+        authorize('manage_profile');
         require_once __DIR__ . '/Controller/SettingsController.php';
         (new SettingsController())->changePassword();
         break;
@@ -262,7 +278,7 @@ switch ($page) {
 
     // --- CÁC CASE QUẢN TRỊ ADMIN (BỊ THIẾU TỪ REPO GỐC ĐƯỢC TÍCH HỢP LẠI) ---
     case 'admin_dashboard':
-        authorize('manage_users');
+        authorize('view_dashboard');
         require_once __DIR__ . '/Controller/DashboardController.php';
         (new DashboardController())->render();
         break;
@@ -270,24 +286,24 @@ switch ($page) {
     case 'admin_userm':
     case 'accountmangement':
     case 'accountmanagement':
-        authorize('manage_users');
+        authorize('manage_accounts');
         require_once __DIR__ . '/Controller/account_controller.php';
         (new AccountController())->render();
         break;
 
     case 'categorymanagement':
-        authorize('manage_category');
+        authorize('manage_content');
         require_once __DIR__ . '/Controller/category_controller.php';
         (new CategoryController())->render();
         break;
     case 'api_category':
-        authorize('manage_category');
+        authorize('manage_content');
         require_once __DIR__ . '/Controller/category_controller.php';
         (new CategoryController())->handleApi();
         break;
 
     case 'api_account':
-        authorize('manage_users');
+        authorize('manage_accounts');
         require_once __DIR__ . '/Controller/account_controller.php';
         (new AccountController())->handleApi();
         break;
