@@ -739,3 +739,80 @@
     height: 1rem;
     background-color: rgba(255,255,255,0.2);
   }
+
+/* Dark Mode support via CSS variables in version-control.css */
+body.theme-dark {
+  --color-primary: #1a73e8;
+  --color-primary-dim: #1557b0;
+  --color-on-primary: #ffffff;
+  --color-primary-container: rgba(26, 115, 232, 0.2);
+  --color-on-primary-container: #1a73e8;
+  --color-surface: #0a0a0a;
+  --color-surface-dim: #121212;
+  --color-surface-bright: #161616;
+  --color-surface-container-lowest: #121212;
+  --color-surface-container-low: #161616;
+  --color-surface-container: #161616;
+  --color-surface-container-high: #1e1e1e;
+  --color-surface-container-highest: #262626;
+  --color-surface-variant: #262626;
+  --color-on-surface: #f5f5f5;
+  --color-on-surface-variant: #a3a3a3;
+  --color-outline: #333333;
+  --color-outline-variant: #444444;
+  --color-background: #0a0a0a;
+  --color-on-background: #f5f5f5;
+  --color-inverse-surface: #ffffff;
+  --color-inverse-on-surface: #121212;
+}
+
+body.theme-dark .version-history-item {
+  background: #161616;
+  border-color: #262626;
+}
+
+body.theme-dark .version-history-item:hover {
+  border-color: #1a73e8;
+}
+
+body.theme-dark .version-history-item.active-item {
+  background-color: rgba(26, 115, 232, 0.15);
+  border-color: rgba(26, 115, 232, 0.3);
+}
+
+body.theme-dark .diff-added {
+  background-color: rgba(16, 185, 129, 0.2) !important;
+  color: #10b981 !important;
+}
+
+body.theme-dark .diff-removed {
+  background-color: rgba(239, 68, 68, 0.2) !important;
+  color: #ef4444 !important;
+}
+
+body.theme-dark .view-toggle button.active {
+  background-color: #262626 !important;
+  color: #1a73e8 !important;
+}
+
+body.theme-dark .card-header-row {
+  border-bottom-color: #262626 !important;
+}
+
+body.theme-dark .topbar {
+  background-color: rgba(18, 18, 18, 0.8) !important;
+  border-bottom-color: #262626 !important;
+}
+
+body.theme-dark .topbar-search {
+  background-color: #161616 !important;
+  border-color: #262626 !important;
+}
+
+body.theme-dark .topbar-search input {
+  color: #f5f5f5 !important;
+}
+
+body.theme-dark .icon-btn:hover {
+  background-color: #262626 !important;
+}

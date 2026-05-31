@@ -135,3 +135,102 @@ body {
   background: #f1f3f4;
   color: var(--np-text-dark);
 }
+
+/* Dark Mode styles for Category Management */
+body.theme-dark {
+  background-color: #0a0a0a !important;
+  color: #f5f5f5 !important;
+}
+
+body.theme-dark .main-wrapper {
+  background-color: #0a0a0a !important;
+}
+
+body.theme-dark .content-area {
+  background-color: #0a0a0a !important;
+}
+
+body.theme-dark .page-title,
+body.theme-dark h1,
+body.theme-dark h2,
+body.theme-dark h5,
+body.theme-dark p,
+body.theme-dark th,
+body.theme-dark td {
+  color: #f5f5f5 !important;
+}
+
+body.theme-dark .text-muted,
+body.theme-dark .text-secondary {
+  color: #a3a3a3 !important;
+}
+
+body.theme-dark .stat-card,
+body.theme-dark .table-card {
+  background-color: #161616 !important;
+  border-color: #262626 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;
+}
+
+body.theme-dark .table {
+  color: #f5f5f5 !important;
+}
+
+body.theme-dark .table thead th {
+  background-color: #121212 !important;
+  color: #a3a3a3 !important;
+  border-bottom-color: #262626 !important;
+}
+
+body.theme-dark .table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+}
+
+body.theme-dark .table td {
+  border-bottom-color: #262626 !important;
+}
+
+body.theme-dark .btn-action {
+  color: #a3a3a3 !important;
+}
+
+body.theme-dark .btn-action:hover {
+  background: #262626 !important;
+  color: #ffffff !important;
+}
+
+body.theme-dark .bg-tech {
+  background-color: rgba(26, 115, 232, 0.15) !important;
+  color: #1a73e8 !important;
+}
+
+body.theme-dark .bg-biz {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  color: #a3a3a3 !important;
+}
+
+body.theme-dark .bg-ai {
+  background-color: rgba(249, 171, 0, 0.15) !important;
+  color: #f9ab00 !important;
+}
+
+body.theme-dark .modal-content {
+  background-color: #161616 !important;
+  color: #f5f5f5 !important;
+  border-color: #262626 !important;
+}
+
+body.theme-dark .modal-header,
+body.theme-dark .modal-footer {
+  border-color: #262626 !important;
+}
+
+body.theme-dark .form-control {
+  background-color: #1e1e1e !important;
+  color: #f5f5f5 !important;
+  border-color: #333333 !important;
+}
+
+body.theme-dark .form-control::placeholder {
+  color: #737373 !important;
+}
