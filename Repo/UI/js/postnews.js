@@ -180,15 +180,7 @@ function syncSeoPreview() {
     document.getElementById('previewSlug').innerText = slug || "slug-bai-viet";
 }
 
-// 8. LOGIC HẸN GIỜ XUẤT BẢN
-function togglePublishTime(show) {
-    const picker = document.getElementById('schedulePicker');
-    if (show) {
-        picker.classList.remove('d-none');
-    } else {
-        picker.classList.add('d-none');
-    }
-}
+
 // 9. CORE ACTION: GỬI DỮ LIỆU LÊN SERVER (ĐÃ GỘP TẤT CẢ)
 function handleQuickAction(action, event) {
     if (event) {

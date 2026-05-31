@@ -3,6 +3,8 @@ const langData = {
     logo: "NEWSPULSE", welcome: "Chào mừng trở lại", create_account: "Tạo tài khoản",
     full_name: "Họ và tên", placeholder_full_name: "Nhập họ tên",
     email_or_phone: "Email", placeholder_user: "email@vi-du.com",
+    login_user: "Tài khoản", placeholder_login_user: "Nhập Username hoặc Email...",
+    username_label: "Tên đăng nhập", placeholder_username: "Nhập tên đăng nhập của bạn...",
     password: "Mật khẩu", placeholder_pass: "Tối thiểu 6 ký tự",
     log_in: "Đăng nhập", sign_up: "Đăng ký ngay", or: "Hoặc",
     no_acc: "Chưa có tài khoản?", have_acc: "Đã có tài khoản?",
@@ -13,6 +15,8 @@ const langData = {
     logo: "NEWSPULSE", welcome: "Welcome back", create_account: "Create account",
     full_name: "Full Name", placeholder_full_name: "Enter your name",
     email_or_phone: "Email", placeholder_user: "email@example.com",
+    login_user: "Username", placeholder_login_user: "Enter Username or Email...",
+    username_label: "Username", placeholder_username: "Enter your username...",
     password: "Password", placeholder_pass: "At least 6 chars",
     log_in: "Log in", sign_up: "Sign Up", or: "Or",
     no_acc: "Don't have an account?", have_acc: "Already have an account?",
@@ -56,7 +60,7 @@ function renderGoogleButton(mode = 'login') {
   if (!isGoogleInitialized) {
     google.accounts.id.initialize({
       client_id: "124352835901-jqh4f03ga43s57qpi10pcbhatlj2pj8k.apps.googleusercontent.com",
-      callback: (res) => console.log("Google User:", res.credential)
+      callback: handleGoogleResponse
     });
     isGoogleInitialized = true;
   }
@@ -163,6 +167,29 @@ async function handleFormSubmit(formId, url, actionType) {
       btn.innerHTML = originalText;
     }
   });
+}
+
+async function handleGoogleResponse(res) {
+  try {
+    const response = await fetch('?page=google_auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'credential=' + encodeURIComponent(res.credential)
+    });
+    const result = (await response.text()).trim();
+    if (['admin', 'editor', 'contributor', 'reader', 'chief editor'].includes(result)) {
+      Swal.fire({ icon: 'success', title: 'Đăng nhập Google thành công!', timer: 1000, showConfirmButton: false })
+        .then(() => {
+          if (result === 'admin') window.location.href = 'index.php?page=admin_dashboard';
+          else if (result === 'chief editor') window.location.href = 'index.php?page=categorymanagement';
+          else window.location.href = 'index.php?page=home';
+        });
+    } else {
+      Swal.fire({ icon: 'error', title: 'Lỗi đăng nhập Google', text: result });
+    }
+  } catch (err) {
+    Swal.fire({ icon: 'error', title: 'Lỗi kết nối', text: 'Không thể kết nối đến máy chủ.' });
+  }
 }
 
 function applyLanguage(lang) {
