@@ -21,7 +21,30 @@ class SettingsController
             exit;
         }
 
-        $this->view->render();
+        $homeCategories = [
+            ['name' => 'Thời sự', 'slug' => 'thoi-su', 'emoji' => '🗞'],
+            ['name' => 'Công nghệ', 'slug' => 'cong-nghe', 'emoji' => '💻'],
+            ['name' => 'Kinh doanh', 'slug' => 'kinh-doanh', 'emoji' => '📈'],
+            ['name' => 'Tài chính', 'slug' => 'tai-chinh', 'emoji' => '💵'],
+            ['name' => 'Thị trường', 'slug' => 'thi-truong', 'emoji' => '📊'],
+            ['name' => 'Khởi nghiệp', 'slug' => 'startup', 'emoji' => '🚀'],
+            ['name' => 'Thế giới', 'slug' => 'the-gioi', 'emoji' => '🌍'],
+            ['name' => 'Pháp luật', 'slug' => 'phap-luat', 'emoji' => '⚖️'],
+            ['name' => 'Môi trường', 'slug' => 'moi-truong', 'emoji' => '🌱'],
+            ['name' => 'Khoa học', 'slug' => 'khoa-hoc', 'emoji' => '🔬'],
+            ['name' => 'Sức khỏe', 'slug' => 'suc-khoe', 'emoji' => '❤️'],
+            ['name' => 'Xe', 'slug' => 'xe', 'emoji' => '🚗'],
+            ['name' => 'Giải trí', 'slug' => 'giai-tri', 'emoji' => '🎬'],
+            ['name' => 'Đời sống', 'slug' => 'doi-song', 'emoji' => '🌿'],
+            ['name' => 'Thể thao', 'slug' => 'the-thao', 'emoji' => '⚽'],
+        ];
+
+        $topicsHtml = '';
+        foreach ($homeCategories as $cat) {
+            $topicsHtml .= '<button type="button" class="btn topic-chip" data-topic="' . htmlspecialchars($cat['slug']) . '">' . $cat['emoji'] . ' ' . htmlspecialchars($cat['name']) . '</button>' . "\n";
+        }
+
+        $this->view->render(['TOPICS_OPTIONS' => $topicsHtml]);
     }
 
     public function changePassword(): void
