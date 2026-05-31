@@ -197,6 +197,7 @@ thead th:last-child{
 
     font-size:12px;
     font-weight:700;
+    white-space:nowrap !important;
 }
 
 /* ─────────────────────────
