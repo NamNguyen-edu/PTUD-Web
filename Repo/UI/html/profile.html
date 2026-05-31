@@ -224,29 +224,6 @@ class="bg-light-custom d-flex flex-column min-vh-100">
         </div>
     </main>
 
-    <div class="modal fade" id="userPreferenceModal" tabindex="-1" role="dialog" data-backdrop="static">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content border-0 shadow-lg rounded-xl">
-                <div class="modal-body p-5 text-center">
-                    <div class="pref-icon mb-4">
-                        <i class="fas fa-bullseye fa-3x text-warning"></i>
-                    </div>
-                    <h4 class="font-weight-bold">Tối ưu trải nghiệm của bạn</h4>
-                    <p class="text-muted">Chào Bảo! Hãy chọn các chủ đề bạn quan tâm để NewsPulse đề xuất những bài viết
-                        phù hợp nhất cho bạn.</p>
-
-                    <div class="d-flex flex-wrap justify-content-center mt-4" id="topicSelection">
-                        {{TOPICS_POPUP_OPTIONS}}
-                    </div>
-
-                    <button type="button" class="btn btn-pulse-primary btn-block mt-4 py-3 font-weight-bold shadow"
-                        onclick="saveUserPreferences()">
-                        BẮT ĐẦU KHÁM PHÁ <i class="fas fa-rocket ml-2"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
 <input type="file" id="avatarInput" accept="image/*" class="d-none" onchange="openCropModal(event)">
     
     <div class="modal fade" id="cropModal" tabindex="-1" data-backdrop="static">

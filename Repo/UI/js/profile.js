@@ -15,7 +15,6 @@ document.addEventListener("DOMContentLoaded", function() {
         } catch(e) {
             console.error("Lỗi parse JSON kỹ năng:", e);
         }
-            checkFirstTimeLogin();
             checkArticleAlerts();
         }
     }); // Đóng DOMContentLoaded ở dòng 4
@@ -69,7 +68,6 @@ function checkArticleAlerts() {
 
     // 2. KHỞI TẠO KHI TRANG LOAD XONG (Phần logic cũ của Profile)
     function initProfile() {
-        checkFirstTimeLogin();
         loadReadingHistory();
         $('[data-toggle="tooltip"]').tooltip();
     }
@@ -99,66 +97,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 });
 
 
-// 5. KIỂM TRA TRẠNG THÁI ĐĂNG NHẬP LẦN ĐẦU
-function checkFirstTimeLogin() {
-    const hasPrefs = localStorage.getItem('newsPulse_UserPrefs');
-    
-    try {
-        const saved = JSON.parse(localStorage.getItem('newsPulse_UserPrefs') || '{}');
-        const savedTopics = Array.isArray(saved.topics) ? saved.topics : [];
-        $('.topic-tag').each(function() {
-            if (savedTopics.includes($(this).data('topic'))) {
-                $(this).addClass('selected');
-            } else {
-                $(this).removeClass('selected');
-            }
-        });
-    } catch(e) {
-        console.error("Lỗi load topics ở profile:", e);
-    }
-    
-    if (!hasPrefs) {
-        setTimeout(() => {
-            $('#userPreferenceModal').modal('show');
-        }, 1000);
-    }
-}
-
-// 6. XỬ LÝ CHỌN TAG CHỦ ĐỀ TRONG POPUP
-$(document).on('click', '.topic-tag', function() {
-    $(this).toggleClass('selected');
-    const selectedCount = $('.topic-tag.selected').length;
-    
-});
-
-function saveUserPreferences() {
-    const selectedTags = [];
-    $('.topic-tag.selected').each(function() {
-        selectedTags.push($(this).data('topic'));
-    });
-
-    if (selectedTags.length < 2) {
-        alert("Bảo ơi, bạn hãy chọn ít nhất 2 chủ đề để NewsPulse có thể đề xuất tin tốt nhất nhé!");
-        return;
-    }
-
-    const prefRecord = {
-        userId: "nguyenduybao_87",
-        topics: selectedTags,
-        updatedAt: new Date().toISOString()
-    };
-
-    localStorage.setItem('newsPulse_UserPrefs', JSON.stringify(prefRecord));
-    
-    const btn = event.target;
-    btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i> ĐÃ LƯU THÀNH CÔNG';
-    btn.classList.replace('btn-pulse-primary', 'btn-success');
-
-    setTimeout(() => {
-        $('#userPreferenceModal').modal('hide');
-        alert("Tuyệt vời! Sở thích của bạn đã được ghi nhận. Hệ thống sẽ cá nhân hóa bảng tin ngay bây giờ.");
-    }, 800);
-}
+// 5. KIỂM TRA TRẠNG THÁI ĐĂNG NHẬP LẦN ĐẦU (ĐÃ XÓA THEO YÊU CẦU)
 
 // 7. XỬ LÝ LƯU THAY ĐỔI HỒ SƠ (TAB SETTINGS)
 
