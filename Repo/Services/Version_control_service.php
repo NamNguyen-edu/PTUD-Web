@@ -55,13 +55,7 @@ class VersionControlService
                 u.full_name,
                 u.avatar_url,
 
-                CONCAT(
-                    'v',
-                    ROW_NUMBER() OVER (
-                        PARTITION BY av.article_id
-                        ORDER BY av.created_at DESC
-                    )
-                ) AS version_label
+                CONCAT('v', av.version_name) AS version_label
 
             FROM article_versions av
 
@@ -111,92 +105,92 @@ class VersionControlService
     // ─────────────────────────────────────────
     // HIGHLIGHT TEXT MỚI
     // ─────────────────────────────────────────
+    // ─────────────────────────────────────────
+    // HIGHLIGHT TEXT MỚI (PRESERVE HTML FORMATTING)
+    // ─────────────────────────────────────────
     private function highlightNewText(
         string $old,
         string $new
     ): string {
-
         $oldWords = preg_split(
             '/\s+/',
-            strip_tags($old)
+            strtolower(strip_tags($old)),
+            -1,
+            PREG_SPLIT_NO_EMPTY
         );
 
-        $newWords = preg_split(
-            '/\s+/',
-            strip_tags($new)
-        );
+        $oldWordsClean = array_map(function($w) {
+            return preg_replace('/[.,?!;:"()\[\]{}*_-]/u', '', $w);
+        }, $oldWords);
 
+        $tokens = preg_split('/(<[^>]+>)/u', $new, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
         $html = '';
 
-        foreach ($newWords as $word) {
-
-            if (!in_array($word, $oldWords)) {
-
-                $html .=
-                    '<span style="
-                        background:#d1fae5;
-                        color:#065f46;
-                        padding:2px 4px;
-                        border-radius:4px;
-                    ">' .
-                    htmlspecialchars($word) .
-                    '</span> ';
-            }
-            else {
-
-                $html .=
-                    htmlspecialchars($word)
-                    . ' ';
+        foreach ($tokens as $token) {
+            if (str_starts_with($token, '<')) {
+                $html .= $token;
+            } else {
+                $wordsAndSpaces = preg_split('/(\s+)/u', $token, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+                foreach ($wordsAndSpaces as $part) {
+                    if (trim($part) === '') {
+                        $html .= $part;
+                    } else {
+                        $cleanWord = preg_replace('/[.,?!;:"()\[\]{}*_-]/u', '', strtolower($part));
+                        if (!in_array($cleanWord, $oldWordsClean) && !empty($cleanWord)) {
+                            $html .= '<span class="diff-added" style="background:#d1fae5; color:#065f46; padding:2px 4px; border-radius:4px;">' . htmlspecialchars($part) . '</span>';
+                        } else {
+                            $html .= htmlspecialchars($part);
+                        }
+                    }
+                }
             }
         }
 
-        return nl2br($html);
+        return $html;
     }
 
     // ─────────────────────────────────────────
-    // HIGHLIGHT TEXT BỊ XOÁ
+    // HIGHLIGHT TEXT BỊ XOÁ (PRESERVE HTML FORMATTING)
     // ─────────────────────────────────────────
     private function highlightRemovedText(
         string $old,
         string $new
     ): string {
-
-        $oldWords = preg_split(
-            '/\s+/',
-            strip_tags($old)
-        );
-
         $newWords = preg_split(
             '/\s+/',
-            strip_tags($new)
+            strtolower(strip_tags($new)),
+            -1,
+            PREG_SPLIT_NO_EMPTY
         );
 
+        $newWordsClean = array_map(function($w) {
+            return preg_replace('/[.,?!;:"()\[\]{}*_-]/u', '', $w);
+        }, $newWords);
+
+        $tokens = preg_split('/(<[^>]+>)/u', $old, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
         $html = '';
 
-        foreach ($oldWords as $word) {
-
-            if (!in_array($word, $newWords)) {
-
-                $html .=
-                    '<span style="
-                        background:#fee2e2;
-                        color:#991b1b;
-                        text-decoration:line-through;
-                        padding:2px 4px;
-                        border-radius:4px;
-                    ">' .
-                    htmlspecialchars($word) .
-                    '</span> ';
-            }
-            else {
-
-                $html .=
-                    htmlspecialchars($word)
-                    . ' ';
+        foreach ($tokens as $token) {
+            if (str_starts_with($token, '<')) {
+                $html .= $token;
+            } else {
+                $wordsAndSpaces = preg_split('/(\s+)/u', $token, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+                foreach ($wordsAndSpaces as $part) {
+                    if (trim($part) === '') {
+                        $html .= $part;
+                    } else {
+                        $cleanWord = preg_replace('/[.,?!;:"()\[\]{}*_-]/u', '', strtolower($part));
+                        if (!in_array($cleanWord, $newWordsClean) && !empty($cleanWord)) {
+                            $html .= '<span class="diff-removed" style="background:#fee2e2; color:#991b1b; text-decoration:line-through; padding:2px 4px; border-radius:4px;">' . htmlspecialchars($part) . '</span>';
+                        } else {
+                            $html .= htmlspecialchars($part);
+                        }
+                    }
+                }
             }
         }
 
-        return nl2br($html);
+        return $html;
     }
 
     // ─────────────────────────────────────────
@@ -258,9 +252,6 @@ class VersionControlService
         return true;
     }
 
-    // ─────────────────────────────────────────
-    // TẠO VERSION MỚI
-    // ─────────────────────────────────────────
     public function createVersion(
         int $articleId,
         string $title,
@@ -268,29 +259,41 @@ class VersionControlService
         int $editedBy
     ): bool {
 
-        $count = pdo_query_value(
+        $row = pdo_query_one(
             "
-            SELECT COUNT(*)
+            SELECT COUNT(*) as total
             FROM article_versions
             WHERE article_id = ?
             ",
             $articleId
         );
+        $count = $row ? (int)$row['total'] : 0;
 
-        $versionName =
-            'v' . ($count + 1);
+        if ($count === 0) {
+            $versionName = '1.0';
+        } elseif ($count === 1) {
+            $versionName = '1.1';
+        } elseif ($count === 2) {
+            $versionName = '1.2';
+        } elseif ($count === 3) {
+            $versionName = '1.3';
+        } else {
+            // Đã đạt/vượt quá 1.3 và có hành động tiếp tục -> Tự động chuyển bài viết thành rejected
+            pdo_execute(
+                "UPDATE articles SET status = 'rejected', updated_at = NOW() WHERE article_id = ?",
+                $articleId
+            );
+            return false;
+        }
 
         $sql = "
             INSERT INTO article_versions (
-
                 article_id,
                 title,
                 content,
                 version_name,
                 edited_by
-
             )
-
             VALUES (?, ?, ?, ?, ?)
         ";
 
@@ -304,5 +307,17 @@ class VersionControlService
         );
 
         return true;
+    }
+
+    public function ensureOriginalVersion(int $articleId, string $title, string $content, int $userId): void
+    {
+        $row = pdo_query_one(
+            "SELECT COUNT(*) as total FROM article_versions WHERE article_id = ?",
+            $articleId
+        );
+        $count = $row ? (int)$row['total'] : 0;
+        if ($count === 0) {
+            $this->createVersion($articleId, $title, $content, $userId);
+        }
     }
 }

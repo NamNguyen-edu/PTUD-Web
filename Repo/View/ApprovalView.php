@@ -215,17 +215,19 @@ class ApprovalView
         return '
         <div class="white-card mb-4">
             <h5 class="fw-bold mb-4">Hành động biên tập</h5>
-            <button class="btn-approve" onclick="approveArticle()">
+            <button class="btn-approve">
                 <span class="material-symbols-outlined">check_circle</span>
                 Duyệt bài viết
             </button>
-            <button class="btn-revision mb-3" onclick="toggleRevisionForm()">
+            <button class="btn-revision mb-3">
                 <span class="material-symbols-outlined">edit_note</span>
                 Yêu cầu chỉnh sửa
             </button>
-            <div class="text-danger fw-bold small text-center"
-                 style="cursor:pointer"
-                 onclick="rejectArticle()"
+            <button class="btn btn-outline-primary w-100 rounded-pill fw-bold d-flex align-items-center justify-content-center gap-2 mb-3" onclick="showCompareModal()">
+                <span class="material-symbols-outlined">compare_arrows</span>
+                So sánh phiên bản
+            </button>
+            <div class="text-danger fw-bold small text-center cursor-pointer"
                  id="btn-reject">
                 Từ chối bài viết
             </div>
@@ -254,7 +256,7 @@ class ApprovalView
 
     private function countWords(string $html): int
     {
-        return str_word_count(strip_tags($html));
+        return count(preg_split('/\s+/', trim(strip_tags($html)), -1, PREG_SPLIT_NO_EMPTY));
     }
 
     private function fmtDate(?string $d): string

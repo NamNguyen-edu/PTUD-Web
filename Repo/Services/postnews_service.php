@@ -50,6 +50,26 @@ public function saveArticle(int $userId, array $data): int
             );
         }
 
+        // Version control hooks
+        if ($status === 'pending') {
+            require_once __DIR__ . '/Version_control_service.php';
+            $versionService = new VersionControlService();
+            
+            // Đảm bảo có bản 1.0 đầu tiên
+            $versionService->ensureOriginalVersion($articleId, $title, $content, $userId);
+            
+            // Nếu là cập nhật bài viết (resubmission)
+            $rowCount = pdo_query_one("SELECT COUNT(*) as total FROM article_versions WHERE article_id = ?", $articleId);
+            $count = $rowCount ? (int)$rowCount['total'] : 0;
+            if ($count % 2 === 0 && $count > 0) {
+                $ok = $versionService->createVersion($articleId, $title, $content, $userId);
+                if (!$ok) {
+                    $status = 'rejected';
+                    pdo_execute("UPDATE articles SET status = 'rejected', updated_at = NOW() WHERE article_id = ?", $articleId);
+                }
+            }
+        }
+
         // 1. XỬ LÝ CHUYÊN MỤC
         if ($catSlug !== '') {
             $catDb = pdo_query_one("SELECT category_id FROM categories WHERE slug = ? LIMIT 1", $catSlug);
