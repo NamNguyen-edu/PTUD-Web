@@ -4,67 +4,7 @@
 document.addEventListener("DOMContentLoaded", function() {
     const BASE = "/PTUD-Web/Repo/UI";
 
-    // Tải Header
-    fetch(BASE + "/components/header.html")
-        .then(response => {
-            if (!response.ok) throw new Error("Không thể load header");
-            return response.text();
-        })
-        .then(data => {
-            const el = document.getElementById("header-placeholder");
-            if (!el) return;
-            el.innerHTML = data;
 
-            const headerScript = document.createElement('script');
-            headerScript.src = BASE + '/js/header_user.js';
-            headerScript.defer = true;
-            headerScript.onload = function() {
-                if (window.initHeaderUser) window.initHeaderUser();
-            };
-            document.head.appendChild(headerScript);
-
-            const loginSection = document.getElementById("login-section");
-            const profileSection = document.getElementById("profile-section");
-            if (loginSection) loginSection.classList.add("d-none");
-            if (profileSection) {
-                profileSection.classList.remove("d-none");
-                profileSection.classList.add("d-flex");
-            }
-
-            const realName = document.querySelector('.profile-sidebar h4')?.innerText || 'Biên tập viên';
-            const profileName = document.getElementById("profile-name");
-            const profileMenuName = document.getElementById("profile-menu-name");
-            if (profileName) profileName.innerText = realName;
-            if (profileMenuName) profileMenuName.innerText = realName;
-
-            const profileBtn = document.querySelector('.profile-info');
-            const profileMenu = document.querySelector('.profile-menu');
-            if (profileBtn && profileMenu) {
-                profileBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    profileMenu.classList.toggle('d-block');
-                });
-                document.addEventListener('click', function(e) {
-                    if (!profileMenu.contains(e.target) && !profileBtn.contains(e.target)) {
-                        profileMenu.classList.remove('d-block');
-                    }
-                });
-            }
-        })
-        .catch(err => console.error(err));
-
-    // Tải Footer
-    fetch(BASE + "/components/footer.html")
-        .then(response => {
-            if (!response.ok) throw new Error("Không thể load footer");
-            return response.text();
-        })
-        .then(data => {
-            const el = document.getElementById("footer-placeholder");
-            if (!el) return;
-            el.innerHTML = data;
-        })
-        .catch(err => console.error(err));
 
     // Skills
     const hiddenSkillsInput = document.getElementById('hiddenSkills');
@@ -163,8 +103,21 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 function checkFirstTimeLogin() {
     const hasPrefs = localStorage.getItem('newsPulse_UserPrefs');
     
+    try {
+        const saved = JSON.parse(localStorage.getItem('newsPulse_UserPrefs') || '{}');
+        const savedTopics = Array.isArray(saved.topics) ? saved.topics : [];
+        $('.topic-tag').each(function() {
+            if (savedTopics.includes($(this).data('topic'))) {
+                $(this).addClass('selected');
+            } else {
+                $(this).removeClass('selected');
+            }
+        });
+    } catch(e) {
+        console.error("Lỗi load topics ở profile:", e);
+    }
+    
     if (!hasPrefs) {
-        
         setTimeout(() => {
             $('#userPreferenceModal').modal('show');
         }, 1000);
