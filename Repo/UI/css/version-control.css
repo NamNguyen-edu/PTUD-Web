@@ -231,7 +231,7 @@
     }
 
     body.sidebar-open .main-content {
-      margin-left: var(--sidebar-width) !important;
+      margin-left: 0 !important;
     }
 
     .topbar,
@@ -242,14 +242,14 @@
 
     body.sidebar-open .topbar,
     body.sidebar-open .top-header {
-      left: var(--sidebar-width) !important;
-      width: calc(100% - var(--sidebar-width)) !important;
+      left: 0 !important;
+      width: 100% !important;
     }
 
     .floating-bar {
-      left: 50%;
-      width: min(95vw, 38rem);
-      transform: translateX(-50%);
+      left: 50% !important;
+      width: min(95vw, 38rem) !important;
+      transform: translateX(-50%) !important;
       padding: 1rem;
       flex-wrap: wrap;
       justify-content: center;
@@ -258,8 +258,13 @@
     }
 
     body.sidebar-open .floating-bar {
-      left: calc(50% + var(--sidebar-width) / 2);
-      width: min(calc(100vw - var(--sidebar-width) - 2rem), 38rem);
+      left: 50% !important;
+      width: min(95vw, 38rem) !important;
+      transform: translateX(-50%) !important;
+    }
+
+    .floating-divider {
+      display: none !important;
     }
 
     .floating-btn {
@@ -739,3 +744,113 @@
     height: 1rem;
     background-color: rgba(255,255,255,0.2);
   }
+
+/* Dark Mode support via CSS variables in version-control.css */
+body.theme-dark {
+  --color-primary: #1a73e8;
+  --color-primary-dim: #1557b0;
+  --color-on-primary: #ffffff;
+  --color-primary-container: rgba(26, 115, 232, 0.2);
+  --color-on-primary-container: #1a73e8;
+  --color-surface: #0a0a0a;
+  --color-surface-dim: #121212;
+  --color-surface-bright: #161616;
+  --color-surface-container-lowest: #121212;
+  --color-surface-container-low: #161616;
+  --color-surface-container: #161616;
+  --color-surface-container-high: #1e1e1e;
+  --color-surface-container-highest: #262626;
+  --color-surface-variant: #262626;
+  --color-on-surface: #f5f5f5;
+  --color-on-surface-variant: #a3a3a3;
+  --color-outline: #333333;
+  --color-outline-variant: #444444;
+  --color-background: #0a0a0a;
+  --color-on-background: #f5f5f5;
+  --color-inverse-surface: #ffffff;
+  --color-inverse-on-surface: #121212;
+}
+
+body.theme-dark .version-history-item {
+  background: #161616;
+  border-color: #262626;
+}
+
+body.theme-dark .version-history-item:hover {
+  border-color: #1a73e8;
+}
+
+body.theme-dark .version-history-item.active-item {
+  background-color: rgba(26, 115, 232, 0.15);
+  border-color: rgba(26, 115, 232, 0.3);
+}
+
+body.theme-dark .diff-added {
+  background-color: rgba(16, 185, 129, 0.2) !important;
+  color: #10b981 !important;
+}
+
+body.theme-dark .diff-removed {
+  background-color: rgba(239, 68, 68, 0.2) !important;
+  color: #ef4444 !important;
+}
+
+body.theme-dark .view-toggle button.active {
+  background-color: #262626 !important;
+  color: #1a73e8 !important;
+}
+
+body.theme-dark .card-header-row {
+  border-bottom-color: #262626 !important;
+}
+
+body.theme-dark .topbar {
+  background-color: rgba(18, 18, 18, 0.8) !important;
+  border-bottom-color: #262626 !important;
+}
+
+body.theme-dark .topbar-search {
+  background-color: #161616 !important;
+  border-color: #262626 !important;
+}
+
+body.theme-dark .topbar-search input {
+  color: #f5f5f5 !important;
+}
+
+body.theme-dark .icon-btn:hover {
+  background-color: #262626 !important;
+}
+
+@media (max-width: 576px) {
+  .floating-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: calc(100% - 32px) !important;
+    bottom: 1rem !important;
+    border-radius: 16px !important;
+    gap: 8px !important;
+    padding: 12px !important;
+  }
+
+  .floating-btn {
+    flex: none !important;
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 10px 16px !important;
+    background-color: rgba(255, 255, 255, 0.06) !important;
+    border-radius: 10px !important;
+  }
+
+  .floating-btn:hover {
+    background-color: rgba(255, 255, 255, 0.12) !important;
+  }
+
+  .floating-btn.danger {
+    background-color: rgba(239, 68, 68, 0.12) !important;
+  }
+
+  .floating-btn.danger:hover {
+    background-color: rgba(239, 68, 68, 0.22) !important;
+  }
+}

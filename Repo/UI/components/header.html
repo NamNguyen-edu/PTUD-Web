@@ -1,7 +1,7 @@
-<div class="row topbar align-items-center g-0 px-3">
+<div class="row topbar align-items-center g-0 px-3 py-2">
 
     <!-- LOGO -->
-    <div class="col-2 d-flex align-items-center">
+    <div class="col-6 col-md-3 col-lg-2 d-flex align-items-center">
         <a href="?page=home" class="logo">
             <span class="logo-icon"></span>
             <span class="logo-text">News</span><span class="logo-pulse">Pulse</span>
@@ -9,7 +9,7 @@
     </div>
 
     <!-- SEARCH -->
-    <div class="col-6 d-flex justify-content-center align-items-center px-2">
+    <div class="col-12 col-md-5 col-lg-6 d-flex justify-content-center align-items-center px-md-3 mt-2 mt-md-0 order-3 order-md-2">
         <form action="" method="get" class="search-form w-100 position-relative">
             <input type="hidden" name="page" value="search">
             <div class="input-group search-input-group">
@@ -26,7 +26,7 @@
     </div>
 
     <!-- USER ACTIONS -->
-    <div class="col-4 d-flex justify-content-end align-items-center gap-3" id="user-actions" style="min-width:0; flex-shrink:1;">
+    <div class="col-6 col-md-4 col-lg-4 d-flex justify-content-end align-items-center gap-2 gap-md-3 order-2 order-md-3" id="user-actions" style="min-width:0; flex-shrink:1;">
 
         <!-- Dark Mode Toggle -->
         <button id="direct-theme-toggle" class="btn-theme-toggle me-2" aria-label="Toggle dark mode">
@@ -48,20 +48,7 @@
 
         <!-- NOTIFICATION BELL -->
         <div id="notif-bell-wrapper" class="d-none position-relative">
-            <button id="notif-bell-btn" style="
-                background: rgba(255,255,255,0.8);
-                border: none;
-                border-radius: 50%;
-                width: 40px;
-                height: 40px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                cursor: pointer;
-                transition: all 0.2s;
-                padding: 0;
-                margin-right: 12px;
-            ">
+            <button id="notif-bell-btn">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                     <path d="M12 22C13.1 22 14 21.1 14 20H10C10 21.1 10.9 22 12 22Z" fill="#1e293b"/>
                     <path d="M18 11C18 7.93 16.36 5.36 13.5 4.68V4C13.5 3.17 12.83 2.5 12 2.5C11.17 2.5 10.5 3.17 10.5 4V4.68C7.63 5.36 6 7.92 6 11V16L4 18V19H20V18L18 16V11Z" fill="#1e293b"/>
