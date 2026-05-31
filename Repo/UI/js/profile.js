@@ -101,7 +101,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 
 // 7. XỬ LÝ LƯU THAY ĐỔI HỒ SƠ (TAB SETTINGS)
 
-function saveProfileChanges() {
+function saveProfileChanges(btn) {
     const fullNameInput = document.getElementById('fullName');
     const bioInput = document.getElementById('bioInput');
     
@@ -119,10 +119,12 @@ function saveProfileChanges() {
     }
 
     // Đổi trạng thái nút bấm tránh user spam click
-    const btn = event.target;
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> ĐANG LƯU...';
-    btn.disabled = true;
+    btn = btn || (window.event ? window.event.target : null);
+    const originalText = btn ? btn.innerHTML : 'LƯU THAY ĐỔI';
+    if (btn) {
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> ĐANG LƯU...';
+        btn.disabled = true;
+    }
 
     // Chuẩn bị dữ liệu gửi đi
     const formData = new FormData();
@@ -355,15 +357,19 @@ function openCropModal(event) {
     event.target.value = ''; // Reset input
 }
 
-function uploadAvatar() {
+function uploadAvatar(btn) {
     if (!cropper) return;
     
     // Lấy ảnh đã cắt dạng Base64
     const canvas = cropper.getCroppedCanvas({ width: 300, height: 300 });
     const base64Image = canvas.toDataURL('image/png');
 
-    const btn = event.target;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ĐANG TẢI LÊN...';
+    btn = btn || (window.event ? window.event.target : null);
+    const originalText = btn ? btn.innerHTML : 'CẬP NHẬT ẢNH';
+    if (btn) {
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ĐANG TẢI LÊN...';
+        btn.disabled = true;
+    }
 
     // Bắn thẳng base64 lên server
     fetch('?page=upload_avatar', {
@@ -384,7 +390,10 @@ function uploadAvatar() {
         }
     })
     .finally(() => {
-        btn.innerHTML = 'CẬP NHẬT ẢNH';
+        if (btn) {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
     });
 }
 // =========================================================================
