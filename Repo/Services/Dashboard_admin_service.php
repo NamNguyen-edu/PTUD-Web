@@ -3,57 +3,30 @@
 require_once __DIR__ . "/../Model/pdo.php";
 
 function getPDO(): PDO {
-    // static $pdo = null;
-    // if ($pdo === null) {
-    //     $pdo = new PDO(
-    //         'mysql:host=localhost;dbname=news_pulse;charset=utf8mb4',
-    //         'root',      // username
-    //         '123456',          // password
-    //         [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-    //     );
     return pdo_get_connection();
     }
-    //return $pdo;
-/**
- * Dashboard Admin Service
- * Trả về toàn bộ dữ liệu cần thiết cho trang Admin Dashboard
- */
-
-// ─────────────────────────────────────────────
-// 1. KPI Cards
-// ─────────────────────────────────────────────
-
-/**
- * Tổng số bài viết (tất cả trạng thái)
- */
+    
 function getTotalArticles(): int {
     $pdo = getPDO();
     $stmt = $pdo->query("SELECT COUNT(*) FROM articles");
     return (int) $stmt->fetchColumn();
 }
 
-/**
- * Số bài viết đang chờ duyệt (status = 'pending')
- */
+
 function getPendingApprovalsCount(): int {
     $pdo = getPDO();
     $stmt = $pdo->query("SELECT COUNT(*) FROM articles WHERE status = 'pending'");
     return (int) $stmt->fetchColumn();
 }
 
-/**
- * Số user đang active (status = 'active')
- */
+
 function getActiveUsersCount(): int {
     $pdo = getPDO();
     $stmt = $pdo->query("SELECT COUNT(*) FROM users WHERE status = 'active'");
     return (int) $stmt->fetchColumn();
 }
 
-/**
- * Thời gian duyệt trung bình (phút) — tính từ created_at → published_at
- * Chỉ tính các bài đã published trong 30 ngày gần nhất
- */
+
 function getAvgApprovalTimeMinutes(): float {
     $pdo = getPDO();
     $stmt = $pdo->query("
@@ -67,14 +40,7 @@ function getAvgApprovalTimeMinutes(): float {
     return $val !== null ? round((float) $val, 1) : 0.0;
 }
 
-// ─────────────────────────────────────────────
-// 2. Workflow Status (Donut chart data)
-// ─────────────────────────────────────────────
 
-/**
- * Phân bố trạng thái bài viết (%) và tổng số bài live (published)
- * Trả về: ['published' => %, 'draft' => %, 'pending' => %, 'archived' => %, 'live_count' => int]
- */
 function getWorkflowStatus(): array {
     $pdo = getPDO();
 
@@ -109,10 +75,6 @@ function getWorkflowStatus(): array {
     ];
 }
 
-// ─────────────────────────────────────────────
-// 3. Approval Queue
-// ─────────────────────────────────────────────
-
 /**
  * Danh sách bài đang chờ duyệt, sắp xếp theo cũ nhất trước (ưu tiên urgent)
  * Mỗi item gồm: article_id, title, slug, author_name, primary_category, created_at
@@ -142,21 +104,8 @@ function getApprovalQueue(int $limit = 10): array {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-// ─────────────────────────────────────────────
-// 4. Recent Activity Feed
-// ─────────────────────────────────────────────
 
 /**
- * Lịch sử hoạt động gần đây tổng hợp từ articles + comments + users
- * Trả về mảng các event: [type, description, actor, target, created_at]
- *
- * Các loại event được tổng hợp:
- *   - article_published : bài được xuất bản
- *   - article_draft     : bài mới tạo (status = draft)
- *   - article_rejected  : bài bị từ chối (archived bởi editor)
- *   - comment_added     : bình luận mới (status = approved)
- *   - user_registered   : user mới đăng ký
- *
  * @param int $limit
  */
 function getRecentActivity(int $limit = 20): array {
@@ -244,10 +193,6 @@ function getRecentActivity(int $limit = 20): array {
     return array_slice($all, 0, $limit);
 }
 
-// ─────────────────────────────────────────────
-// 5. Entry point — trả toàn bộ data dưới dạng JSON
-//    Dùng khi gọi file này như 1 API endpoint AJAX
-// ─────────────────────────────────────────────
 if (isset($_GET['action']) && $_GET['action'] === 'get_dashboard_data') {
     header('Content-Type: application/json; charset=utf-8');
 
