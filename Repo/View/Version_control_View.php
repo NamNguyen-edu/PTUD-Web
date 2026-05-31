@@ -19,6 +19,8 @@ class VersionControlView
         array $versions,
         array $diff
     ): void {
+        $basePath = dirname(__DIR__);
+        $role = $_SESSION['role'] ?? 'guest';
 
         $current  = $versions[0] ?? [];
         $previous = $versions[1] ?? [];
@@ -26,8 +28,9 @@ class VersionControlView
         $currentContent  = strip_tags($current['content'] ?? '');
         $previousContent = strip_tags($previous['content'] ?? '');
 
-        $currentWordCount  = str_word_count($currentContent);
-        $previousWordCount = str_word_count($previousContent);
+        // Cách đếm từ chuẩn xác cho cả tiếng Việt
+        $currentWordCount  = count(preg_split('/\s+/', trim($currentContent), -1, PREG_SPLIT_NO_EMPTY));
+        $previousWordCount = count(preg_split('/\s+/', trim($previousContent), -1, PREG_SPLIT_NO_EMPTY));
 
         $currentReadingSeconds  = max(30, (int) ceil($currentWordCount / 200 * 60));
         $previousReadingSeconds = max(30, (int) ceil($previousWordCount / 200 * 60));
@@ -53,8 +56,16 @@ class VersionControlView
 
         $seoScore = min(100, max(30, 40 + (int) round($uniqueWords / 2)));
 
-        $data = [
+        // Chuẩn bị avatar động cho giao diện người dùng
+        $currentAvatar = !empty($current['avatar_url'])
+            ? '<img src="' . htmlspecialchars($current['avatar_url']) . '" class="rounded-circle" width="32" height="32">'
+            : '<img src="https://ui-avatars.com/api/?background=0c56d0&color=fff&name=' . urlencode($current['full_name'] ?? 'U') . '" class="rounded-circle" width="32" height="32">';
 
+        $previousAvatar = !empty($previous['avatar_url'])
+            ? '<img src="' . htmlspecialchars($previous['avatar_url']) . '" class="rounded-circle" width="32" height="32">'
+            : '<img src="https://ui-avatars.com/api/?background=0c56d0&color=fff&name=' . urlencode($previous['full_name'] ?? 'U') . '" class="rounded-circle" width="32" height="32">';
+
+        $data = [
             'ARTICLE_ID'       => $article['article_id'],
             'ARTICLE_TITLE'    => htmlspecialchars($article['title'] ?? ''),
             'ARTICLE_CATEGORY' => htmlspecialchars(
@@ -88,6 +99,9 @@ class VersionControlView
             'CURRENT_DIFF_HTML' => $diff['new'],
             'PREVIOUS_DIFF_HTML' => $diff['old'],
 
+            'CURRENT_AVATAR_HTML' => $currentAvatar,
+            'PREVIOUS_AVATAR_HTML' => $previousAvatar,
+
             'VERSION_HISTORY_HTML' =>
                 $this->buildVersionList($versions),
 
@@ -98,10 +112,18 @@ class VersionControlView
             'SEO_SCORE'     => $seoScore,
         ];
 
-        echo $this->engine->render(
-            'version-control',
-            $data
-        );
+        // Lọc giao diện theo vai trò (Người đăng bài dùng VersionControl_View, Editor/Admin dùng version-control)
+        if ($role === 'contributor') {
+            echo $this->engine->render('VersionControl_View', $data);
+        } else {
+            $sidebarHtml = @file_get_contents($basePath . '/UI/html/sidebar_admin.html') ?: '';
+            $headerHtml  = @file_get_contents($basePath . '/UI/html/header_admin.html') ?: '';
+
+            $data['SIDEBAR_COMPONENT'] = $sidebarHtml;
+            $data['HEADER_COMPONENT']  = $headerHtml;
+
+            echo $this->engine->render('version-control', $data);
+        }
     }
 
     private function buildVersionList(array $versions): string

@@ -74,6 +74,9 @@ public function render(array $userInfo, array $userArticles, array $alertArticle
                     $editBtnHtml = '<a href="?page=postnews&id=' . $articleId . '" class="btn btn-light btn-sm mr-1 text-primary" title="Chỉnh sửa"><i class="fas fa-edit"></i></a>';
                 }
 
+                // Nút xem lịch sử so sánh & nhận xét của biên tập viên
+                $historyBtnHtml = '<a href="?page=version-control&article_id=' . $articleId . '" class="btn btn-light btn-sm mr-1 text-success" title="Xem lịch sử & Nhận xét"><i class="fas fa-history"></i></a>';
+
                 // ==========================================
                 // TASK 3: RẼ NHÁNH 3 KỊCH BẢN CHO NÚT XÓA
                 // ==========================================
@@ -103,6 +106,7 @@ public function render(array $userInfo, array $userArticles, array $alertArticle
                     </td>
                     <td class="text-right align-middle">
                         ' . $editBtnHtml . '
+                        ' . $historyBtnHtml . '
                         ' . $deleteBtnHtml . '
                     </td>
                 </tr>';

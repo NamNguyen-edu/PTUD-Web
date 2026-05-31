@@ -73,6 +73,18 @@ public function savePost(): void
 
             $savedArticleId = $this->service->saveArticle($userId, $data);
 
+            $articleStatus = pdo_query_one("SELECT status FROM articles WHERE article_id = ?", $savedArticleId)['status'] ?? 'draft';
+
+            if ($articleStatus === 'rejected') {
+                echo json_encode([
+                    'success'    => true,
+                    'article_id' => $savedArticleId,
+                    'is_rejected'=> true,
+                    'message'    => 'Bài viết đã vượt quá giới hạn chỉnh sửa (1.3) và hệ thống đã tự động Từ chối!'
+                ]);
+                return;
+            }
+
             echo json_encode([
                 'success'   => true,
                 'article_id'=> $savedArticleId

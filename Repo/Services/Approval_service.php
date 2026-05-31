@@ -119,21 +119,55 @@ function approveAndPublish(int $article_id, int $approver_id): bool {
  * @param string $revision_note  Nội dung yêu cầu chỉnh sửa
  * @return bool
  */
-function requestRevision(int $article_id, int $editor_id, string $revision_note): bool {
+function requestRevision(int $article_id, int $editor_id, string $revision_note, ?string $edited_title = null, ?string $edited_content = null): bool {
     $article = pdo_query_one(
-        "SELECT status FROM articles WHERE article_id = ?",
+        "SELECT status, title, content, user_id FROM articles WHERE article_id = ?",
         $article_id
     );
 
     if (!$article || $article['status'] !== 'pending') return false;
 
-    // Trả bài về draft
+    require_once __DIR__ . '/Version_control_service.php';
+    $versionService = new VersionControlService();
+
+    // 1. Đảm bảo bản 1.0 (hoặc bản gốc hiện tại) được chụp lại nếu chưa có phiên bản nào
+    $versionService->ensureOriginalVersion($article_id, $article['title'], $article['content'], (int)$article['user_id']);
+
+    // 2. Kiểm tra giới hạn phiên bản 1.3
+    $rowCount = pdo_query_one("SELECT COUNT(*) as total FROM article_versions WHERE article_id = ?", $article_id);
+    $count = $rowCount ? (int)$rowCount['total'] : 0;
+    if ($count >= 4) {
+        pdo_execute("
+            UPDATE articles
+            SET status = 'rejected',
+                approved_by = ?,
+                updated_at = NOW()
+            WHERE article_id = ?
+        ", $editor_id, $article_id);
+        
+        pdo_execute("
+            INSERT INTO comments (article_id, user_id, content, status, created_at)
+            VALUES (?, ?, ?, 'approved', NOW())
+        ", $article_id, $editor_id, '[TỰ ĐỘNG TỪ CHỐI] Bài viết vượt quá giới hạn chỉnh sửa (1.3).');
+        return false;
+    }
+
+    // Nếu Editor có chỉnh sửa trực tiếp, ta cập nhật title và content của bài viết chính
+    $titleToSave = !empty($edited_title) ? $edited_title : $article['title'];
+    $contentToSave = !empty($edited_content) ? $edited_content : $article['content'];
+
+    // Trả bài về revision, cập nhật title & content nếu Editor sửa
     pdo_execute("
-    UPDATE articles
-    SET status = 'revision',
-    updated_at = NOW()
-    WHERE article_id = ?
-    ", $article_id);
+        UPDATE articles
+        SET status = 'revision',
+            title = ?,
+            content = ?,
+            updated_at = NOW()
+        WHERE article_id = ?
+    ", $titleToSave, $contentToSave, $article_id);
+
+    // 3. Tạo phiên bản chỉnh sửa mới (1.1, 1.3...)
+    $versionService->createVersion($article_id, $titleToSave, $contentToSave, $editor_id);
 
     // Lưu ghi chú chỉnh sửa vào comments (dùng status = 'approved' để phân biệt editorial note)
     pdo_execute("
@@ -265,14 +299,23 @@ if (isset($_POST['action']) || isset($_GET['action'])) {
         // POST: yêu cầu chỉnh sửa
         case 'request_revision':
             $note = trim($_POST['revision_note'] ?? '');
+            $edited_title = isset($_POST['edited_title']) ? trim($_POST['edited_title']) : null;
+            $edited_content = isset($_POST['edited_content']) ? trim($_POST['edited_content']) : null;
             if (!$note) {
                 echo json_encode(['success' => false, 'message' => 'Vui lòng nhập nội dung yêu cầu chỉnh sửa.']);
                 break;
             }
-            $ok = requestRevision($article_id, $current_user_id, $note);
+            $ok = requestRevision($article_id, $current_user_id, $note, $edited_title, $edited_content);
+            
+            $latestArticle = pdo_query_one("SELECT status FROM articles WHERE article_id = ?", $article_id);
+            $msg = 'Đã gửi yêu cầu chỉnh sửa.';
+            if ($latestArticle && $latestArticle['status'] === 'rejected') {
+                $msg = 'Bài viết vượt quá giới hạn chỉnh sửa (1.3) và đã bị tự động Từ chối!';
+            }
+
             echo json_encode([
                 'success' => $ok,
-                'message' => $ok ? 'Đã gửi yêu cầu chỉnh sửa.' : 'Không thể gửi yêu cầu.',
+                'message' => $msg,
             ]);
             break;
 

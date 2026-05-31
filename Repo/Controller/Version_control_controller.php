@@ -17,6 +17,11 @@ class VersionControlController
         $articleId = (int)($_GET['article_id'] ?? 0);
 
         if ($articleId <= 0) {
+            if (isset($_GET['ajax'])) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => 'Thiếu article_id']);
+                exit;
+            }
             die('Thiếu article_id');
         }
 
@@ -24,7 +29,32 @@ class VersionControlController
         $article = $this->service->getArticle($articleId);
 
         if (!$article) {
+            if (isset($_GET['ajax'])) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => 'Không tìm thấy bài viết']);
+                exit;
+            }
             die('Không tìm thấy bài viết');
+        }
+
+        // Kiểm tra quyền truy cập: Admin/Editor hoặc Tác giả của bài viết này
+        require_once __DIR__ . '/../Services/auth_service.php';
+        $auth = new AuthService();
+        $role = $_SESSION['role'] ?? 'guest';
+        $userId = (int)($_SESSION['user_id'] ?? 0);
+
+        $hasGlobalPermission = $auth->checkPermission($role, 'manage_version');
+        $isAuthor = ((int)($article['user_id'] ?? 0) === $userId);
+        $hasAuthorPermission = ($role === 'contributor' && $isAuthor);
+
+        if (!$hasGlobalPermission && !$hasAuthorPermission) {
+            http_response_code(403);
+            if (isset($_GET['ajax'])) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => 'Bạn không có quyền xem lịch sử phiên bản bài viết này.']);
+                exit;
+            }
+            die('<h1>403 Forbidden: Bạn không có quyền xem lịch sử phiên bản bài viết này.</h1>');
         }
 
         // lấy version
@@ -32,6 +62,17 @@ class VersionControlController
 
         // tạo diff
         $diff = $this->service->generateDiff($versions);
+
+        if (isset($_GET['ajax'])) {
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => true,
+                'article' => $article,
+                'versions' => $versions,
+                'diff' => $diff
+            ]);
+            exit;
+        }
 
         // render
         $view = new VersionControlView();

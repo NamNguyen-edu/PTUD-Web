@@ -16,9 +16,15 @@ class VersionListView
 
     public function render(array $articles): void
     {
+        $basePath = dirname(__DIR__);
+        $sidebarHtml = @file_get_contents($basePath . '/UI/html/sidebar_admin.html') ?: '';
+        $headerHtml  = @file_get_contents($basePath . '/UI/html/header_admin.html') ?: '';
+
         $tableHtml = $this->buildTable($articles);
 
         $data = [
+            'SIDEBAR_COMPONENT' => $sidebarHtml,
+            'HEADER_COMPONENT'  => $headerHtml,
             'PENDING_COUNT'     => count($articles),
             'ARTICLES_TABLE'    => $tableHtml,
         ];
