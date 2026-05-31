@@ -1,6 +1,4 @@
-
-
-document.addEventListener('DOMContentLoaded', () => {
+function initHeaderAdmin() {
   const profileTrigger = document.querySelector('.profile-info-admin');
   const profileContainer = document.querySelector('.profile-container-admin');
 
@@ -25,7 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (mainNameEl.textContent !== "Đang tải...") {
         dropdownNameEl.textContent = mainNameEl.textContent;
 
-
         if (mainAvatarImg && dropdownAvatarImg) {
           dropdownAvatarImg.src = mainAvatarImg.src;
         }
@@ -34,4 +31,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     observer.observe(mainNameEl, { childList: true, characterData: true, subtree: true });
   }
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initHeaderAdmin);
+} else {
+  initHeaderAdmin();
+}

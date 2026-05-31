@@ -104,7 +104,7 @@ function checkArticleAlerts() {
             let st = statusMap[art.status] || { label: art.status, cls: 'secondary', icon: 'fa-info' };
 
             listHtml += `
-                <li class="list-group-item border-left-${st.cls} shadow-sm mb-3 rounded" style="border-width: 0 0 0 4px !important; cursor: pointer;" onclick="window.location.href='?page=version-control&article_id=${art.article_id}'">
+                <li class="list-group-item border-left-${st.cls} shadow-sm mb-3 rounded" style="border-width: 0 0 0 4px !important; cursor: pointer;" onclick="window.location.href=\`${art.status === 'revision' ? '?page=postnews&id=' + art.article_id : '?page=user-version-control&article_id=' + art.article_id}\`">
                     <div class="d-flex w-100 justify-content-between align-items-center">
                         <h6 class="mb-0 font-weight-bold text-truncate" style="max-width: 65%;">${art.title}</h6>
                         <span class="badge badge-${st.cls} p-1"><i class="fas ${st.icon} mr-1"></i>${st.label}</span>

@@ -40,11 +40,11 @@ body.sidebar-open .main-content {
 </head>
 <body>
 
-{{SIDEBAR_COMPONENT}}
+<div id="sidebar-placeholder"></div>
+<div id="header_admin"></div>
 
 <!-- ── Main ── -->
 <main class="main-content">
-  {{HEADER_COMPONENT}}
   <div class="main-inner">
 
     <!-- Header -->
@@ -203,7 +203,7 @@ body.sidebar-open .main-content {
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="../js/sidebar_admin.js"></script>
+<script src="../js/loadsidebar.js"></script>
 <script src="../js/version_control.js"></script>
 
 <script>
