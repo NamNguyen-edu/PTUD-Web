@@ -42,9 +42,19 @@ function toggleAuth(mode) {
   if (mode === 'signup') {
     loginSec.style.display = 'none';
     signupSec.style.display = 'block';
+    if(document.getElementById('forgot-section')) document.getElementById('forgot-section').style.display = 'none';
+  } else if (mode === 'forgot') {
+    loginSec.style.display = 'none';
+    signupSec.style.display = 'none';
+    if(document.getElementById('forgot-section')) {
+      document.getElementById('forgot-section').style.display = 'block';
+      document.getElementById('forgotRequestForm').style.display = 'block';
+      document.getElementById('forgotResetForm').style.display = 'none';
+    }
   } else {
     loginSec.style.display = 'block';
     signupSec.style.display = 'none';
+    if(document.getElementById('forgot-section')) document.getElementById('forgot-section').style.display = 'none';
   }
 
   // Trì hoãn 50ms để DOM kịp hiển thị block trước khi Google đo kích thước khung
@@ -213,3 +223,73 @@ function applyLanguage(lang) {
     }
   });
 }
+
+// XỬ LÝ FORGOT PASSWORD
+document.addEventListener('DOMContentLoaded', () => {
+  const reqForm = document.getElementById('forgotRequestForm');
+  const resetForm = document.getElementById('forgotResetForm');
+
+  if (reqForm) {
+    reqForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!reqForm.checkValidity()) {
+        reqForm.classList.add('was-validated');
+        return;
+      }
+
+      const btn = document.getElementById('btn-send-otp');
+      const originalText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Đang gửi...';
+
+      try {
+        const res = await fetch('?page=forgot_password_request', { method: 'POST', body: new FormData(reqForm) });
+        const data = await res.json();
+        if (data.success) {
+          Swal.fire({ icon: 'success', title: 'Thành công', text: data.message });
+          reqForm.style.display = 'none';
+          resetForm.style.display = 'block';
+        } else {
+          Swal.fire({ icon: 'error', title: 'Thất bại', text: data.message });
+        }
+      } catch (err) {
+        Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Không thể kết nối đến máy chủ.' });
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
+    });
+  }
+
+  if (resetForm) {
+    resetForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!resetForm.checkValidity()) {
+        resetForm.classList.add('was-validated');
+        return;
+      }
+
+      const btn = document.getElementById('btn-reset-pass');
+      const originalText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Đang xử lý...';
+
+      try {
+        const res = await fetch('?page=forgot_password_reset', { method: 'POST', body: new FormData(resetForm) });
+        const data = await res.json();
+        if (data.success) {
+          Swal.fire({ icon: 'success', title: 'Thành công', text: data.message }).then(() => {
+            toggleAuth('login');
+          });
+        } else {
+          Swal.fire({ icon: 'error', title: 'Thất bại', text: data.message });
+        }
+      } catch (err) {
+        Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Không thể kết nối đến máy chủ.' });
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
+    });
+  }
+});

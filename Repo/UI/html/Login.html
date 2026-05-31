@@ -48,6 +48,10 @@
               </div>
             </div>
 
+            <div class="text-end mb-3">
+               <a href="javascript:void(0)" class="small text-decoration-none fw-bold" onclick="toggleAuth('forgot')" data-key="forgot_password">Quên mật khẩu?</a>
+            </div>
+
             <button type="submit" class="btn btn-primary w-100 py-2 fw-bold" data-key="log_in">Log in</button>
           </form>
           <p class="mt-4 text-center small">
@@ -99,8 +103,46 @@
               data-key="log_in_here">Log in here</a>
           </p>
         </div>
-      </div>
+        <!-- FORGOT PASSWORD SECTION -->
+        <div id="forgot-section" style="display: none;">
+          <h4 class="fw-bold mb-4">Khôi phục mật khẩu</h4>
+          
+          <!-- Bước 1: Nhập Email -->
+          <form id="forgotRequestForm" novalidate>
+            <p class="small text-muted mb-4">Vui lòng nhập email của bạn. Chúng tôi sẽ gửi mã xác nhận OTP gồm 6 chữ số để thiết lập lại mật khẩu.</p>
+            <div class="mb-3">
+              <label class="form-label small fw-bold">Email</label>
+              <input type="email" id="forgotEmail" name="email" class="form-control" placeholder="example@gmail.com" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 py-2 fw-bold" id="btn-send-otp">Gửi mã xác nhận</button>
+          </form>
 
+          <!-- Bước 2: Nhập OTP & Mật khẩu mới -->
+          <form id="forgotResetForm" style="display: none;" novalidate>
+            <p class="small text-muted mb-4">Mã xác nhận đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư.</p>
+            <div class="mb-3">
+              <label class="form-label small fw-bold">Mã OTP (6 số)</label>
+              <input type="text" id="resetOtp" name="otp" class="form-control text-center fw-bold fs-5" maxlength="6" placeholder="------" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-bold">Mật khẩu mới</label>
+              <div class="input-group">
+                <input type="password" id="resetPass" name="new_password" class="form-control" placeholder="Nhập mật khẩu mới..." required>
+                <button class="btn btn-outline-secondary toggle-password" type="button" data-target="resetPass">
+                  <i class="bi bi-eye-slash"></i>
+                </button>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-success w-100 py-2 fw-bold" id="btn-reset-pass">Đổi mật khẩu</button>
+          </form>
+
+          <p class="mt-4 text-center small">
+            <a href="javascript:void(0)" class="fw-bold text-decoration-none" onclick="toggleAuth('login')">
+              <i class="bi bi-arrow-left"></i> Quay lại Đăng nhập
+            </a>
+          </p>
+        </div>
+      </div>
       <div class="col-lg-8 d-none d-lg-flex bg-banner">
         <div class="banner-content text-center px-4">
           <h1 class="fw-bold mb-3 tracking-widest logo fs-1 text-white" data-key="logo">NEWSPULSE</h1>

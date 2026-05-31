@@ -64,6 +64,16 @@ switch ($page) {
         require_once __DIR__ . '/Controller/auth_controller.php';
         (new AuthController())->logout();
         break;
+
+    case 'forgot_password_request':
+        require_once __DIR__ . '/Controller/auth_controller.php';
+        (new AuthController())->forgotPasswordRequest();
+        break;
+
+    case 'forgot_password_reset':
+        require_once __DIR__ . '/Controller/auth_controller.php';
+        (new AuthController())->forgotPasswordReset();
+        break;
     case 'video_feed':
         require_once __DIR__ . '/Controller/home_controller.php';
         (new HomeController())->videoFeed();
@@ -283,8 +293,6 @@ switch ($page) {
         (new DashboardController())->render();
         break;
 
-    case 'admin_userm':
-    case 'accountmangement':
     case 'accountmanagement':
         authorize('manage_accounts');
         require_once __DIR__ . '/Controller/account_controller.php';
@@ -296,6 +304,7 @@ switch ($page) {
         require_once __DIR__ . '/Controller/category_controller.php';
         (new CategoryController())->render();
         break;
+
     case 'api_category':
         authorize('manage_content');
         require_once __DIR__ . '/Controller/category_controller.php';
