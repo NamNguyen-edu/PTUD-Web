@@ -480,18 +480,21 @@
             });
         }
 
-        // Nút bấm thay đổi giao diện (Dark/Light)
-        const toggleBtn = document.getElementById('direct-theme-toggle');
-        toggleBtn?.addEventListener('click', function() {
-            const isDark = document.body.classList.contains('theme-dark');
-            const targetTheme = isDark ? 'light' : 'dark';
-            applyTheme(targetTheme);
+        // Nút bấm thay đổi giao diện (Dark/Light) - Dùng Event Delegation
+        document.addEventListener('click', function(e) {
+            const btn = e.target.closest('#direct-theme-toggle');
+            if (btn) {
+                e.preventDefault();
+                const isDark = document.body.classList.contains('theme-dark');
+                const targetTheme = isDark ? 'light' : 'dark';
+                applyTheme(targetTheme);
 
-            if (isUserLoggedIn && currentUserId) {
-                localStorage.setItem(`newsPulse_theme_user_${currentUserId}`, targetTheme);
-                syncThemeToDB(targetTheme);
-            } else {
-                sessionStorage.setItem('newsPulse_theme', targetTheme);
+                if (isUserLoggedIn && currentUserId) {
+                    localStorage.setItem(`newsPulse_theme_user_${currentUserId}`, targetTheme);
+                    syncThemeToDB(targetTheme);
+                } else {
+                    sessionStorage.setItem('newsPulse_theme', targetTheme);
+                }
             }
         });
 
