@@ -446,3 +446,207 @@
   max-width: 340px;
   width: 100%;
 }
+
+/* Style cho nút Dark Mode Toggle trên trang Admin */
+.btn-theme-toggle {
+  background: rgba(241, 243, 244, 0.8);
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #5f6368;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.btn-theme-toggle:hover {
+  background: #ffffff;
+  color: #1a73e8;
+  box-shadow: 0 4px 12px rgba(0, 45, 94, 0.12);
+  transform: translateY(-1px);
+}
+
+body.theme-dark .btn-theme-toggle {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #a3a3a3;
+}
+
+body.theme-dark .btn-theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #1a73e8;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive Mobile Header */
+@media (max-width: 768px) {
+  .top-header {
+    padding: 0 16px !important;
+    height: 60px !important;
+  }
+  .header-left {
+    gap: 8px !important;
+  }
+  .brand-text {
+    font-size: 15px !important;
+  }
+  .header-right {
+    gap: 12px !important;
+  }
+  /* Ẩn các tab chữ tĩnh để không bị tràn trên màn hình di động */
+  .header-right .header-link-item,
+  .header-right .active-tab {
+    display: none !important;
+  }
+  .profile-info-admin {
+    padding: 4px !important;
+  }
+  .profile-chevron-admin {
+    display: none !important;
+  }
+  /* Giảm chiều cao nạp phần ruột chính trên mobile */
+  .content-body, .content-area, main {
+    padding-top: 75px !important;
+  }
+}
+
+/* Dark Mode styles for Admin Header */
+body.theme-dark .top-header {
+  background: #121212 !important;
+  border-bottom: 1px solid #262626 !important;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2) !important;
+}
+
+body.theme-dark .brand-text {
+  color: #1a73e8 !important;
+}
+
+body.theme-dark .search-bar {
+  background-color: #1e1e1e !important;
+  color: #f5f5f5 !important;
+}
+
+body.theme-dark .search-bar::placeholder {
+  color: #737373 !important;
+}
+
+body.theme-dark .header-right .header-link-item {
+  color: #a3a3a3 !important;
+}
+
+body.theme-dark .header-right .header-link-item:hover {
+  color: #1a73e8 !important;
+}
+
+body.theme-dark .header-right .active-tab {
+  color: #1a73e8 !important;
+  border-bottom-color: #1a73e8 !important;
+}
+
+body.theme-dark .profile-info-admin:hover {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+body.theme-dark .profile-name-admin {
+  color: #f5f5f5 !important;
+}
+
+body.theme-dark .profile-email-admin {
+  color: #a3a3a3 !important;
+}
+
+body.theme-dark .profile-avatar-admin img {
+  border-color: #262626 !important;
+}
+
+body.theme-dark .profile-chevron-admin {
+  color: #a3a3a3 !important;
+}
+
+/* Profile Dropdown Menu in Dark Mode */
+body.theme-dark .profile-menu-admin {
+  background-color: #161616 !important;
+  border-color: #262626 !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5) !important;
+}
+
+body.theme-dark .profile-menu-name-admin {
+  color: #f5f5f5 !important;
+}
+
+body.theme-dark .profile-menu-email-admin {
+  color: #a3a3a3 !important;
+}
+
+body.theme-dark .profile-menu-divider-admin {
+  background-color: #262626 !important;
+}
+
+body.theme-dark .profile-menu-item-admin {
+  color: #d4d4d4 !important;
+}
+
+body.theme-dark .profile-menu-item-admin:hover {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+  color: #1a73e8 !important;
+}
+
+body.theme-dark .menu-icon-admin {
+  color: #a3a3a3 !important;
+}
+
+body.theme-dark .menu-content-admin small {
+  color: #a3a3a3 !important;
+}
+
+/* Notification Bell in Dark Mode */
+body.theme-dark .btn-bell-admin {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: #a3a3a3 !important;
+}
+
+body.theme-dark .btn-bell-admin:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #f5f5f5 !important;
+}
+
+body.theme-dark .notif-badge-admin {
+  border-color: #121212 !important;
+}
+
+body.theme-dark .notif-dropdown-admin {
+  background: #161616 !important;
+  border-color: #262626 !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5) !important;
+}
+
+body.theme-dark .notif-dropdown-header-admin {
+  border-bottom-color: #262626 !important;
+}
+
+body.theme-dark .notif-dropdown-header-admin span {
+  color: #f5f5f5 !important;
+}
+
+body.theme-dark .btn-clear-notif-admin:hover {
+  color: #f5f5f5 !important;
+}
+
+body.theme-dark .notif-list-admin::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+body.theme-dark .notif-empty-admin {
+  color: #a3a3a3 !important;
+}
+
+/* Toast Container in Dark Mode */
+body.theme-dark .notif-container-admin {
+  color: #f5f5f5 !important;
+}

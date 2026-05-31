@@ -57,25 +57,36 @@ function updateKPIs() {
 // ĐOẠN 2: DỰNG GIAO DIỆN BẢNG HTML VÀ PHÂN TRANG ĐỘNG
 // =========================================================================
 function formatTimeAgo(dateString) {
-    if (!dateString || dateString === 'Never') return 'Never';
+    if (!dateString || dateString === 'Never') return 'Chưa bao giờ';
     const date = new Date(dateString.replace(/-/g, "/"));
     const now = new Date();
     const secondsPast = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-    if (secondsPast < 0 || secondsPast < 60) return 'Just now';
+    if (secondsPast < 0 || secondsPast < 60) return 'Vừa xong';
     if (secondsPast < 3600) {
         const minutes = Math.floor(secondsPast / 60);
-        return `${minutes} min${minutes > 1 ? 's' : ''} ago`;
+        return `${minutes} phút trước`;
     }
     if (secondsPast < 86400) {
         const hours = Math.floor(secondsPast / 3600);
-        return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+        return `${hours} giờ trước`;
     }
     if (secondsPast < 2592000) {
         const days = Math.floor(secondsPast / 86400);
-        return `${days} day${days > 1 ? 's' : ''} ago`;
+        return `${days} ngày trước`;
     }
-    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    return date.toLocaleDateString('vi-VN', { year: 'numeric', month: 'short', day: 'numeric' });
+}
+
+function translateRole(role) {
+    if (!role) return "";
+    const lower = role.toLowerCase();
+    if (lower === "admin") return "Quản trị viên";
+    if (lower === "editor") return "Biên tập viên";
+    if (lower === "chief editor") return "Tổng biên tập";
+    if (lower === "contributor") return "Cộng tác viên";
+    if (lower === "reader") return "Độc giả";
+    return role;
 }
 
 function renderTable() {
@@ -98,9 +109,9 @@ function renderTable() {
         let statusBadge = "";
         const statusLower = user.status ? user.status.toLowerCase() : "";
         if (statusLower === "active") {
-            statusBadge = '<span class="badge bg-success bg-opacity-10 text-success">Active</span>';
+            statusBadge = '<span class="badge bg-success bg-opacity-10 text-success">Hoạt động</span>';
         } else if (statusLower === "pending") {
-            statusBadge = '<span class="badge bg-warning bg-opacity-10 text-warning">Pending</span>';
+            statusBadge = '<span class="badge bg-warning bg-opacity-10 text-warning">Chờ duyệt</span>';
         } else {
             statusBadge = '<span class="badge bg-danger bg-opacity-10 text-danger">Banned</span>';
         }
@@ -132,7 +143,7 @@ function renderTable() {
             
             <td class="align-middle text-secondary small">${user.email}</td>
             
-            <td class="align-middle fw-medium text-dark">${user.role}</td>
+            <td class="align-middle fw-medium text-dark">${translateRole(user.role)}</td>
             
             <td class="align-middle">${statusBadge}</td>
             
@@ -167,14 +178,14 @@ function updatePaginationControls(currentRowsCount) {
 
     const startItem = totalItems === 0 ? 0 : (currentPage - 1) * rowsPerPage + 1;
     const endItem = Math.min(currentPage * rowsPerPage, totalItems);
-    document.getElementById("pagination-info").innerText = `Showing ${startItem}-${endItem} of ${totalItems} users`;
+    document.getElementById("pagination-info").innerText = `Hiển thị ${startItem}-${endItem} trên ${totalItems} người dùng`;
 
     const container = document.getElementById("pagination-container");
     container.innerHTML = "";
 
     container.innerHTML += `
         <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-            <a class="page-link" href="#" onclick="changePage(${currentPage - 1})">Previous</a>
+            <a class="page-link" href="#" onclick="changePage(${currentPage - 1})">Trước</a>
         </li>
     `;
 
@@ -188,7 +199,7 @@ function updatePaginationControls(currentRowsCount) {
 
     container.innerHTML += `
         <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-            <a class="page-link" href="#" onclick="changePage(${currentPage + 1})">Next</a>
+            <a class="page-link" href="#" onclick="changePage(${currentPage + 1})">Sau</a>
         </li>
     `;
 }
@@ -389,9 +400,9 @@ function initBulkActions() {
         const actionText = actionBtn.textContent.trim().toLowerCase();
         let actionType = '';
 
-        if (actionText.includes('suspend')) actionType = 'suspend';
-        else if (actionText.includes('delete')) actionType = 'delete';
-        else if (actionText.includes('invite')) actionType = 'invite';
+        if (actionText.includes('suspend') || actionText.includes('đình chỉ')) actionType = 'suspend';
+        else if (actionText.includes('delete') || actionText.includes('xóa')) actionType = 'delete';
+        else if (actionText.includes('invite') || actionText.includes('mới')) actionType = 'invite';
 
         if (actionType === 'delete') {
             const confirmResult = await Swal.fire({

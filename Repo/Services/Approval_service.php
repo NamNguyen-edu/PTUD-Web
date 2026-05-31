@@ -2,19 +2,6 @@
 <?php
 require_once __DIR__ . '/../Model/pdo.php';
 
-/**
- * Workflow Approval Service
- * Xử lý toàn bộ logic cho trang Phê duyệt của Tổng biên tập (admin1)
- */
-
-// ─────────────────────────────────────────────
-// 1. LẤY CHI TIẾT BÀI VIẾT
-// ─────────────────────────────────────────────
-
-/**
- * Lấy toàn bộ thông tin bài viết theo article_id
- * Bao gồm: thông tin bài, tác giả, người duyệt, danh mục chính, tags
- */
 function getArticleDetail(int $article_id): array|false {
     $article = pdo_query_one("
         SELECT
@@ -70,16 +57,7 @@ function getArticleDetail(int $article_id): array|false {
     return $article;
 }
 
-// ─────────────────────────────────────────────
-// 2. DUYỆT & XUẤT BẢN
-// ─────────────────────────────────────────────
-
 /**
- * Tổng biên tập duyệt và xuất bản bài viết
- * - Đổi status → 'published'
- * - Ghi approved_by = người duyệt
- * - Ghi published_at = NOW()
- *
  * @param int $article_id
  * @param int $approver_id  user_id của tổng biên tập đang đăng nhập
  * @return bool
@@ -105,14 +83,9 @@ function approveAndPublish(int $article_id, int $approver_id): bool {
     return true;
 }
 
-// ─────────────────────────────────────────────
-// 3. YÊU CẦU CHỈNH SỬA
-// ─────────────────────────────────────────────
 
 /**
- * Tổng biên tập gửi yêu cầu chỉnh sửa
- * - Đổi status bài → 'draft' (trả về cho tác giả)
- * - Lưu nội dung yêu cầu vào bảng comments dưới dạng editorial note
+ note
  *
  * @param int    $article_id
  * @param int    $editor_id      user_id của tổng biên tập
@@ -178,14 +151,7 @@ function requestRevision(int $article_id, int $editor_id, string $revision_note,
     return true;
 }
 
-// ─────────────────────────────────────────────
-// 4. TỪ CHỐI BÀI VIẾT
-// ─────────────────────────────────────────────
-
 /**
- * Tổng biên tập từ chối bài viết
- * - Đổi status → 'rejected'
- * - Ghi lại người từ chối vào approved_by
  *
  * @param int $article_id
  * @param int $editor_id
@@ -209,14 +175,8 @@ function rejectArticle(int $article_id, int $editor_id): bool {
     return true;
 }
 
-// ─────────────────────────────────────────────
-// 5. LUỒNG Ý KIẾN BIÊN TẬP (COMMENTS)
-// ─────────────────────────────────────────────
 
 /**
- * Lấy danh sách bình luận biên tập của bài viết
- * Chỉ lấy comment gốc (parent_id IS NULL), sắp xếp theo thời gian
- *
  * @param int $article_id
  */
 function getEditorialComments(int $article_id): array {
@@ -257,9 +217,6 @@ function addEditorialComment(int $article_id, int $user_id, string $content, ?in
     ", $article_id, $user_id, $parent_id, trim($content));
 }
 
-// ─────────────────────────────────────────────
-// 6. AJAX ENTRY POINT
-// ─────────────────────────────────────────────
 if (isset($_POST['action']) || isset($_GET['action'])) {
     header('Content-Type: application/json; charset=utf-8');
 
