@@ -48,8 +48,20 @@ class CategoryTagModel
     public function delete($type, $id)
     {
         if ($type === 'Category') {
+            // Kiểm tra xem có bài viết nào liên kết tới chuyên mục này không
+            $sqlCheck = "SELECT COUNT(*) as count FROM article_categories WHERE category_id = ?";
+            $res = pdo_query_one($sqlCheck, $id);
+            if ($res && $res['count'] > 0) {
+                throw new Exception("Không thể xóa chuyên mục này vì đang có bài viết liên kết tới!");
+            }
             pdo_execute("DELETE FROM categories WHERE category_id = ?", $id);
         } else {
+            // Kiểm tra xem có bài viết nào liên kết tới thẻ này không
+            $sqlCheck = "SELECT COUNT(*) as count FROM article_tags WHERE tag_id = ?";
+            $res = pdo_query_one($sqlCheck, $id);
+            if ($res && $res['count'] > 0) {
+                throw new Exception("Không thể xóa thẻ này vì đang có bài viết liên kết tới!");
+            }
             pdo_execute("DELETE FROM tags WHERE tag_id = ?", $id);
         }
     }

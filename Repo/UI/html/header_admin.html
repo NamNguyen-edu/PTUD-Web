@@ -17,7 +17,27 @@
     <span class="d-none d-sm-flex header-link-item">Phân tích</span>
     <span class="d-none d-sm-flex header-link-item">Hiệu suất</span>
     <span class="active-tab">Trực tiếp</span>
-    <span class="material-symbols-outlined icon-bell">notifications</span>
+
+    <!-- NOTIFICATION BELL SYSTEM -->
+    <div id="notif-bell-wrapper" class="d-none position-relative">
+      <button id="notif-bell-btn" class="btn-bell-admin" aria-label="Thông báo">
+        <span class="material-symbols-outlined">notifications</span>
+      </button>
+      <span id="notif-badge" class="d-none notif-badge-admin"></span>
+
+      <!-- DROPDOWN -->
+      <div id="notif-dropdown" class="d-none notif-dropdown-admin">
+        <div class="notif-dropdown-header-admin">
+          <span>Thông báo</span>
+          <button id="notif-clear-btn" class="btn-clear-notif-admin">Xóa tất cả</button>
+        </div>
+        <div id="notif-list" class="notif-list-admin">
+          <div id="notif-empty" class="notif-empty-admin">
+            Chưa có thông báo nào
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div class="actions-auth" id="user-actions">
       <div id="profile-section" class="profile-container-admin">
@@ -78,6 +98,9 @@
     </div>
   </div>
 </header>
+
+<!-- TOAST NOTIFICATION CONTAINER -->
+<div id="notif-container" class="notif-container-admin"></div>
 
 <script src="UI/js/header_user.js" defer></script>
 <script src="UI/js/header_admin.js" defer></script>

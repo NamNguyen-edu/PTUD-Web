@@ -247,6 +247,7 @@ switch ($page) {
     case 'admin_dashboard':
     case 'admin_userm':
     case 'accountmangement':
+    case 'accountmanagement':
         authorize('manage_users');
         require_once __DIR__ . '/Controller/account_controller.php';
         (new AccountController())->render();
