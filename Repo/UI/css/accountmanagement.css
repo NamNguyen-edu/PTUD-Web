@@ -239,7 +239,250 @@ body.sidebar-collapsed .sidebar .nav-link-custom {
     color: #842029 !important;
 }
 
+#actionToast.bg-danger {
+    background-color: #f8d7da !important;
+    color: #842029 !important;
+}
+
 #actionToast.bg-warning {
     background-color: #fff3cd !important;
     color: #664d03 !important;
+}
+
+/* Dark Mode styles for Account Management */
+body.theme-dark {
+  background-color: #0a0a0a !important;
+  color: #f5f5f5 !important;
+}
+
+body.theme-dark .main-wrapper {
+  background-color: #0a0a0a !important;
+}
+
+body.theme-dark .card {
+  background-color: #161616 !important;
+  border-color: #262626 !important;
+  color: #f5f5f5 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;
+}
+
+body.theme-dark .card-header,
+body.theme-dark .card-footer {
+  background-color: #121212 !important;
+  border-bottom-color: #262626 !important;
+  border-top-color: #262626 !important;
+  color: #f5f5f5 !important;
+}
+
+body.theme-dark h2,
+body.theme-dark h3,
+body.theme-dark h5,
+body.theme-dark p,
+body.theme-dark label,
+body.theme-dark span,
+body.theme-dark th,
+body.theme-dark td {
+  color: #f5f5f5 !important;
+}
+
+body.theme-dark p.text-secondary,
+body.theme-dark span.text-secondary,
+body.theme-dark .text-secondary {
+  color: #a3a3a3 !important;
+}
+
+body.theme-dark .table th {
+  background-color: #121212 !important;
+  color: #a3a3a3 !important;
+  border-bottom-color: #262626 !important;
+}
+
+body.theme-dark .table td {
+  border-bottom-color: #262626 !important;
+}
+
+body.theme-dark .table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+}
+
+body.theme-dark .btn-light {
+  background-color: #262626 !important;
+  border-color: #333333 !important;
+  color: #f5f5f5 !important;
+}
+
+body.theme-dark .btn-light:hover {
+  background-color: #333333 !important;
+  color: #ffffff !important;
+}
+
+body.theme-dark .form-control,
+body.theme-dark .form-select {
+  background-color: #1e1e1e !important;
+  color: #f5f5f5 !important;
+  border-color: #333333 !important;
+}
+
+body.theme-dark .form-control::placeholder {
+  color: #737373 !important;
+}
+
+body.theme-dark .form-control:focus,
+body.theme-dark .form-select:focus {
+  border-color: #1a73e8 !important;
+  box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.25) !important;
+}
+
+body.theme-dark .bg-light,
+body.theme-dark .bg-light-opacity-50 {
+  background-color: #121212 !important;
+}
+
+body.theme-dark .bg-white {
+  background-color: #161616 !important;
+}
+
+body.theme-dark .border {
+  border-color: #262626 !important;
+}
+
+body.theme-dark .modal-content {
+  background-color: #161616 !important;
+  color: #f5f5f5 !important;
+  border-color: #262626 !important;
+}
+
+body.theme-dark .modal-header,
+body.theme-dark .modal-footer {
+  border-color: #262626 !important;
+}
+
+body.theme-dark .modal-title,
+body.theme-dark .form-label {
+  color: #f5f5f5 !important;
+}
+
+body.theme-dark .sticky-footer {
+  background-color: #121212 !important;
+  border-top-color: #262626 !important;
+  color: #f5f5f5 !important;
+}
+
+body.theme-dark .sticky-footer span,
+body.theme-dark .sticky-footer button {
+  color: #f5f5f5 !important;
+}
+
+body.theme-dark .sticky-footer button:hover {
+  color: #1a73e8 !important;
+}
+
+body.theme-dark .sticky-footer .text-danger {
+  color: #ef4444 !important;
+}
+
+body.theme-dark .avatar-letters {
+  background-color: #1a73e8 !important;
+  color: #ffffff !important;
+}
+
+body.theme-dark #account-list img {
+  border-color: #262626 !important;
+}
+
+/* Role Matrix boxes */
+body.theme-dark .vstack .bg-white {
+  background-color: #121212 !important;
+  border-color: #262626 !important;
+}
+
+body.theme-dark .vstack .text-dark {
+  color: #f5f5f5 !important;
+}
+
+.role-matrix-card {
+  background-color: #e9edff !important;
+}
+
+body.theme-dark .role-matrix-card {
+  background-color: #121212 !important;
+}
+
+/* Security Alert box background adjust */
+body.theme-dark .security-alert-card {
+  background: linear-gradient(135deg, #1e1e1e 0%, #121212 100%) !important;
+  border: 1px solid #ef4444 !important;
+}
+
+/* Account Management Table Transparency & Pagination in Dark Mode */
+body.theme-dark table,
+body.theme-dark thead,
+body.theme-dark tbody,
+body.theme-dark tr,
+body.theme-dark th,
+body.theme-dark td {
+  background-color: transparent !important;
+  color: #f5f5f5 !important;
+}
+body.theme-dark .table {
+  --bs-table-bg: transparent !important;
+  color: #f5f5f5 !important;
+}
+
+body.theme-dark .pagination .page-link {
+  background-color: #1e1e1e !important;
+  border-color: #262626 !important;
+  color: #a3a3a3 !important;
+}
+body.theme-dark .pagination .page-item.active .page-link {
+  background-color: #1a73e8 !important;
+  border-color: #1a73e8 !important;
+  color: #ffffff !important;
+}
+body.theme-dark .pagination .page-link:hover {
+  background-color: #262626 !important;
+  color: #ffffff !important;
+}
+
+body.theme-dark .text-dark {
+  color: #f5f5f5 !important;
+}
+
+/* Mobile Sidebar Layout Shift Override */
+@media (max-width: 991.98px) {
+  .main-wrapper {
+    margin-left: 0 !important;
+  }
+  .top-header {
+    left: 0 !important;
+  }
+  .sticky-footer {
+    left: 0 !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .sticky-footer {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start !important;
+    padding: 0.75rem 1rem !important;
+  }
+  .sticky-footer > div:last-child {
+    display: none !important;
+  }
+  .sticky-footer > div:first-child {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 8px !important;
+    width: 100%;
+  }
+  .sticky-footer .d-flex.gap-3 {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .content-body {
+    padding: 16px !important;
+    padding-top: 80px !important;
+  }
 }

@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/../Services/DashboardAdminService.php';
 
-require_once __DIR__ . '/../View/ViewEngine.php';
+require_once __DIR__ . '/../View/dashboardview.php';
 
 class DashboardController
 {
@@ -28,7 +28,7 @@ class DashboardController
 
     public function render(): void
     {
-        $engine = new ViewEngine();
-        echo $engine->render('admin_dashboard');
+        $view = new DashboardView();
+        $view->render();
     }
 }

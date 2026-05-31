@@ -37,14 +37,11 @@
             <div class="d-flex justify-content-between align-items-end mb-4">
                 <div>
                     <h2 class="fw-bolder headline-font mb-1 h3">{{TITLE}}</h2>
-                    <p class="text-secondary mb-0">Configure account settings and access levels across the newsroom.</p>
+                    <p class="text-secondary mb-0">Cấu hình thiết lập tài khoản và các cấp độ truy cập trong tòa soạn.
+                    </p>
                 </div>
                 <div class="d-flex gap-2">
-                    <button class="btn btn-light border fw-semibold px-4">Export Report</button>
-                    <button class="btn btn-primary px-4 d-flex align-items-center gap-2" data-bs-toggle="modal"
-                        data-bs-target="#createUserModal">
-                        <span class="material-symbols-outlined fs-6">person_add</span> Create New User
-                    </button>
+                    <button class="btn btn-light border fw-semibold px-4">Xuất báo cáo</button>
                 </div>
             </div>
 
@@ -54,9 +51,9 @@
                         <div class="d-flex justify-content-between align-items-start mb-3">
                             <span class="material-symbols-outlined bg-primary bg-opacity-10 text-primary p-2 rounded"
                                 style="font-variation-settings: 'FILL' 1;">group</span>
-                            <span class="badge bg-success bg-opacity-10 text-success fw-bold">+12% vs LW</span>
+                            <span class="badge bg-success bg-opacity-10 text-success fw-bold">+12% vs tuần trước</span>
                         </div>
-                        <p class="text-secondary small fw-medium mb-1">Total Users</p>
+                        <p class="text-secondary small fw-medium mb-1">Tổng người dùng</p>
                         <h3 class="fw-bolder headline-font mb-0" id="kpi-total-users">0</h3>
                     </div>
                 </div>
@@ -66,9 +63,9 @@
                         <div class="d-flex justify-content-between align-items-start mb-3">
                             <span class="material-symbols-outlined bg-info bg-opacity-10 text-info p-2 rounded"
                                 style="font-variation-settings: 'FILL' 1;">bolt</span>
-                            <span class="badge bg-primary bg-opacity-10 text-primary fw-bold">Live now</span>
+                            <span class="badge bg-primary bg-opacity-10 text-primary fw-bold">Hiện hoạt động</span>
                         </div>
-                        <p class="text-secondary small fw-medium mb-1">Active Now</p>
+                        <p class="text-secondary small fw-medium mb-1">Đang hoạt động</p>
                         <h3 class="fw-bolder headline-font mb-0" id="kpi-active-users">0</h3>
                     </div>
                 </div>
@@ -78,9 +75,9 @@
                         <div class="d-flex justify-content-between align-items-start mb-3">
                             <span class="material-symbols-outlined bg-danger bg-opacity-10 text-danger p-2 rounded"
                                 style="font-variation-settings: 'FILL' 1;">mail</span>
-                            <span class="badge bg-danger bg-opacity-10 text-danger fw-bold">Action required</span>
+                            <span class="badge bg-danger bg-opacity-10 text-danger fw-bold">Yêu cầu xử lý</span>
                         </div>
-                        <p class="text-secondary small fw-medium mb-1">Pending Invites</p>
+                        <p class="text-secondary small fw-medium mb-1">Lời mời đang chờ</p>
                         <h3 class="fw-bolder headline-font mb-0" id="kpi-pending-users">0</h3>
                     </div>
                 </div>
@@ -91,28 +88,28 @@
                     <div class="card h-100 overflow-hidden">
                         <div
                             class="card-header bg-white border-bottom p-4 d-flex justify-content-between align-items-center">
-                            <h5 class="fw-bold headline-font mb-0">Directory</h5>
+                            <h5 class="fw-bold headline-font mb-0">Danh sách người dùng</h5>
                             <div class="d-flex gap-2">
                                 <input type="text" id="userSearch" class="form-control form-control-sm"
-                                    placeholder="Search users..." style="width: 200px;">
+                                    placeholder="Tìm kiếm người dùng..." style="width: 200px;">
                                 <button class="btn btn-light btn-sm"><span
                                         class="material-symbols-outlined fs-6">filter_list</span></button>
                             </div>
                         </div>
 
-                        <div class="table-responsive">
+                        <div class="table-responsive" style="overflow: visible !important;">
                             <table class="table table-hover mb-0">
                                 <thead>
                                     <tr>
                                         <th class="ps-4" style="width: 40px;">
                                             <input class="form-check-input" id="selectAll" type="checkbox" />
                                         </th>
-                                        <th>User</th>
+                                        <th>Người dùng</th>
                                         <th>Email</th>
-                                        <th>Role</th>
-                                        <th>Status</th>
-                                        <th>Last Active</th>
-                                        <th class="text-end pe-4">Actions</th>
+                                        <th>Vai trò</th>
+                                        <th>Trạng thái</th>
+                                        <th>Hoạt động cuối</th>
+                                        <th class="text-end pe-4">Thao tác</th>
                                     </tr>
                                 </thead>
                                 <tbody id="account-list">
@@ -123,8 +120,8 @@
 
                         <div
                             class="card-footer bg-light bg-opacity-50 p-3 d-flex justify-content-between align-items-center">
-                            <span class="small text-secondary fw-medium" id="pagination-info">Showing 0 of 0
-                                users</span>
+                            <span class="small text-secondary fw-medium" id="pagination-info">Hiển thị 0 trên 0 người
+                                dùng</span>
                             <nav>
                                 <ul class="pagination pagination-sm mb-0" id="pagination-container"></ul>
                             </nav>
@@ -133,118 +130,79 @@
                 </div>
 
                 <div class="col-lg-4">
-                    <div class="card mb-4 bg-light border-0 shadow-none p-4"
-                        style="background-color: #e9edff !important;">
-                        <h5 class="fw-bold headline-font mb-1">Role Matrix</h5>
-                        <p class="small text-secondary mb-4">Quick reference for access levels.</p>
+                    <div class="card mb-4 bg-light border-0 shadow-none p-4 role-matrix-card">
+                        <h5 class="fw-bold headline-font mb-1">Ma trận Vai trò</h5>
+                        <p class="small text-secondary mb-4">Tham chiếu nhanh quyền hạn tài khoản.</p>
                         <div class="vstack gap-3">
                             <div class="bg-white p-3 rounded-3 border">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <span class="small fw-bold text-primary">Admin</span>
+                                    <span class="small fw-bold text-primary">Quản trị viên</span>
                                     <span class="material-symbols-outlined fs-6 text-primary"
                                         style="font-variation-settings: 'FILL' 1;">stars</span>
                                 </div>
-                                <p class="mb-0 text-secondary" style="font-size: 10px;">Full system access, billing, and
-                                    global settings.</p>
+                                <p class="mb-0 text-secondary" style="font-size: 10px;">Toàn quyền hệ thống, thanh toán
+                                    và cài đặt chung.</p>
                             </div>
                             <div class="bg-white p-3 rounded-3 border">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <span class="small fw-bold text-dark">Chief Editor</span>
+                                    <span class="small fw-bold text-dark">Tổng biên tập</span>
                                     <span class="material-symbols-outlined fs-6 text-muted">publish</span>
                                 </div>
-                                <p class="mb-0 text-secondary" style="font-size: 10px;">Publish permissions, editorial
-                                    strategy, and team management.</p>
+                                <p class="mb-0 text-secondary" style="font-size: 10px;">Quyền xuất bản, chiến lược nội
+                                    dung và quản lý đội ngũ.</p>
                             </div>
                             <div class="bg-white p-3 rounded-3 border">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <span class="small fw-bold text-dark">Editor</span>
+                                    <span class="small fw-bold text-dark">Biên tập viên</span>
                                     <span class="material-symbols-outlined fs-6 text-muted">edit</span>
                                 </div>
-                                <p class="mb-0 text-secondary" style="font-size: 10px;">Draft review, content editing,
-                                    and basic publication.</p>
+                                <p class="mb-0 text-secondary" style="font-size: 10px;">Duyệt bản thảo, quản lý bài đăng
+                                    hệ thống.</p>
                             </div>
                             <div class="bg-white p-3 rounded-3 border opacity-75">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <span class="small fw-bold text-dark">Contributor</span>
-                                    <span class="material-symbols-outlined fs-6 text-muted">border_color</span>
+                                    <span class="small fw-bold text-dark">Độc giả</span>
+                                    <span class="material-symbols-outlined fs-6 text-muted">local_library</span>
                                 </div>
-                                <p class="mb-0 text-secondary" style="font-size: 10px;">Content creation only. Cannot
-                                    publish without review.</p>
+                                <p class="mb-0 text-secondary" style="font-size: 10px;">Đọc tin tức, bình luận và đăng
+                                    tin cơ bản.</p>
                             </div>
                         </div>
                         <button class="btn btn-link text-primary text-decoration-none fw-bold small mt-3 p-0">
-                            Full Permissions Guide <span
+                            Hướng dẫn chi tiết phân quyền <span
                                 class="material-symbols-outlined fs-6 align-middle">north_east</span>
                         </button>
-                    </div>
-
-                    <div class="card security-alert-card p-4">
-                        <div class="position-relative z-1">
-                            <h5 class="fw-bold headline-font mb-2">Security Alert</h5>
-                            <p class="small opacity-75 mb-4">3 users have been flagged for multiple failed login
-                                attempts. Verify identities immediately.</p>
-                            <button class="btn btn-danger btn-sm px-3 fw-bold">Review Security</button>
-                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
+            <div class="modal fade" id="assignRoleModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-sm">
                     <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
                         <div class="modal-header border-bottom-0 pt-4 px-4">
-                            <h5 class="modal-title fw-bold headline-font" id="createUserModalLabel">Create New User</h5>
+                            <h5 class="modal-title fw-bold headline-font">Change Role</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body px-4">
-                            <form id="createUserForm" novalidate>
+                            <form id="assignRoleForm">
+                                <input type="hidden" id="assign-user-id">
                                 <div class="mb-3">
-                                    <label for="reg-name" class="form-label small fw-bold text-dark">Full Name</label>
-                                    <input type="text" class="form-control form-control-md rounded-3" id="reg-name"
-                                        placeholder="e.g. John Doe" required>
-                                    <div class="invalid-feedback small">Please enter the user's full name.</div>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="reg-email" class="form-label small fw-bold text-dark">Email
-                                        Address</label>
-                                    <input type="email" class="form-control form-control-md rounded-3" id="reg-email"
-                                        placeholder="name@editorial.com" required>
-                                    <div class="invalid-feedback small">Please enter a valid company email address.
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="reg-role" class="form-label small fw-bold text-dark">Role</label>
-                                        <select class="form-select form-control-md rounded-3" id="reg-role" required>
-                                            <option value="" selected disabled>Select role</option>
-                                            <option value="Admin">Admin</option>
-                                            <option value="Chief Editor">Chief Editor</option>
-                                            <option value="Editor">Editor</option>
-                                            <option value="Contributor">Contributor</option>
-                                        </select>
-                                        <div class="invalid-feedback small">Please select a role.</div>
-                                    </div>
-
-                                    <div class="col-md-6 mb-3">
-                                        <label for="reg-status" class="form-label small fw-bold text-dark">Initial
-                                            Status</label>
-                                        <select class="form-select form-control-md rounded-3" id="reg-status" required>
-                                            <option value="Active">Active</option>
-                                            <option value="Pending">Pending</option>
-                                            <option value="Suspended">Suspended</option>
-                                        </select>
-                                    </div>
+                                    <label class="form-label small fw-bold text-dark mb-3">Select a new role for this
+                                        user:</label>
+                                    <select class="form-select form-control-md rounded-3 fw-medium"
+                                        id="assign-role-select" required style="cursor:pointer">
+                                        <option value="Admin">Admin</option>
+                                        <option value="Editor">Editor</option>
+                                        <option value="Reader">Reader</option>
+                                    </select>
                                 </div>
                             </form>
                         </div>
-                        <div class="modal-footer border-top-0 pb-4 px-4 gap-2">
-                            <button type="button" class="btn btn-light border px-4 fw-semibold rounded-3"
+                        <div class="modal-footer border-top-0 pb-4 px-4 d-flex gap-2 justify-content-between">
+                            <button type="button" class="btn btn-light border px-3 fw-semibold rounded-3 flex-grow-1"
                                 data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-primary px-4 fw-semibold rounded-3"
-                                onclick="submitCreateUserForm()">Save & Invite</button>
+                            <button type="button" class="btn btn-primary px-3 fw-semibold rounded-3 flex-grow-1"
+                                onclick="submitAssignRoleForm()">Update Role</button>
                         </div>
                     </div>
                 </div>
@@ -253,22 +211,23 @@
 
         <footer class="sticky-footer d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center gap-4">
-                <span class="small text-secondary fw-semibold">Bulk Actions (<span id="selected-count">0</span>):</span>
+                <span class="small text-secondary fw-semibold">Hành động hàng loạt (<span
+                        id="selected-count">0</span>):</span>
                 <div class="d-flex gap-3">
                     <button
                         class="btn btn-link p-0 text-decoration-none text-dark small fw-bold d-flex align-items-center gap-1"
                         onclick="handleBulkAction('invite')">
-                        <span class="material-symbols-outlined fs-6">mail</span> Invite selected
+                        <span class="material-symbols-outlined fs-6">manage_accounts</span> Thay đổi role hàng loạt
                     </button>
                     <button
                         class="btn btn-link p-0 text-decoration-none text-dark small fw-bold d-flex align-items-center gap-1"
                         onclick="handleBulkAction('suspend')">
-                        <span class="material-symbols-outlined fs-6">block</span> Suspend
+                        <span class="material-symbols-outlined fs-6">block</span> Đình chỉ
                     </button>
                     <button
                         class="btn btn-link p-0 text-decoration-none text-danger small fw-bold d-flex align-items-center gap-1"
                         onclick="handleBulkAction('delete')">
-                        <span class="material-symbols-outlined fs-6">delete</span> Delete
+                        <span class="material-symbols-outlined fs-6">delete</span> Xóa
                     </button>
                 </div>
             </div>
@@ -280,8 +239,9 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     {{JSON_USERS_DATA}}
-    <script src="UI/js/accountmanagement.js" defer></script>
+    <script src="UI/js/accountmanagement.js?v=5" defer></script>
 </body>
 
 </html>

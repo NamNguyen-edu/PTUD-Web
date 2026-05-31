@@ -30,26 +30,21 @@ class AccountService
   }
 
   /**
-   * Tạo mới người dùng
+   * Cập nhật Role (Phân quyền)
    */
-  public function createUser(array $data): void
+  public function changeRole(array $ids, string $role): void
   {
+    if (empty($ids)) return;
+
     // Lấy role_id từ tên role
-    $role = pdo_query_one("SELECT role_id FROM roles WHERE name = ?", $data['role']);
-    $roleId = $role ? $role['role_id'] : 5;
+    $roleRow = pdo_query_one("SELECT role_id FROM roles WHERE name = ?", $role);
+    if (!$roleRow) throw new Exception("Vai trò không hợp lệ.");
 
-    $sql = "INSERT INTO users(full_name, email, password_hash, role_id, status) VALUES(?, ?, ?, ?, ?)";
+    $roleId = $roleRow['role_id'];
+    $sanitizedIds = implode(',', array_map('intval', $ids));
 
-    $hashedPassword = password_hash('123456', PASSWORD_DEFAULT);
-
-    pdo_execute(
-      $sql,
-      $data['name'],
-      $data['email'],
-      $hashedPassword,
-      $roleId,
-      strtolower($data['status'])
-    );
+    $sql = "UPDATE users SET role_id = ? WHERE user_id IN ($sanitizedIds)";
+    pdo_execute($sql, $roleId);
   }
 
   /**
@@ -61,8 +56,7 @@ class AccountService
 
     // Ép kiểu mảng IDs thành số nguyên để tránh SQL Injection
     $sanitizedIds = implode(',', array_map('intval', $ids));
-
-    $sql = "DELETE FROM users WHERE user_id IN ($sanitizedIds)";
+    $sql = "UPDATE users SET status = 'banned' WHERE user_id IN ($sanitizedIds)";
     pdo_execute($sql);
   }
 

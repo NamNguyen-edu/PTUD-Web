@@ -139,8 +139,11 @@ class HomeService {
         $slugs = [];
         foreach ($preferredTopics as $topic) {
             $topic = trim($topic);
+            if (empty($topic)) continue;
             if (isset($mapping[$topic])) {
                 $slugs[] = $mapping[$topic];
+            } else {
+                $slugs[] = $topic;
             }
         }
 
@@ -166,6 +169,12 @@ class HomeService {
                 a.downvote_count,
                 a.published_at,
                 (CAST(a.upvote_count AS SIGNED) - CAST(a.downvote_count AS SIGNED)) AS trust_score,
+                CASE WHEN EXISTS (
+                    SELECT 1 
+                    FROM article_categories ac2
+                    INNER JOIN categories c2 ON ac2.category_id = c2.category_id
+                    WHERE ac2.article_id = a.article_id AND c2.slug IN ($placeholders)
+                ) THEN 1 ELSE 0 END AS is_preferred,
                 (
                     SELECT GROUP_CONCAT(t.name SEPARATOR ',')
                     FROM tags t
@@ -179,11 +188,9 @@ class HomeService {
                     WHERE ac.article_id = a.article_id
                 ) AS category_names
             FROM articles a
-            INNER JOIN article_categories ac ON a.article_id = ac.article_id
-            INNER JOIN categories c ON ac.category_id = c.category_id
-            WHERE a.status = 'published' AND c.slug IN ($placeholders)
+            WHERE a.status = 'published'
               AND (CAST(a.upvote_count AS SIGNED) - CAST(a.downvote_count AS SIGNED)) >= -3
-            ORDER BY trust_score DESC, a.published_at DESC
+            ORDER BY is_preferred DESC, trust_score DESC, a.published_at DESC
             LIMIT $limit OFFSET $offset
         ";
 

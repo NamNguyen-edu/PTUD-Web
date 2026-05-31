@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", function () {
       document.body.appendChild(script);
     }),
     loadComponent('header_admin', headerUrl, (el) => {
-      el.className = "top-header";
+      el.className = "";
       // Nạp các file JS cho header admin
       const scriptUser = document.createElement('script');
       scriptUser.src = headerUserJsUrl;

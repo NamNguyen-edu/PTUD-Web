@@ -28,22 +28,22 @@ class AccountView
       foreach ($initialPageUsers as $user) {
         $statusStr = isset($user['status']) ? strtolower($user['status']) : '';
         $statusBadge = match ($statusStr) {
-          'active'  => '<span class="badge bg-success bg-opacity-10 text-success">Active</span>',
-          'pending' => '<span class="badge bg-warning bg-opacity-10 text-warning">Pending</span>',
-          default   => '<span class="badge bg-secondary bg-opacity-10 text-secondary">Suspended/Banned</span>',
+          'active'  => '<span class="badge bg-success bg-opacity-10 text-success">Hoạt động</span>',
+          'pending' => '<span class="badge bg-warning bg-opacity-10 text-warning">Chờ duyệt</span>',
+          default   => '<span class="badge bg-secondary bg-opacity-10 text-secondary">Đình bản</span>',
         };
 
-        $timeAgo = 'Never';
+        $timeAgo = 'Chưa bao giờ';
         if (!empty($user['lastActive']) && $user['lastActive'] !== 'Never' && $user['lastActive'] !== '0000-00-00 00:00:00') {
           $timePast = time() - strtotime($user['lastActive']);
-          if ($timePast < 60) $timeAgo = 'Just now';
-          elseif ($timePast < 3600) $timeAgo = floor($timePast / 60) . ' mins ago';
-          elseif ($timePast < 86400) $timeAgo = floor($timePast / 3600) . ' hours ago';
-          else $timeAgo = date('M d, Y', strtotime($user['lastActive']));
+          if ($timePast < 60) $timeAgo = 'Vừa xong';
+          elseif ($timePast < 3600) $timeAgo = floor($timePast / 60) . ' phút trước';
+          elseif ($timePast < 86400) $timeAgo = floor($timePast / 3600) . ' giờ trước';
+          else $timeAgo = date('d/m/Y', strtotime($user['lastActive']));
         }
 
         // Lấy tên hiển thị (Phòng hờ nếu DB bị null thì để chữ Vô danh)
-        $displayName = !empty($user['name']) ? htmlspecialchars($user['name']) : 'Unknown User';
+        $displayName = !empty($user['name']) ? htmlspecialchars($user['name']) : 'Vô danh';
 
         // XỬ LÝ AVATAR ĐỘC LẬP BẰNG HTML/CSS (Không dùng API ngoài)
         if (!empty($user['avatar'])) {
@@ -64,6 +64,15 @@ class AccountView
           $avatarHtml = '<div class="avatar-letters">' . $initials . '</div>';
         }
 
+        $roleName = match (strtolower($user['role'] ?? '')) {
+          'admin' => 'Quản trị viên',
+          'chief editor' => 'Tổng biên tập',
+          'editor' => 'Biên tập viên',
+          'contributor' => 'Cộng tác viên',
+          'reader' => 'Độc giả',
+          default => htmlspecialchars($user['role'] ?? '')
+        };
+
         $initialRowsHtml .= '
             <tr>
                 <td class="ps-4 align-middle">
@@ -76,7 +85,7 @@ class AccountView
                     </div>
                 </td>
                 <td class="align-middle text-secondary small">' . htmlspecialchars($user['email']) . '</td>
-                <td class="align-middle fw-medium text-dark text-capitalize">' . htmlspecialchars($user['role']) . '</td>
+                <td class="align-middle fw-medium text-dark">' . $roleName . '</td>
                 <td class="align-middle">' . $statusBadge . '</td>
                 <td class="align-middle text-secondary small">' . $timeAgo . '</td>
                 <td class="text-end pe-4 align-middle">
@@ -85,8 +94,8 @@ class AccountView
                             <span class="material-symbols-outlined fs-5">more_vert</span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                            <li><a class="dropdown-item small fw-bold" href="#" onclick="updateSingleStatus(' . $user['id'] . ', \'suspend\')">Suspend</a></li>
-                            <li><a class="dropdown-item small text-danger fw-bold" href="#" onclick="deleteSingleUser(' . $user['id'] . ')">Delete</a></li>
+                            <li><a class="dropdown-item small fw-bold" href="#" onclick="updateSingleStatus(' . $user['id'] . ', \'suspend\')">Đình bản</a></li>
+                            <li><a class="dropdown-item small text-danger fw-bold" href="#" onclick="deleteSingleUser(' . $user['id'] . ')">Xóa</a></li>
                         </ul>
                     </div>
                 </td>
