@@ -182,13 +182,11 @@ function initNotifications() {
     const saved = JSON.parse(localStorage.getItem('newsPulse_Notifications') || '{}');
     if (saved.newArticle  !== undefined) document.getElementById('notif-new-article').checked  = saved.newArticle;
     if (saved.commentReply !== undefined) document.getElementById('notif-comment-reply').checked = saved.commentReply;
-    if (saved.weekly      !== undefined) document.getElementById('notif-weekly').checked       = saved.weekly;
 
     btn.addEventListener('click', function () {
         const prefs = {
             newArticle:   document.getElementById('notif-new-article').checked,
             commentReply: document.getElementById('notif-comment-reply').checked,
-            weekly:       document.getElementById('notif-weekly').checked,
         };
 
         localStorage.setItem('newsPulse_Notifications', JSON.stringify(prefs));
@@ -204,32 +202,40 @@ function initNotifications() {
 function initTopicPreferences() {
     const btn       = document.getElementById('btn-save-preferences');
     const savedText = document.getElementById('pref-saved');
-    const chips     = document.querySelectorAll('.topic-chip');
+    const container = document.getElementById('topic-chips');
 
-    if (!btn) return;
+    if (!btn || !container) return;
 
     // Load topics đã lưu từ newsPulse_UserPrefs (dùng chung với home.js)
     try {
         const saved = JSON.parse(localStorage.getItem('newsPulse_UserPrefs') || '{}');
         const savedTopics = Array.isArray(saved.topics) ? saved.topics : [];
 
+        const chips = container.querySelectorAll('.topic-chip');
         chips.forEach(chip => {
             if (savedTopics.includes(chip.dataset.topic)) {
                 chip.classList.add('selected');
             }
         });
-    } catch (e) {}
+    } catch (e) {
+        console.error(e);
+    }
 
-    // Toggle chip
-    chips.forEach(chip => {
-        chip.addEventListener('click', function () {
-            this.classList.toggle('selected');
-        });
+    // Toggle chip using event delegation
+    container.addEventListener('click', function (e) {
+        const chip = e.target.closest('.topic-chip');
+        if (chip) {
+            e.preventDefault();
+            e.stopPropagation();
+            chip.classList.toggle('selected');
+        }
     });
 
     // Lưu
-    btn.addEventListener('click', function () {
+    btn.addEventListener('click', function (e) {
+        e.preventDefault();
         const selectedTopics = [];
+        const chips = container.querySelectorAll('.topic-chip');
         chips.forEach(chip => {
             if (chip.classList.contains('selected')) {
                 selectedTopics.push(chip.dataset.topic);

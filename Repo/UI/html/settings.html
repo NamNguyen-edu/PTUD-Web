@@ -121,16 +121,7 @@
                                 <input class="form-check-input pref-toggle" type="checkbox" id="notif-comment-reply" checked>
                             </div>
                         </div>
-                        <hr class="my-1">
-                        <div class="settings-toggle-row">
-                            <div>
-                                <div class="fw-semibold">Bản tin hàng tuần</div>
-                                <small class="text-muted">Tổng hợp tin tức nổi bật gửi qua email mỗi tuần</small>
-                            </div>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input pref-toggle" type="checkbox" id="notif-weekly">
-                            </div>
-                        </div>
+
                     </div>
 
                     <div class="mt-4">
@@ -155,14 +146,7 @@
                         <label class="form-label fw-semibold">Chủ đề yêu thích</label>
                         <small class="d-block text-muted mb-3">Chọn các chủ đề bạn quan tâm để feed hiển thị phù hợp hơn</small>
                         <div class="d-flex flex-wrap gap-2" id="topic-chips">
-                            <button class="btn topic-chip" data-topic="thoi-su">🗞 Thời sự</button>
-                            <button class="btn topic-chip" data-topic="cong-nghe">💻 Công nghệ</button>
-                            <button class="btn topic-chip" data-topic="kinh-doanh">📈 Kinh doanh</button>
-                            <button class="btn topic-chip" data-topic="giao-duc">📚 Giáo dục</button>
-                            <button class="btn topic-chip" data-topic="the-thao">⚽ Thể thao</button>
-                            <button class="btn topic-chip" data-topic="giai-tri">🎬 Giải trí</button>
-                            <button class="btn topic-chip" data-topic="suc-khoe">❤️ Sức khoẻ</button>
-                            <button class="btn topic-chip" data-topic="du-lich">✈️ Du lịch</button>
+                            {{TOPICS_OPTIONS}}
                         </div>
                     </div>
 
