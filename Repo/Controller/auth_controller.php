@@ -49,7 +49,7 @@ class AuthController
       echo "Tài khoản hoặc mật khẩu không chính xác!";
       exit;
     } catch (Exception $e) {
-      echo "Hệ thống đang bảo trì hoặc gặp lỗi xử lý.";
+      echo $e->getMessage();
       exit;
     }
   }
@@ -196,15 +196,26 @@ class AuthController
 
     $email = $payload['email'];
     $name = $payload['name'] ?? 'Google User';
+    $mode = $_POST['mode'] ?? 'login';
 
     $sql = "SELECT u.*, r.name AS role_name FROM users u LEFT JOIN roles r ON u.role_id = r.role_id WHERE u.email = ? LIMIT 1";
     $user = pdo_query_one($sql, $email);
 
-    if (!$user) {
+    if ($mode === 'signup') {
+        if ($user) {
+            exit('EMAIL_EXISTS');
+        }
         $username = explode('@', $email)[0] . rand(1000, 9999);
         $password = bin2hex(random_bytes(8));
         $this->service->createAccount($name, $email, $username, $password);
         $user = pdo_query_one($sql, $email);
+    } else {
+        if (!$user) {
+            exit('EMAIL_NOT_FOUND');
+        }
+        if ($user['status'] === 'banned') {
+            exit('BANNED');
+        }
     }
 
     if ($user) {
