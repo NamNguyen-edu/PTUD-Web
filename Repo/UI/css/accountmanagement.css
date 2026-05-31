@@ -400,8 +400,11 @@ body.theme-dark .vstack .text-dark {
   color: #f5f5f5 !important;
 }
 
-body.theme-dark .card.bg-light[style*="background-color: #e9edff"],
-body.theme-dark .card.bg-light[style*="background-color:#e9edff"] {
+.role-matrix-card {
+  background-color: #e9edff !important;
+}
+
+body.theme-dark .role-matrix-card {
   background-color: #121212 !important;
 }
 
@@ -409,4 +412,44 @@ body.theme-dark .card.bg-light[style*="background-color:#e9edff"] {
 body.theme-dark .security-alert-card {
   background: linear-gradient(135deg, #1e1e1e 0%, #121212 100%) !important;
   border: 1px solid #ef4444 !important;
+}
+
+/* Account Management Table Transparency & Pagination in Dark Mode */
+body.theme-dark table,
+body.theme-dark thead,
+body.theme-dark tbody,
+body.theme-dark tr,
+body.theme-dark th,
+body.theme-dark td {
+  background-color: transparent !important;
+  color: #f5f5f5 !important;
+}
+body.theme-dark .table {
+  --bs-table-bg: transparent !important;
+  color: #f5f5f5 !important;
+}
+
+body.theme-dark .pagination .page-link {
+  background-color: #1e1e1e !important;
+  border-color: #262626 !important;
+  color: #a3a3a3 !important;
+}
+body.theme-dark .pagination .page-item.active .page-link {
+  background-color: #1a73e8 !important;
+  border-color: #1a73e8 !important;
+  color: #ffffff !important;
+}
+body.theme-dark .pagination .page-link:hover {
+  background-color: #262626 !important;
+  color: #ffffff !important;
+}
+
+/* Mobile Sidebar Layout Shift Override */
+@media (max-width: 991.98px) {
+  body.sidebar-open .main-wrapper {
+    margin-left: 0 !important;
+  }
+  body.sidebar-open .sticky-footer {
+    left: 0 !important;
+  }
 }
