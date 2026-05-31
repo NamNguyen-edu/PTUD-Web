@@ -63,20 +63,26 @@ class AuthController
 
     $fullname = trim($_POST['fullname'] ?? '');
     $emailOrPhone = trim($_POST['email_or_phone'] ?? '');
+    $username = trim($_POST['username'] ?? '');
     $password = trim($_POST['password'] ?? '');
 
-    if ($fullname === '' || $emailOrPhone === '' || $password === '') {
-      echo "Vui lòng điền đầy đủ thông vị trí đăng ký.";
+    if ($fullname === '' || $emailOrPhone === '' || $username === '' || $password === '') {
+      echo "Vui lòng điền đầy đủ thông tin đăng ký.";
       exit;
     }
 
     try {
       if ($this->service->emailExists($emailOrPhone)) {
-        echo "Email hoặc số điện thoại này đã được sử dụng.";
+        echo "Email này đã được sử dụng.";
         exit;
       }
 
-      $this->service->createAccount($fullname, $emailOrPhone, $password);
+      if ($this->service->usernameExists($username)) {
+        echo "Tên đăng nhập này đã được sử dụng.";
+        exit;
+      }
+
+      $this->service->createAccount($fullname, $emailOrPhone, $username, $password);
 
       echo "success";
       exit;
@@ -158,6 +164,66 @@ class AuthController
   private function redirect(string $url): void
   {
     header('Location: ' . $url);
+    exit;
+  }
+
+  public function googleAuth(): void
+  {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+      exit('Invalid request');
+    }
+    
+    $credential = $_POST['credential'] ?? '';
+    if (!$credential) {
+      exit('No credential provided');
+    }
+
+    $parts = explode('.', $credential);
+    if (count($parts) !== 3) {
+      exit('Invalid credential format');
+    }
+
+    $base64 = str_replace(['-', '_'], ['+', '/'], $parts[1]);
+    $pad = strlen($base64) % 4;
+    if ($pad) {
+        $base64 .= str_repeat('=', 4 - $pad);
+    }
+    
+    $payload = json_decode(base64_decode($base64), true);
+    if (!$payload || !isset($payload['email'])) {
+      exit('Invalid Google payload');
+    }
+
+    $email = $payload['email'];
+    $name = $payload['name'] ?? 'Google User';
+
+    $sql = "SELECT u.*, r.name AS role_name FROM users u LEFT JOIN roles r ON u.role_id = r.role_id WHERE u.email = ? LIMIT 1";
+    $user = pdo_query_one($sql, $email);
+
+    if (!$user) {
+        $username = explode('@', $email)[0] . rand(1000, 9999);
+        $password = bin2hex(random_bytes(8));
+        $this->service->createAccount($name, $email, $username, $password);
+        $user = pdo_query_one($sql, $email);
+    }
+
+    if ($user) {
+        $_SESSION['user_id'] = $user['user_id'] ?? ($user['id'] ?? null);
+        $_SESSION['user_name'] = $user['full_name'] ?? ($user['name'] ?? 'Thành viên');
+        $_SESSION['user_email'] = $user['email'] ?? '';
+
+        $role = strtolower(trim($user['role_name'] ?? 'reader'));
+        $_SESSION['role'] = $role;
+
+        if (ob_get_length()) {
+          ob_clean();
+        }
+
+        echo $role;
+        exit;
+    }
+    
+    echo "Lỗi khi xử lý đăng nhập Google.";
     exit;
   }
 }
