@@ -247,9 +247,9 @@
     }
 
     .floating-bar {
-      left: 50%;
-      width: min(95vw, 38rem);
-      transform: translateX(-50%);
+      left: 50% !important;
+      width: min(95vw, 38rem) !important;
+      transform: translateX(-50%) !important;
       padding: 1rem;
       flex-wrap: wrap;
       justify-content: center;
@@ -261,6 +261,10 @@
       left: 50% !important;
       width: min(95vw, 38rem) !important;
       transform: translateX(-50%) !important;
+    }
+
+    .floating-divider {
+      display: none !important;
     }
 
     .floating-btn {
@@ -816,4 +820,37 @@ body.theme-dark .topbar-search input {
 
 body.theme-dark .icon-btn:hover {
   background-color: #262626 !important;
+}
+
+@media (max-width: 576px) {
+  .floating-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: calc(100% - 32px) !important;
+    bottom: 1rem !important;
+    border-radius: 16px !important;
+    gap: 8px !important;
+    padding: 12px !important;
+  }
+
+  .floating-btn {
+    flex: none !important;
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 10px 16px !important;
+    background-color: rgba(255, 255, 255, 0.06) !important;
+    border-radius: 10px !important;
+  }
+
+  .floating-btn:hover {
+    background-color: rgba(255, 255, 255, 0.12) !important;
+  }
+
+  .floating-btn.danger {
+    background-color: rgba(239, 68, 68, 0.12) !important;
+  }
+
+  .floating-btn.danger:hover {
+    background-color: rgba(239, 68, 68, 0.22) !important;
+  }
 }
