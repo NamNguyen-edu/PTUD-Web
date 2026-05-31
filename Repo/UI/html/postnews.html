@@ -39,6 +39,8 @@
             </div>
         </div>
 
+        {{REVISION_ALERT_HTML}}
+
         <form id="postNewsForm" novalidate>
             <input type="hidden" id="articleId" value="{{ARTICLE_ID}}">
 
@@ -54,10 +56,7 @@
                                     <input type="hidden" id="hiddenCategory" value="{{CATEGORY_SLUG}}">
                                     <select class="form-control custom-select" id="postCategory" required>
                                         <option value="">-- Chọn một chuyên mục --</option>
-                                        <option value="thoi-su">Thời sự</option>
-                                        <option value="kinh-doanh">Kinh doanh</option>
-                                        <option value="cong-nghe">Công nghệ</option>
-                                        <option value="the-thao">Thể thao</option>
+                                        {{CATEGORIES_OPTIONS}}
                                     </select>
 
  
