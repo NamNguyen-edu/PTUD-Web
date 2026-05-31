@@ -5,11 +5,9 @@ class AuthService
 {
   // Định nghĩa quyền hạn cụ thể cho từng role
   private array $permissions = [
-    'admin'        => ['all'], // 'all' là quyền đặc biệt
-    'chief editor' => ['manage_category', 'manage_version', 'approve_post', 'manage_users'],
-    'editor'       => ['manage_version', 'approve_post'],
-    'contributor'  => ['manage_post', 'manage_profile'],
-    'reader'       => ['manage_profile', 'read_post']
+    'admin'  => ['all'],
+    'editor' => ['view_dashboard', 'manage_content', 'manage_own_posts', 'manage_profile'],
+    'reader' => ['manage_own_posts', 'manage_profile']
   ];
 
   /**

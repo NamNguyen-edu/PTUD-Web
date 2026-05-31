@@ -129,7 +129,8 @@ class AuthController
       'id' => $logged ? ($_SESSION['user_id'] ?? null) : null,
       'name' => $logged ? ($_SESSION['user_name'] ?? ($_SESSION['user_fullname'] ?? '')) : null,
       'email' => $logged ? ($_SESSION['user_email'] ?? null) : null,
-      'avatar_url' => $avatarUrl
+      'avatar_url' => $avatarUrl,
+      'role' => $logged ? ($_SESSION['role'] ?? 'guest') : 'guest'
     ];
 
     echo json_encode(['logged' => $logged, 'user' => $user]);
