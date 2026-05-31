@@ -65,6 +65,6 @@ class CategoryView
       'TAG_ROWS'          => $tagRowsHtml      // Đổ data cứng từ PHP sinh ra
     ];
 
-    return $this->viewEngine->render('categorymanagement', $data);
+    return $this->viewEngine->render('categorymangement', $data);
   }
 }

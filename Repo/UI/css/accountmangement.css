@@ -6,7 +6,7 @@
     --sidebar-bg: #cbdaff;
     --background-bg: #f9f9ff;
     --surface-container: #e9edff;
-    --sidebar-width: 280px;
+    --sidebar-width: 260px;
     --sidebar-collapsed-width: 80px;
 }
 
@@ -24,7 +24,7 @@ body {
 /* ==========================================================================
    LAYOUT STRUCTURE (FLEXBOX CHỐNG ĐÈ INTERFACE)
    ========================================================================== */
-.main-content {
+.main-wrapper {
     margin-left: var(--sidebar-width);
     min-height: 100vh;
     display: flex;
@@ -39,8 +39,8 @@ body {
     /* Tạo khoảng trống phía trên chống bị Header che khuất */
 }
 
-/* Khi sidebar thu nhỏ, dịch main-content sang trái tương ứng */
-body.sidebar-collapsed .main-content {
+/* Khi sidebar thu nhỏ, dịch main-wrapper sang trái tương ứng */
+body.sidebar-collapsed .main-wrapper {
     margin-left: var(--sidebar-collapsed-width);
 }
 
