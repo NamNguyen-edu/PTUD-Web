@@ -9,7 +9,7 @@ class CategoryTagModel
     public function getAllCategories(): array
     {
         $sql = "
-            SELECT c.category_id AS id, c.name, c.slug, COUNT(ac.article_id) AS count
+            SELECT c.category_id AS id, c.category_id, c.name, c.slug, COUNT(ac.article_id) AS count
             FROM categories c
             LEFT JOIN article_categories ac ON c.category_id = ac.category_id
             GROUP BY c.category_id, c.name, c.slug
@@ -24,7 +24,7 @@ class CategoryTagModel
     public function getAllTags(): array
     {
         $sql = "
-            SELECT t.tag_id AS id, t.name, t.slug, COUNT(at.article_id) AS count
+            SELECT t.tag_id AS id, t.tag_id, t.name, t.slug, COUNT(at.article_id) AS count
             FROM tags t
             LEFT JOIN article_tags at ON t.tag_id = at.tag_id
             GROUP BY t.tag_id, t.name, t.slug
