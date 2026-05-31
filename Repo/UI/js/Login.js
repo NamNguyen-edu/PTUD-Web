@@ -136,8 +136,16 @@ async function handleFormSubmit(formId, url, actionType) {
 
       if (actionType === 'login') {
         if (['admin', 'editor', 'contributor', 'reader', 'chief editor'].includes(result)) {
-          Swal.fire({ icon: 'success', title: 'Thành công!', timer: 1000, showConfirmButton: false })
-            .then(() => window.location.href = (result === 'admin' || result === 'chief editor') ? 'index.php?page=categorymanagement' : 'index.php?page=home');
+          Swal.fire({ icon: 'success', title: 'Đăng nhập thành công!', timer: 1000, showConfirmButton: false })
+            .then(() => {
+              if (result === 'admin') {
+                window.location.href = 'index.php?page=admin_dashboard';
+              } else if (result === 'chief editor') {
+                window.location.href = 'index.php?page=categorymanagement';
+              } else {
+                window.location.href = 'index.php?page=home';
+              }
+            });
         } else {
           Swal.fire({ icon: 'error', title: 'Đăng nhập thất bại', text: result });
         }

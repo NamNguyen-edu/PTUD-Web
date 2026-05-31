@@ -1,5 +1,5 @@
 
-const API_URL = "/PTUD-WEB/Repo/Controller/Controller/User_controller.php";
+const API_URL = "index.php?page=api_account";
 
 let currentUsersList = [];
 let filteredData = [];
