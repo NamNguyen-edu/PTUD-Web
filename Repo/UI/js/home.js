@@ -677,12 +677,32 @@ async function loadVideoSegment() {
     const feed = document.getElementById('feed');
     if (!feed) return;
 
+    // Helper functions to parse YouTube URLs robustly
+    function getYoutubeId(url) {
+        if (!url) return '';
+        // Match watch format, shortener format, embed format, etc.
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const match = url.match(regExp);
+        if (match && match[2].length === 11) {
+            return match[2];
+        }
+        // Fallback for simple 11 character string
+        const matches = url.match(/([a-zA-Z0-9_-]{11})/);
+        return matches ? matches[1] : '';
+    }
+
+    function getYoutubeEmbedUrl(url) {
+        const id = getYoutubeId(url);
+        return id ? `https://www.youtube.com/embed/${id}` : url;
+    }
+
     try {
         const response = await fetch(getAppUrl('?page=video_feed'));
         const result = await response.json();
         if (result.success && result.items && result.items.length > 0) {
             const videos = result.items;
             const activeVideo = videos[0];
+            const activeEmbedUrl = getYoutubeEmbedUrl(activeVideo.url);
 
             const videoBlockHtml = `
                 <div class="video-block my-5">
@@ -695,7 +715,7 @@ async function loadVideoSegment() {
                                 <iframe 
                                     id="main-video-player"
                                     class="position-absolute top-0 start-0 w-100 h-100 border-0"
-                                    src="${activeVideo.url}" 
+                                    src="${activeEmbedUrl}" 
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                                     allowfullscreen
                                 ></iframe>
@@ -709,11 +729,11 @@ async function loadVideoSegment() {
                             <h6 class="video-up-next-title">Up next</h6>
                             <div class="video-up-next-list d-flex flex-column gap-2">
                                 ${videos.map((vid, idx) => {
-                                    // Parse Youtube ID to show official thumbnail
-                                    const ytId = vid.url.split('/').pop().split('?')[0];
-                                    const thumbUrl = `https://img.youtube.com/vi/${ytId}/mqdefault.jpg`;
+                                    const ytId = getYoutubeId(vid.url);
+                                    const embedUrl = ytId ? `https://www.youtube.com/embed/${ytId}` : vid.url;
+                                    const thumbUrl = ytId ? `https://img.youtube.com/vi/${ytId}/mqdefault.jpg` : 'https://picsum.photos/100/60';
                                     return `
-                                        <div class="video-up-next-item ${idx === 0 ? 'active' : ''}" data-video-url="${vid.url}" data-video-title="${escapeHtml(vid.title)}" data-video-date="${new Date(vid.created_at).toLocaleDateString('vi-VN')}">
+                                        <div class="video-up-next-item ${idx === 0 ? 'active' : ''}" data-video-url="${embedUrl}" data-video-title="${escapeHtml(vid.title)}" data-video-date="${new Date(vid.created_at).toLocaleDateString('vi-VN')}">
                                             <div class="video-thumb-container">
                                                 <img src="${thumbUrl}" onerror="this.src='https://picsum.photos/100/60'">
                                                 <div class="video-play-icon">▶</div>
@@ -1158,24 +1178,8 @@ function initMegaMenu() {
         // Desktop: Hover
         item.addEventListener('mouseenter', loadMegaData);
 
-        // Mobile: Click
-        if (navLink) {
-            navLink.addEventListener('click', (e) => {
-                if (window.innerWidth <= 768) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    const isActive = item.classList.contains('active-mega');
-                    
-                    navItems.forEach(i => i.classList.remove('active-mega'));
-                    
-                    if (!isActive) {
-                        item.classList.add('active-mega');
-                        loadMegaData();
-                    }
-                }
-            });
-        }
+        // Mobile: Click - Cho phép điều hướng trực tiếp đến trang chuyên mục khi click trên mobile
+        // thay vì chặn lại để mở Mega Menu (Mega Menu không phù hợp hiển thị trên Mobile).
     });
 
     document.addEventListener('click', (e) => {

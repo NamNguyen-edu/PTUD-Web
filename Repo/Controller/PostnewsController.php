@@ -98,6 +98,30 @@ public function savePost(): void
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);
         }
     }
+
+    public function uploadThumbnail(): void
+    {
+        header('Content-Type: application/json; charset=utf-8');
+        $userId = $_SESSION['user_id'] ?? 1;
+
+        if (!isset($_FILES['thumbnail']) || $_FILES['thumbnail']['error'] !== UPLOAD_ERR_OK) {
+            echo json_encode(['success' => false, 'message' => 'Không nhận được dữ liệu ảnh thumbnail hoặc ảnh bị lỗi']);
+            return;
+        }
+
+        try {
+            $file = $_FILES['thumbnail'];
+            $thumbnailUrl = $this->service->uploadThumbnailDirect($file, $userId);
+
+            if ($thumbnailUrl) {
+                echo json_encode(['success' => true, 'url' => $thumbnailUrl]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Lỗi tải ảnh lên thư mục lưu trữ']);
+            }
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+    }
     public function handleAction(): void
 {
     header('Content-Type: application/json');

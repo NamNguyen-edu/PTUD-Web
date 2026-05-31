@@ -1,0 +1,16 @@
+# Environment configuration files
+.env
+.env.local
+.env.*.local
+
+# Sensitive certificates and keys
+ca.pem
+*.pem
+*.key
+*.cert
+
+# Cache and temporary files
+tmp_cache/
+cache/
+.system_generated/
+.gemini/

@@ -1,0 +1,4 @@
+<?php
+require_once __DIR__ . '/../Model/pdo.php';
+$users = pdo_query('SELECT user_id, username, full_name, avatar_url FROM users');
+print_r($users);

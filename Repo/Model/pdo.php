@@ -34,23 +34,51 @@ function pdo_query_search($sql, $keyword)
 
 function pdo_get_connection()
 {
-
     static $conn = null;
 
     if ($conn !== null) {
         return $conn;
     }
 
-    $host = 'newspulsedb-newspulseg5.h.aivencloud.com';
-    $port = 18427;
-    $dbname = 'news_pulse';
-    $username = 'avnadmin';
-    $password = 'AVNS_5kpa6shKuuTPQ13VEIo';
+    // Tự động nạp cấu hình từ tệp .env ở thư mục gốc
+    $envPath = dirname(__DIR__) . '/.env';
+    $env = [];
+    if (file_exists($envPath)) {
+        $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if (strpos($line, '#') === 0 || strpos($line, '=') === false) {
+                continue;
+            }
+            list($key, $val) = explode('=', $line, 2);
+            $key = trim($key);
+            $val = trim($val);
+            
+            // Loại bỏ dấu nháy bọc ngoài nếu có
+            if (preg_match('/^([\'"])(.*)\1$/', $val, $matches)) {
+                $val = $matches[2];
+            }
+            $env[$key] = $val;
+        }
+    }
 
-    $sslCaFile = realpath(__DIR__ . '/../ca.pem');
+    $host     = $env['DB_HOST'] ?? 'newspulsedb-newspulseg5.h.aivencloud.com';
+    $port     = (int)($env['DB_PORT'] ?? 18427);
+    $dbname   = $env['DB_NAME'] ?? 'news_pulse';
+    $username = $env['DB_USER'] ?? 'avnadmin';
+    $password = $env['DB_PASS'] ?? 'AVNS_5kpa6shKuuTPQ13VEIo';
+
+    $sslCaFile = __DIR__ . '/../ca.pem';
+    if (!empty($env['DB_SSL_CA'])) {
+        $caContent = str_replace('\n', "\n", $env['DB_SSL_CA']);
+        // Tự động cập nhật tệp ca.pem vật lý nếu chưa có hoặc nội dung khác với tệp cấu hình .env
+        if (!file_exists($sslCaFile) || file_get_contents($sslCaFile) !== $caContent) {
+            @file_put_contents($sslCaFile, $caContent);
+        }
+    }
+    $sslCaFile = realpath($sslCaFile);
 
     try {
-
         $dburl = "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4";
 
         $options = [
@@ -79,7 +107,6 @@ function pdo_get_connection()
 
         return $conn;
     } catch (PDOException $e) {
-
         die('Lỗi kết nối CSDL: ' . $e->getMessage());
     }
 }

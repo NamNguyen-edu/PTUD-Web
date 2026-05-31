@@ -351,13 +351,13 @@ function updateQueue(queue) {
             formatDeadline(item.created_at);
 
         return `
-            <tr>
+            <tr onclick="window.location.href='?page=approval&article_id=${encodeURIComponent(item.article_id)}'" style="cursor: pointer;">
 
                 <td class="ps-4">
                     <div class="fw-bold text-truncate"
                         style="max-width:250px;">
-                        <a href="?page=admin1&article_id=${encodeURIComponent(item.article_id)}"
-                            class="text-decoration-none text-dark">
+                        <a href="?page=approval&article_id=${encodeURIComponent(item.article_id)}"
+                            class="text-decoration-none text-dark" onclick="event.stopPropagation();">
                             ${title}
                         </a>
                     </div>

@@ -15,7 +15,7 @@ public function saveArticle(int $userId, array $data): int
         $tagsStr = $data['tags'] ?? '';     // Nhận tags từ JS
 
         // Xử lý upload ảnh (Giữ nguyên tính năng lưu ảnh)
-        $thumbnailUrl = null;
+        $thumbnailUrl = $data['thumbnail_url'] ?? null;
         if (isset($data['thumbnail_file'])) {
             $thumbnailUrl = $this->handleFileUpload($data['thumbnail_file'], $userId);
         }
@@ -101,10 +101,15 @@ public function saveArticle(int $userId, array $data): int
 
         return $articleId;
     }
+    public function uploadThumbnailDirect(array $file, int $userId): ?string
+    {
+        return $this->handleFileUpload($file, $userId);
+    }
+
     // ==================================================
     // HÀM PHỤ TRỢ: XỬ LÝ UPLOAD FILE THỰC SỰ
     // ==================================================
-    private function handleFileUpload(array $file, int $userId): ?string
+    public function handleFileUpload(array $file, int $userId): ?string
     {
         // 1. Kiểm tra lỗi
         if ($file['error'] !== UPLOAD_ERR_OK) {
@@ -113,7 +118,7 @@ public function saveArticle(int $userId, array $data): int
 
         // 2. Validate file type (chỉ nhận ảnh)
         $allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-        if (!in_array($file['mime_type'], $allowedTypes)) {
+        if (!in_array($file['type'], $allowedTypes)) {
             // Bạn có thể quăng Exception ở đây nếu muốn validate chặt
             return null;
         }
