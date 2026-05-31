@@ -37,22 +37,22 @@ switch ($page) {
         break;
 
     case 'login':
-        require_once __DIR__ . '/Controller/AuthController.php';
+        require_once __DIR__ . '/Controller/auth_controller.php';
         (new AuthController())->login();
         break;
 
     case 'signup':
-        require_once __DIR__ . '/Controller/AuthController.php';
+        require_once __DIR__ . '/Controller/auth_controller.php';
         (new AuthController())->signup();
         break;
 
     case 'logout':
-        require_once __DIR__ . '/Controller/AuthController.php';
+        require_once __DIR__ . '/Controller/auth_controller.php';
         (new AuthController())->logout();
         break;
 
     case 'update_settings':
-        require_once __DIR__ . '/Controller/AuthController.php';
+        require_once __DIR__ . '/Controller/auth_controller.php';
         (new AuthController())->updateSettings();
         break;
 
@@ -72,7 +72,7 @@ switch ($page) {
         break;
 
     case 'get_current_user':
-        require_once __DIR__ . '/Controller/AuthController.php';
+        require_once __DIR__ . '/Controller/auth_controller.php';
         (new AuthController())->currentUser();
         break;
 
@@ -125,7 +125,6 @@ switch ($page) {
         break;
 
     case 'version-control':
-        authorize('manage_version');
         require_once __DIR__ . '/Controller/Version_control_controller.php';
         (new VersionControlController())->show();
         break;

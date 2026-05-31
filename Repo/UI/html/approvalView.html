@@ -35,7 +35,7 @@
                         <div>
                             <span class="text-primary fw-bold small text-uppercase">Giai đoạn: Phê duyệt của Tổng biên
                                 tập</span>
-                            <h2 class="display-6 fw-bold mt-1">{{ARTICLE_TITLE}}</h2>
+                            <h2 id="editable-article-title" contenteditable="true" class="display-6 fw-bold mt-1 border-bottom border-primary border-dashed" title="Nhấp vào để sửa tiêu đề trực tiếp" style="outline: none;">{{ARTICLE_TITLE}}</h2>
                         </div>
                         <div
                             class="text-danger bg-danger-subtle px-3 py-2 rounded-3 border border-danger-subtle small fw-bold d-flex align-items-center gap-1">
@@ -70,7 +70,7 @@
                     <div class="col-lg-8">
                         <div class="white-card mb-4 article-body">
                             <div class="d-flex justify-content-between align-items-start mb-4">
-                                <h3 class="h4 fw-bold mb-0">Chi tiết biên tập</h3>
+                                <h3 class="h4 fw-bold mb-0">Chi tiết biên tập <small class="text-muted fs-6 fw-normal">(Có thể sửa trực tiếp tiêu đề và nội dung dưới đây)</small></h3>
                                 <div class="d-flex gap-2">
                                     <span
                                         class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">{{WORD_COUNT}}
@@ -84,7 +84,7 @@
 
                             {{THUMBNAIL_BLOCK}}
 
-                            <div class="content-body">
+                            <div id="editable-article-body" contenteditable="true" class="content-body border border-dashed border-primary p-3 rounded-4" title="Nhấp vào để sửa nội dung trực tiếp" style="outline: none; min-height: 200px;">
                                 {{ARTICLE_BODY}}
                             </div>
                         </div>
@@ -154,6 +154,167 @@
         function toggleRevisionForm() {
             var form = document.getElementById("revisionForm");
             form.style.display = form.style.display === "none" ? "block" : "none";
+        }
+
+        async function submitRevision() {
+            const text = document.getElementById('revisionText').value.trim();
+            if (!text) {
+                showToast('Vui lòng nhập nội dung chỉnh sửa', 'warn');
+                return;
+            }
+            
+            const titleEl = document.getElementById('editable-article-title');
+            const bodyEl = document.getElementById('editable-article-body');
+            const editedTitle = titleEl ? titleEl.innerText.trim() : '';
+            const editedContent = bodyEl ? bodyEl.innerHTML.trim() : '';
+            
+            disableAllActions();
+            showToast('Đang gửi yêu cầu chỉnh sửa...', 'warn');
+            
+            try {
+                const result = await postApprovalAction('request_revision', {
+                    revision_note: text,
+                    edited_title: editedTitle,
+                    edited_content: editedContent
+                });
+                
+                if (!result.success) {
+                    throw new Error(result.message || 'Gửi yêu cầu chỉnh sửa thất bại.');
+                }
+                
+                if (result.message && result.message.includes('Từ chối')) {
+                    setWorkflowRejected();
+                    showToast('Bài viết đã bị tự động từ chối do quá giới hạn 1.3!', 'reject');
+                    setTimeout(() => {
+                        showModal(
+                            'Tự động Từ chối!',
+                            'Bài viết đã vượt quá giới hạn chỉnh sửa (1.3) và hệ thống đã tự động từ chối duyệt.',
+                            'cancel',
+                            'reject'
+                        );
+                    }, 500);
+                } else {
+                    setWorkflowRevision();
+                    showToast('Đã gửi yêu cầu chỉnh sửa', 'warn');
+                    setTimeout(() => {
+                        showModal(
+                            'Đã gửi yêu cầu chỉnh sửa',
+                            'Tác giả sẽ nhận được bản chỉnh sửa v1.1 / v1.3 và có thể so sánh thay đổi.',
+                            'edit_note',
+                            'warn'
+                        );
+                    }, 500);
+                }
+                document.getElementById('revisionForm').style.display = 'none';
+            } catch (error) {
+                enableAllActions();
+                handleActionError(error);
+            }
+        }
+
+        async function showCompareModal() {
+            const articleId = document.getElementById('articleId').value;
+            
+            showToast('Đang tải dữ liệu so sánh...', 'info');
+            
+            try {
+                const response = await fetch(`index.php?page=version-control&article_id=${articleId}&ajax=1`);
+                if (!response.ok) throw new Error('Không thể kết nối đến server');
+                
+                const data = await response.json();
+                if (!data.success) {
+                    throw new Error(data.message || 'Lỗi tải dữ liệu so sánh');
+                }
+                
+                const versions = data.versions || [];
+                const diff = data.diff || {};
+                
+                if (versions.length < 2) {
+                    showModal(
+                        'Chưa có dữ liệu so sánh',
+                        'Bài viết này chưa có phiên bản chỉnh sửa khác để tiến hành so sánh (Cần ít nhất 2 phiên bản). Bản đầu tiên sẽ là v1.0.',
+                        'compare_arrows',
+                        'warn'
+                    );
+                    return;
+                }
+                
+                const currentVer = versions[0];
+                const prevVer = versions[1];
+                
+                const existing = document.getElementById('compare-modal-overlay');
+                if (existing) existing.remove();
+                
+                const modal = document.createElement('div');
+                modal.id = 'compare-modal-overlay';
+                modal.style.position = 'fixed';
+                modal.style.inset = '0';
+                modal.style.background = 'rgba(15,23,42,.65)';
+                modal.style.backdropFilter = 'blur(10px)';
+                modal.style.display = 'flex';
+                modal.style.alignItems = 'center';
+                modal.style.justifyContent = 'center';
+                modal.style.zIndex = '99999';
+                
+                modal.innerHTML = `
+                    <div class="compare-modal-box shadow-lg" style="background:#fff; width:92%; max-width:1100px; height:85vh; border-radius:28px; display:flex; flex-direction:column; overflow:hidden; animation: popup .35s cubic-bezier(0.34, 1.56, 0.64, 1);">
+                        <div class="modal-header d-flex justify-content-between align-items-center px-4 py-3 border-bottom bg-light">
+                            <div>
+                                <h4 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary fs-3">compare_arrows</span>
+                                    So Sánh Phiên Bản Bài Viết
+                                </h4>
+                                <small class="text-muted">Đang so sánh bản mới nhất (v${currentVer.version_name}) với bản trước đó (v${prevVer.version_name})</small>
+                            </div>
+                            <button type="button" class="btn-close" onclick="document.getElementById('compare-modal-overlay').remove()"></button>
+                        </div>
+                        
+                        <div class="modal-body p-4 d-flex gap-4 style-scroll" style="flex:1; overflow-y:auto;">
+                            <div class="row w-100 g-4">
+                                <div class="col-md-6 d-flex flex-column">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <span class="badge bg-danger-subtle text-danger px-3 py-2 rounded-pill fw-bold border border-danger-subtle">
+                                            Bản trước (v${prevVer.version_name})
+                                        </span>
+                                        <small class="text-muted">Bởi: <b>${prevVer.full_name || 'Tác giả'}</b> vào ${prevVer.created_at}</small>
+                                    </div>
+                                    <div class="p-3 bg-light rounded-4 border" style="flex:1; overflow-y:auto; font-family:'Inter',sans-serif; line-height:1.7; font-size:15px; color:#334155;">
+                                        <h5 class="fw-bold mb-3 text-dark border-bottom pb-2">${prevVer.title}</h5>
+                                        <div>${diff.old || prevVer.content}</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 d-flex flex-column">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill fw-bold border border-success-subtle">
+                                            Bản mới (v${currentVer.version_name})
+                                        </span>
+                                        <small class="text-muted">Bởi: <b>${currentVer.full_name || 'Biên tập viên'}</b> vào ${currentVer.created_at}</small>
+                                    </div>
+                                    <div class="p-3 bg-light rounded-4 border" style="flex:1; overflow-y:auto; font-family:'Inter',sans-serif; line-height:1.7; font-size:15px; color:#334155;">
+                                        <h5 class="fw-bold mb-3 text-dark border-bottom pb-2">${currentVer.title}</h5>
+                                        <div>${diff.new || currentVer.content}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="modal-footer px-4 py-3 border-top bg-light d-flex justify-content-between align-items-center">
+                            <span class="text-muted small">
+                                <span style="background:#d1fae5; color:#065f46; padding:2px 6px; border-radius:4px; margin-right:4px;">Chữ thêm</span>
+                                <span style="background:#fee2e2; color:#991b1b; text-decoration:line-through; padding:2px 6px; border-radius:4px;">Chữ xóa</span>
+                            </span>
+                            <button class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" onclick="document.getElementById('compare-modal-overlay').remove()">
+                                Xác nhận đóng
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(modal);
+            } catch (err) {
+                console.error(err);
+                showToast(err.message || 'Lỗi không thể tải so sánh phiên bản', 'reject');
+            }
         }
     </script>
 </body>

@@ -18,63 +18,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
         previewZone.innerHTML = `<img src="${finalUrl}" style="width:100%; height:100%; object-fit:cover; border-radius: 8px;">`;
     }
-    // Tải Header
-const hiddenCat = document.getElementById('hiddenCategory');
-if (hiddenCat && hiddenCat.value) {
-    const categorySelect = document.getElementById('postCategory');
-    if (categorySelect) categorySelect.value = hiddenCat.value;
-}
-fetch("../components/header.html")
-    .then(response => {
-        if (!response.ok) throw new Error("Không thể load header");
-        return response.text();
-    })
-    .then(data => {
-        // Đắp HTML của header vào trang
-        document.getElementById("header-placeholder").innerHTML = data;
-
-        // 1. Ẩn nút Đăng nhập / Đăng ký
-        document.getElementById("login-section").classList.add("d-none");
-        
-        // 2. Bật khu vực Profile lên (bỏ class d-none)
-        document.getElementById("profile-section").classList.remove("d-none");
-        document.getElementById("profile-section").classList.add("d-flex"); 
-        
-        // 3. Đổi tên và email
-        document.getElementById("profile-name").innerText = "Nguyễn Duy Bảo";
-        document.getElementById("profile-menu-name").innerText = "Nguyễn Duy Bảo";
-        document.getElementById("profile-email").innerText = "Biên tập viên";
-        document.getElementById("profile-menu-email").innerText = "baond@newspulse.vn";
-
-        // --- ĐOẠN JS MỚI: XỬ LÝ CLICK XỔ MENU ---
-        const profileBtn = document.querySelector('.profile-info');
-        const profileMenu = document.querySelector('.profile-menu');
-
-        // Khi click vào nút profile -> Bật/tắt menu
-        profileBtn.addEventListener('click', function(e) {
-            e.stopPropagation(); // Ngăn sự kiện click truyền ra ngoài
-            profileMenu.classList.toggle('d-block'); // Ép hiển thị bằng class của Bootstrap
-        });
-
-        // Khi click ra vùng trống ngoài màn hình -> Tự động đóng menu
-        document.addEventListener('click', function(e) {
-            if (!profileMenu.contains(e.target) && !profileBtn.contains(e.target)) {
-                profileMenu.classList.remove('d-block');
-            }
-        });
-        // ----------------------------------------
-    })
-    .catch(err => console.error(err));
-    // Tải Footer 
-    fetch("../components/footer.html")
-        .then(response => {
-            if (!response.ok) throw new Error("Không thể load footer");
-            return response.text();
-        })
-        .then(data => {
-            document.getElementById("footer-placeholder").innerHTML = data;
-        })
-        .catch(err => console.error(err));
+    
+    const hiddenCat = document.getElementById('hiddenCategory');
+    if (hiddenCat && hiddenCat.value) {
+        const categorySelect = document.getElementById('postCategory');
+        if (categorySelect) categorySelect.value = hiddenCat.value;
+    }
 });
 
 let currentStep = 1;
@@ -85,6 +34,12 @@ function handleMoveStep(stepIncrement) {
     if (stepIncrement === 1 && !validateCurrentStep()) {
         console.warn("Validation failed for step " + currentStep);
         return; 
+    }
+
+    // Nếu đang ở bước cuối cùng mà bấm nút Xác nhận xuất bản
+    if (currentStep === totalSteps && stepIncrement === 1) {
+        handleQuickAction('publish', window.event);
+        return;
     }
 
     const nextStep = currentStep + stepIncrement;
@@ -265,13 +220,21 @@ function handleQuickAction(action, event) {
         // 3. KIỂM TRA LỖI (VALIDATION)
         // ==================================================
         if (!title.trim() || !content.trim() || content === '<br>') {
-            alert('Vui lòng nhập tiêu đề và nội dung bài viết!');
+            if (window.showGlobalModal) {
+                window.showGlobalModal('Yêu cầu nhập liệu', 'Vui lòng điền đầy đủ Tiêu đề và Nội dung bài viết!');
+            } else {
+                alert('Vui lòng nhập tiêu đề và nội dung bài viết!');
+            }
             return;
         }
 
         // Bắt buộc có ảnh nếu xuất bản (và là bài viết mới chưa có ID)
         if (action !== 'draft' && !thumbnailFile && !articleId) {
-            alert('Vui lòng chọn ảnh đại diện (Thumbnail) trước khi xuất bản!');
+            if (window.showGlobalModal) {
+                window.showGlobalModal('Yêu cầu ảnh đại diện', 'Vui lòng chọn ảnh đại diện (Thumbnail) cho bài viết trước khi xuất bản!');
+            } else {
+                alert('Vui lòng chọn ảnh đại diện (Thumbnail) trước khi xuất bản!');
+            }
             return;
         }
 
@@ -325,19 +288,42 @@ function handleQuickAction(action, event) {
 
             if (data.success) {
                 if (action === 'draft') {
-                    alert('✔️ Đã lưu bản nháp thành công!');
-                    // Cập nhật lại ID để lần lưu sau là Update chứ không phải Insert
+                    if (window.showGlobalModal) {
+                        window.showGlobalModal('Lưu bản nháp', 'Đã lưu bản nháp bài viết thành công!');
+                    } else {
+                        alert('✔️ Đã lưu bản nháp thành công!');
+                    }
                     if (articleIdInput) {
                         articleIdInput.value = data.article_id;
                     }
-                    // Cập nhật thanh địa chỉ URL
                     window.history.pushState({}, '', '?page=postnews&id=' + data.article_id);
                 } else {
-                    alert('🎉 Đã gửi bài viết thành công!');
-                    window.location.href = '?page=profile';
+                    if (data.is_rejected) {
+                        if (window.showGlobalModal) {
+                            window.showGlobalModal('Tự động Từ chối!', 'Bài viết đã vượt quá giới hạn chỉnh sửa (1.3) và hệ thống đã tự động từ chối duyệt.', () => {
+                                window.location.href = '?page=profile';
+                            });
+                        } else {
+                            alert('Bài viết đã bị tự động từ chối do vượt quá giới hạn chỉnh sửa (1.3)!');
+                            window.location.href = '?page=profile';
+                        }
+                    } else {
+                        if (window.showGlobalModal) {
+                            window.showGlobalModal('Gửi bài viết', 'Chúc mừng! Bài viết của bạn đã được gửi duyệt thành công.', () => {
+                                window.location.href = '?page=profile';
+                            });
+                        } else {
+                            alert('🎉 Đã gửi bài viết thành công!');
+                            window.location.href = '?page=profile';
+                        }
+                    }
                 }
             } else {
-                alert(data.message || 'Lỗi hệ thống khi lưu bài viết.');
+                if (window.showGlobalModal) {
+                    window.showGlobalModal('Thông báo lỗi', data.message || 'Lỗi hệ thống khi lưu bài viết.');
+                } else {
+                    alert(data.message || 'Lỗi hệ thống khi lưu bài viết.');
+                }
             }
         })
         .catch(err => {
@@ -346,11 +332,19 @@ function handleQuickAction(action, event) {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             }
-            alert('Lỗi kết nối đến máy chủ. Vui lòng kiểm tra mạng!');
+            if (window.showGlobalModal) {
+                window.showGlobalModal('Lỗi kết nối', 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại mạng!');
+            } else {
+                alert('Lỗi kết nối đến máy chủ. Vui lòng kiểm tra mạng!');
+            }
         });
 
     } catch (error) {
         console.error(error);
-        alert('JS ERROR: ' + error.message);
+        if (window.showGlobalModal) {
+            window.showGlobalModal('Lỗi xử lý', 'Đã xảy ra lỗi hệ thống: ' + error.message);
+        } else {
+            alert('JS ERROR: ' + error.message);
+        }
     }
 }
