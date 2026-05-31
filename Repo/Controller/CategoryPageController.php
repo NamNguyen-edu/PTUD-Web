@@ -1,14 +1,14 @@
 <?php
 
-require_once __DIR__ . '/../Services/category_service.php';
-require_once __DIR__ . '/../View/CategoryView.php';
+require_once __DIR__ . '/../Services/category_user_service.php';
+require_once __DIR__ . '/../View/category_user_view.php';
 
 class CategoryPageController {
 
-    private CategoryService $categoryService;
+    private CategoryUserService $categoryService;
 
     public function __construct() {
-        $this->categoryService = new CategoryService();
+        $this->categoryService = new CategoryUserService();
     }
 
     public function show(): void {
@@ -34,7 +34,7 @@ class CategoryPageController {
         }
         $breadcrumbHtml .= '<li class="breadcrumb-item active text-theme font-weight-bold" aria-current="page">' . htmlspecialchars($category['name'] ?? '') . '</li>';
 
-        $view = new CategoryView();
+        $view = new CategoryUserView();
         $view->render([
             'CATEGORY_NAME' => htmlspecialchars($category['name'] ?? ''),
             'CATEGORY_SLUG' => htmlspecialchars($category['slug'] ?? ''),
