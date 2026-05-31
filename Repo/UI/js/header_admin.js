@@ -1,14 +1,9 @@
-<<<<<<< HEAD
 document.addEventListener('DOMContentLoaded', () => {
   // Để tương thích ngược nếu có trình duyệt gọi DOMContentLoaded
 });
 
 function initHeaderAdmin() {
   console.log("initHeaderAdmin được gọi!");
-  
-=======
-function initHeaderAdmin() {
->>>>>>> 37118a1e254d49d6003b02e2369157396814c752
   const profileTrigger = document.querySelector('.profile-info-admin');
   const profileContainer = document.querySelector('.profile-container-admin');
 
@@ -58,10 +53,7 @@ function initHeaderAdmin() {
   }
 }
 
-<<<<<<< HEAD
 // KHỞI CHẠY THÔNG MINH: Tránh bỏ lỡ sự kiện DOMContentLoaded
-=======
->>>>>>> 37118a1e254d49d6003b02e2369157396814c752
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initHeaderAdmin);
 } else {
