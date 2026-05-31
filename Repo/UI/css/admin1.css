@@ -206,8 +206,8 @@ body {
     }
 
     body.sidebar-open .top-header {
-        left: 260px;
-        width: calc(100% - 260px);
+        left: 0 !important;
+        width: 100% !important;
     }
 
     .main-wrapper {
@@ -216,7 +216,7 @@ body {
     }
 
     body.sidebar-open .main-wrapper {
-        margin-left: 260px !important;
+        margin-left: 0 !important;
     }
 
     .content-area {

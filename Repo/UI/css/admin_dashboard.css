@@ -308,11 +308,11 @@
                 transform: translateX(0);
             }
             body.sidebar-open .top-header {
-                left: var(--sidebar-width);
+                left: 0 !important;
             }
             body.sidebar-open main {
-                margin-left: var(--sidebar-width);
-                width: calc(100% - var(--sidebar-width));
+                margin-left: 0 !important;
+                width: 100% !important;
             }
             .top-header,
             main {
