@@ -223,3 +223,113 @@ body {
         padding: 20px 10px;
     }
 }
+
+/* Dark Mode styles for Editorial Approval (admin1.css) */
+body.theme-dark {
+  background-color: #0a0a0a !important;
+  color: #f5f5f5 !important;
+}
+
+body.theme-dark .main-wrapper {
+  background-color: #0a0a0a !important;
+}
+
+body.theme-dark .content-area {
+  background-color: #0a0a0a !important;
+}
+
+body.theme-dark h1,
+body.theme-dark h2,
+body.theme-dark h3,
+body.theme-dark h4,
+body.theme-dark h5,
+body.theme-dark h6,
+body.theme-dark p,
+body.theme-dark li,
+body.theme-dark span {
+  color: #f5f5f5 !important;
+}
+
+body.theme-dark .text-muted,
+body.theme-dark p.text-muted,
+body.theme-dark .text-secondary {
+  color: #a3a3a3 !important;
+}
+
+body.theme-dark .workflow-header-card {
+  background: #161616 !important;
+  border: 1px solid #262626 !important;
+}
+
+body.theme-dark .pipeline-line {
+  background: #262626 !important;
+}
+
+body.theme-dark .step-box {
+  background: #262626 !important;
+  color: #a3a3a3 !important;
+}
+
+body.theme-dark .step-complete .step-box {
+  background: #1a73e8 !important;
+  color: white !important;
+}
+
+body.theme-dark .step-active .step-box {
+  border-color: #1a73e8 !important;
+  background: #262626 !important;
+  color: #1a73e8 !important;
+}
+
+body.theme-dark .white-card {
+  background-color: #161616 !important;
+  border: 1px solid #262626 !important;
+  color: #f5f5f5 !important;
+}
+
+body.theme-dark .right-panel {
+  background-color: #121212 !important;
+  border: 1px solid #262626 !important;
+}
+
+body.theme-dark .comment-bubble {
+  background-color: #1e1e1e !important;
+  color: #f5f5f5 !important;
+}
+
+body.theme-dark .comment-bubble.active {
+  background-color: rgba(26, 115, 232, 0.15) !important;
+  border-color: rgba(26, 115, 232, 0.3) !important;
+}
+
+body.theme-dark .btn-approve {
+  background: #1a73e8 !important;
+}
+
+body.theme-dark .btn-approve:hover {
+  background: #1557b0 !important;
+}
+
+body.theme-dark .btn-revision {
+  background-color: #262626 !important;
+  border-color: #333333 !important;
+  color: #1a73e8 !important;
+}
+
+body.theme-dark .btn-revision:hover {
+  background-color: #333333 !important;
+}
+
+body.theme-dark .border-bottom,
+body.theme-dark .border-start {
+  border-color: #262626 !important;
+}
+
+body.theme-dark .bg-light {
+  background-color: #121212 !important;
+}
+
+body.theme-dark .article-body p {
+  color: #d4d4d4 !important;
+}
+}
