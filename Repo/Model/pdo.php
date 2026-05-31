@@ -68,13 +68,15 @@ function pdo_get_connection()
     $username = $env['DB_USER'] ?? 'avnadmin';
     $password = $env['DB_PASS'] ?? 'AVNS_5kpa6shKuuTPQ13VEIo';
 
-    $sslCaFile = realpath(__DIR__ . '/../ca.pem');
-    if ((!$sslCaFile || !file_exists($sslCaFile)) && !empty($env['DB_SSL_CA'])) {
+    $sslCaFile = __DIR__ . '/../ca.pem';
+    if (!empty($env['DB_SSL_CA'])) {
         $caContent = str_replace('\n', "\n", $env['DB_SSL_CA']);
-        $tempCaPath = dirname(__DIR__) . '/ca.pem';
-        @file_put_contents($tempCaPath, $caContent);
-        $sslCaFile = realpath($tempCaPath);
+        // Tự động cập nhật tệp ca.pem vật lý nếu chưa có hoặc nội dung khác với tệp cấu hình .env
+        if (!file_exists($sslCaFile) || file_get_contents($sslCaFile) !== $caContent) {
+            @file_put_contents($sslCaFile, $caContent);
+        }
     }
+    $sslCaFile = realpath($sslCaFile);
 
     try {
         $dburl = "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4";
