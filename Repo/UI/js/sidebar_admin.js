@@ -2,19 +2,36 @@
 
 function initSidebar() {
   const sidebarLinks = document.querySelectorAll('.sidebar .nav-link-custom');
+  
+  // Lấy query parameter 'page' hiện tại
   const currentUrlParams = new URLSearchParams(window.location.search);
-  const currentPage = currentUrlParams.get('page') ? currentUrlParams.get('page').toLowerCase() : '';
+  let currentPage = currentUrlParams.get('page') ? currentUrlParams.get('page').toLowerCase() : '';
+  
+  // Nếu không có tham số page, mặc định hiển thị active cho Bảng điều khiển
+  if (!currentPage || currentPage === 'index.php') {
+    currentPage = 'admin_dashboard';
+  }
+
+  console.log("initSidebar: Đang tải trạng thái active cho trang:", currentPage);
 
   if (sidebarLinks.length > 0) {
     sidebarLinks.forEach(link => {
       const linkHref = link.getAttribute('href') ? link.getAttribute('href').toLowerCase() : '';
-
+      
       link.classList.remove('active');
 
-      if (currentPage && linkHref && linkHref.includes(`page=${currentPage}`)) {
+      // So khớp thông minh:
+      // 1. Khớp chính xác tham số page (ví dụ: page=accountmanagement)
+      // 2. Hoặc nếu currentPage là admin_dashboard và link href trỏ đến admin_dashboard
+      if (
+        (currentPage && linkHref && linkHref.includes(`page=${currentPage}`)) ||
+        (currentPage === 'admin_dashboard' && linkHref.includes('page=admin_dashboard'))
+      ) {
         link.classList.add('active');
+        console.log("Đã kích hoạt active cho link:", linkHref);
       }
 
+      // Đăng ký sự kiện click (cho trải nghiệm SPA mượt mà hoặc phản hồi tức thì)
       link.addEventListener('click', function () {
         sidebarLinks.forEach(item => item.classList.remove('active'));
         this.classList.add('active');
