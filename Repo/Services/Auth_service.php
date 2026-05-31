@@ -27,6 +27,9 @@ class AuthService
     $user = pdo_query_one($sql, $identifier, $identifier);
 
     if ($user) {
+      if ($user['status'] === 'banned') {
+        throw new Exception("Tài khoản của bạn đã bị khóa!");
+      }
       if (password_verify($password, $user['password_hash']) || $password === $user['password_hash']) {
         return $user; // Lúc này $user đã có sẵn key 'role_name' (ví dụ: 'admin')
       }

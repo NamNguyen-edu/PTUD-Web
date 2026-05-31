@@ -31,8 +31,10 @@ const CONTROLLER_PATH = "index.php";
 let isGoogleInitialized = false;
 let isLoginGoogleRendered = false;
 let isSignupGoogleRendered = false;
+let currentAuthMode = 'login';
 
 function toggleAuth(mode) {
+  currentAuthMode = mode;
   const loginSec = document.getElementById('login-section');
   const signupSec = document.getElementById('signup-section');
   document.querySelectorAll('.was-validated').forEach(form => form.classList.remove('was-validated'));
@@ -76,7 +78,7 @@ function renderGoogleButton(mode = 'login') {
 
   // 4. Render nút Signup nếu chưa render
   if (mode === 'signup' && !isSignupGoogleRendered && signupBtn) {
-    google.accounts.id.renderButton(signupBtn, { theme: "outline", size: "large", width: "350" });
+    google.accounts.id.renderButton(signupBtn, { theme: "outline", size: "large", width: "350", text: "signup_with" });
     isSignupGoogleRendered = true;
   }
 }
@@ -174,18 +176,22 @@ async function handleGoogleResponse(res) {
     const response = await fetch('?page=google_auth', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: 'credential=' + encodeURIComponent(res.credential)
+      body: 'credential=' + encodeURIComponent(res.credential) + '&mode=' + currentAuthMode
     });
     const result = (await response.text()).trim();
     if (['admin', 'editor', 'contributor', 'reader', 'chief editor'].includes(result)) {
-      Swal.fire({ icon: 'success', title: 'Đăng nhập Google thành công!', timer: 1000, showConfirmButton: false })
+      Swal.fire({ icon: 'success', title: currentAuthMode === 'signup' ? 'Đăng ký Google thành công!' : 'Đăng nhập Google thành công!', timer: 1000, showConfirmButton: false })
         .then(() => {
           if (result === 'admin') window.location.href = 'index.php?page=admin_dashboard';
           else if (result === 'chief editor') window.location.href = 'index.php?page=categorymanagement';
           else window.location.href = 'index.php?page=home';
         });
     } else {
-      Swal.fire({ icon: 'error', title: 'Lỗi đăng nhập Google', text: result });
+      let errorMsg = result;
+      if (result === 'EMAIL_EXISTS') errorMsg = 'Email này đã tồn tại trong hệ thống. Vui lòng chuyển sang Đăng nhập!';
+      if (result === 'EMAIL_NOT_FOUND') errorMsg = 'Email này chưa được đăng ký. Vui lòng chuyển sang Đăng ký!';
+      if (result === 'BANNED') errorMsg = 'Tài khoản của bạn đã bị khóa! Không thể đăng nhập.';
+      Swal.fire({ icon: 'error', title: currentAuthMode === 'signup' ? 'Lỗi đăng ký Google' : 'Lỗi đăng nhập Google', text: errorMsg });
     }
   } catch (err) {
     Swal.fire({ icon: 'error', title: 'Lỗi kết nối', text: 'Không thể kết nối đến máy chủ.' });
