@@ -132,6 +132,13 @@ function renderTable() {
                         <span class="material-symbols-outlined fs-5">more_vert</span>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
+                        <li><h6 class="dropdown-header">Assign Role</h6></li>
+                        <li><a class="dropdown-item small" href="#" onclick="updateUserRole(${user.id}, 'Admin')">Admin</a></li>
+                        <li><a class="dropdown-item small" href="#" onclick="updateUserRole(${user.id}, 'Chief Editor')">Chief Editor</a></li>
+                        <li><a class="dropdown-item small" href="#" onclick="updateUserRole(${user.id}, 'Editor')">Editor</a></li>
+                        <li><a class="dropdown-item small" href="#" onclick="updateUserRole(${user.id}, 'Contributor')">Contributor</a></li>
+                        <li><a class="dropdown-item small" href="#" onclick="updateUserRole(${user.id}, 'Reader')">Reader</a></li>
+                        <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item small fw-bold" href="#" onclick="updateSingleStatus(${user.id}, 'Suspended')">Suspend</a></li>
                         <li><a class="dropdown-item small text-danger fw-bold" href="#" onclick="deleteSingleUser(${user.id})">Delete</a></li>
                     </ul>
