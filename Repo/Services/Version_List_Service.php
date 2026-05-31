@@ -8,7 +8,7 @@ require_once __DIR__ . '/../Model/pdo.php';
 class VersionListService
 {
     // ─────────────────────────────────────────
-    // LẤY DANH SÁCH BÀI VIẾT ĐANG CHỜ DUYỆT
+    // LẤY DANH SÁCH BÀI VIẾT ĐANG CÓ YÊU CẦU CHỈNH SỬA
     // ─────────────────────────────────────────
     public function getPendingArticles(): array
     {
@@ -40,7 +40,7 @@ class VersionListService
             LEFT JOIN users u
                 ON u.user_id = a.user_id
 
-            WHERE a.status = 'pending'
+            WHERE a.status = 'revision'
 
             ORDER BY a.updated_at DESC
         ";
