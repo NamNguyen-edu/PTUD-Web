@@ -238,4 +238,82 @@ class AuthController
     echo "Lỗi khi xử lý đăng nhập Google.";
     exit;
   }
+
+  public function forgotPasswordRequest(): void
+  {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') exit;
+    header('Content-Type: application/json; charset=utf-8');
+
+    $email = trim($_POST['email'] ?? '');
+    if (!$email) {
+      echo json_encode(['success' => false, 'message' => 'Vui lòng nhập Email.']);
+      exit;
+    }
+
+    if (!$this->service->emailExists($email)) {
+      echo json_encode(['success' => false, 'message' => 'Email không tồn tại trong hệ thống.']);
+      exit;
+    }
+
+    // Sinh mã OTP 6 số
+    $otp = sprintf("%06d", mt_rand(1, 999999));
+    
+    // Lưu session
+    if (session_status() === PHP_SESSION_NONE) session_start();
+    $_SESSION['reset_otp'] = $otp;
+    $_SESSION['reset_email'] = $email;
+    $_SESSION['reset_otp_expiry'] = time() + 300; // 5 phút
+
+    // Gửi mail
+    require_once __DIR__ . '/../Services/MailService.php';
+    $mailService = new MailService();
+    try {
+        $mailService->sendOTP($email, $otp);
+        echo json_encode(['success' => true, 'message' => 'Mã OTP đã được gửi đến email của bạn.']);
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    }
+    exit;
+  }
+
+  public function forgotPasswordReset(): void
+  {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') exit;
+    header('Content-Type: application/json; charset=utf-8');
+
+    $otp = trim($_POST['otp'] ?? '');
+    $newPassword = trim($_POST['new_password'] ?? '');
+
+    if (session_status() === PHP_SESSION_NONE) session_start();
+
+    if (!isset($_SESSION['reset_otp']) || !isset($_SESSION['reset_email']) || !isset($_SESSION['reset_otp_expiry'])) {
+        echo json_encode(['success' => false, 'message' => 'Phiên khôi phục không hợp lệ. Vui lòng yêu cầu lại OTP.']);
+        exit;
+    }
+
+    if (time() > $_SESSION['reset_otp_expiry']) {
+        echo json_encode(['success' => false, 'message' => 'Mã OTP đã hết hạn.']);
+        exit;
+    }
+
+    if ($otp !== $_SESSION['reset_otp']) {
+        echo json_encode(['success' => false, 'message' => 'Mã OTP không chính xác.']);
+        exit;
+    }
+
+    if (strlen($newPassword) < 6) {
+        echo json_encode(['success' => false, 'message' => 'Mật khẩu phải có ít nhất 6 ký tự.']);
+        exit;
+    }
+
+    try {
+        $this->service->updatePasswordByEmail($_SESSION['reset_email'], $newPassword);
+        // Xóa session
+        unset($_SESSION['reset_otp'], $_SESSION['reset_email'], $_SESSION['reset_otp_expiry']);
+        echo json_encode(['success' => true, 'message' => 'Đổi mật khẩu thành công! Bạn có thể đăng nhập ngay.']);
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => 'Đã xảy ra lỗi khi cập nhật mật khẩu.']);
+    }
+    exit;
+  }
 }

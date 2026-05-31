@@ -91,4 +91,14 @@ class AuthService
     $sql = "INSERT INTO users (username, email, password_hash, full_name, role_id, status) VALUES (?, ?, ?, ?, 5, 'active')";
     return pdo_execute($sql, $username, $email, $hash, $fullname);
   }
+
+  /**
+   * Cập nhật mật khẩu bằng email (Dành cho Quên mật khẩu)
+   */
+  public function updatePasswordByEmail(string $email, string $newPassword): void
+  {
+    $hash = password_hash($newPassword, PASSWORD_DEFAULT);
+    $sql = "UPDATE users SET password_hash = ? WHERE email = ?";
+    pdo_execute($sql, $hash, $email);
+  }
 }
