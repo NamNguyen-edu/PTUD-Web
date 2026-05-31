@@ -422,6 +422,7 @@
     transition: all 0.3s ease;
     outline: none;
     padding: 0;
+    margin-right: 16px;
 }
 
 .btn-theme-toggle:hover {
@@ -444,7 +445,7 @@
     cursor: pointer;
     transition: all 0.2s ease;
     padding: 0;
-    margin-right: 12px;
+    margin-right: 16px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
@@ -647,14 +648,26 @@ body.theme-dark .toast-body {
         font-size: 1.2rem;
     }
     .profile-info {
-        padding: 4px 8px;
-        gap: 4px;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        gap: 6px !important;
+    }
+    .profile-avatar {
+        width: 40px !important;
+        height: 40px !important;
+        border: 2px solid #ffffff !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
     }
     .profile-details {
         display: none !important;
     }
     .profile-chevron {
+        color: #1e293b !important;
+        font-size: 0.7rem !important;
         margin-left: 2px;
+        display: inline-block !important;
     }
     .btn-login, .btn-signup {
         padding: 6px 12px;
@@ -662,5 +675,22 @@ body.theme-dark .toast-body {
     }
     .topbar {
         padding: 8px 10px !important;
+    }
+    #user-actions {
+        gap: 12px !important;
+    }
+    .btn-theme-toggle {
+        margin-right: 0 !important;
+        background: rgba(255, 255, 255, 0.6) !important;
+        border-color: #ffffff !important;
+    }
+    #notif-bell-btn {
+        margin-right: 0 !important;
+        background: #ffffff !important;
+        border-color: #ffffff !important;
+    }
+    .topbar .search-form {
+        margin-top: 10px !important;
+        margin-bottom: 5px !important;
     }
 }

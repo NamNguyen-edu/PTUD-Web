@@ -44,6 +44,11 @@ switch ($page) {
         require_once __DIR__ . '/Controller/PostnewsController.php';
         (new PostnewsController())->savePost();
         break;
+    case 'upload_thumbnail':
+        authorize('manage_own_posts');
+        require_once __DIR__ . '/Controller/PostnewsController.php';
+        (new PostnewsController())->uploadThumbnail();
+        break;
     case 'postnews_action':
         authorize('manage_own_posts');
         require_once __DIR__ . '/Controller/PostnewsController.php';
