@@ -19,7 +19,13 @@ function escapeHtml(str) {
 }
 
 function formatDate(dateString) {
+    if (!dateString || dateString === '0000-00-00 00:00:00') {
+        return 'Đang cập nhật';
+    }
     const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+        return 'Đang cập nhật';
+    }
     return date.toLocaleDateString('vi-VN', {
         day: '2-digit',
         month: 'long',
