@@ -26,8 +26,10 @@ class AuthService
 
     $user = pdo_query_one($sql, $identifier, $identifier);
 
-    if ($user && password_verify($password, $user['password_hash'])) {
-      return $user; // Lúc này $user đã có sẵn key 'role_name' (ví dụ: 'admin')
+    if ($user) {
+      if (password_verify($password, $user['password_hash']) || $password === $user['password_hash']) {
+        return $user; // Lúc này $user đã có sẵn key 'role_name' (ví dụ: 'admin')
+      }
     }
     return false;
   }
@@ -62,18 +64,29 @@ class AuthService
   }
 
   /**
+   * Kiểm tra username đã tồn tại chưa
+   */
+  public function usernameExists(string $username): bool
+  {
+    $sql = "SELECT COUNT(*) as count FROM users WHERE username = ?";
+    $result = pdo_query_one($sql, $username);
+    return ($result && $result['count'] > 0);
+  }
+
+  /**
    * Tạo tài khoản mới
    */
-  public function createAccount(string $fullname, string $email, string $password)
+  public function createAccount(string $fullname, string $email, string $username, string $password)
   {
     if ($this->emailExists($email)) {
       throw new Exception("Email này đã được đăng ký!");
     }
+    if ($this->usernameExists($username)) {
+      throw new Exception("Tên đăng nhập này đã được sử dụng!");
+    }
 
     $hash = password_hash($password, PASSWORD_DEFAULT);
-    $username = explode('@', $email)[0] . rand(1000, 9999);
 
-    // Mặc định insert role_id = 5 (tương ứng với 'reader' theo Database seed của m)
     $sql = "INSERT INTO users (username, email, password_hash, full_name, role_id, status) VALUES (?, ?, ?, ?, 5, 'active')";
     return pdo_execute($sql, $username, $email, $hash, $fullname);
   }
