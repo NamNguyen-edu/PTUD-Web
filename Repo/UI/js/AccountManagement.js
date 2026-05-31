@@ -45,8 +45,8 @@ async function loadUsersFromBackend() {
 
 function updateKPIs() {
     const total = currentUsersList.length;
-    const active = currentUsersList.filter(u => u.status === "Active").length;
-    const pending = currentUsersList.filter(u => u.status === "Pending").length;
+    const active = currentUsersList.filter(u => u.status && u.status.toLowerCase() === "active").length;
+    const pending = currentUsersList.filter(u => u.status && u.status.toLowerCase() === "pending").length;
 
     document.getElementById("kpi-total-users").innerText = total.toLocaleString();
     document.getElementById("kpi-active-users").innerText = active;
@@ -96,9 +96,10 @@ function renderTable() {
     // Vẽ từng dòng <tr> dựa trên mảng cắt ra (Đã khớp hoàn toàn với 7 cột ở HTML)
     paginatedItems.forEach(user => {
         let statusBadge = "";
-        if (user.status === "Active") {
+        const statusLower = user.status ? user.status.toLowerCase() : "";
+        if (statusLower === "active") {
             statusBadge = '<span class="badge bg-success bg-opacity-10 text-success">Active</span>';
-        } else if (user.status === "Pending") {
+        } else if (statusLower === "pending") {
             statusBadge = '<span class="badge bg-warning bg-opacity-10 text-warning">Pending</span>';
         } else {
             statusBadge = '<span class="badge bg-secondary bg-opacity-10 text-secondary">Suspended</span>';
@@ -236,11 +237,15 @@ async function submitCreateUserForm() {
 async function deleteSingleUser(userId) {
     if (!confirm("Bạn có chắc chắn muốn xóa thành viên này vĩnh viễn khỏi CSDL?")) return;
     try {
-        const response = await fetch(`${API_URL}?id=${userId}`, { method: "DELETE" });
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: 'delete', ids: [userId] })
+        });
         const result = await response.json();
         if (result.success) {
             await loadUsersFromBackend();
-            showToast(result.message, 'danger');
+            showToast(result.message || "Đã xóa thành viên thành công!", 'danger');
         }
     } catch (error) {
         showToast("Lỗi khi thực hiện xóa!", "danger");
@@ -343,7 +348,7 @@ function initSearch() {
         typingTimer = setTimeout(async () => {
             const keyword = e.target.value.trim();
             try {
-                const response = await fetch(`${API_URL}?search=${encodeURIComponent(keyword)}`);
+                const response = await fetch(`${API_URL}&search=${encodeURIComponent(keyword)}`);
                 const result = await response.json();
                 if (result.success) {
                     filteredData = result.data;
