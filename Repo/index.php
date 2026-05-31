@@ -2,28 +2,30 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 session_start();
-require_once __DIR__ . '/Controller/auth_controller.php';
-require_once __DIR__ . '/Controller/DashboardController.php';
 
-function redirect(string $url): void
-{
+
+  require_once __DIR__ . '/Services/auth_service.php';
+  require_once __DIR__ . '/Controller/auth_controller.php';
+  require_once __DIR__ . '/Controller/DashboardController.php';
+
+  function redirect(string $url): void
+  {
     header('Location: ' . $url);
     exit;
-}
+  }
 
-$page = trim((string)($_GET['page'] ?? 'home'));
-
-function authorize(string $action): void
-{
+  function authorize(string $action): void
+  {
     $auth = new AuthService();
     $role = $_SESSION['role'] ?? 'guest';
 
     if (!$auth->checkPermission($role, $action)) {
-        http_response_code(403);
-        die("<h1>403 Forbidden: Bạn không có quyền truy cập trang này.</h1>");
+      http_response_code(403);
+      die("<h1>403 Forbidden: Bạn không có quyền truy cập trang này.</h1>");
     }
-}
+  }
 
+  $page = trim((string)($_GET['page'] ?? 'home'));
 
 switch ($page) {
     case 'save_post':
@@ -36,22 +38,35 @@ switch ($page) {
         break;
 
     case 'login':
-        require_once __DIR__ . '/Controller/AuthController.php';
-        (new AuthController())->login();
-        break;
+      (new AuthController())->login();
+      break;
 
     case 'signup':
-        require_once __DIR__ . '/Controller/AuthController.php';
-        (new AuthController())->signup();
-        break;
+      (new AuthController())->signup();
+      break;
 
     case 'logout':
-        require_once __DIR__ . '/Controller/AuthController.php';
-        (new AuthController())->logout();
-        break;
+      (new AuthController())->logout();
+      break;
+    case 'accountmangement':
+      authorize('manage_users');
+      require_once __DIR__ . '/Controller/account_controller.php';
+      (new AccountController())->render();
+      break;
+
+    case 'categorymanagement':
+      authorize('manage_category');
+      require_once __DIR__ . '/Controller/category_controller.php';
+      (new CategoryController())->render();
+      break;
+    case 'api_category':
+      authorize('manage_category');
+      require_once __DIR__ . '/Controller/category_controller.php';
+      (new CategoryController())->handleApi();
+      break;
 
     case 'update_settings':
-        require_once __DIR__ . '/Controller/AuthController.php';
+        require_once __DIR__ . '/Controller/auth_controller.php';
         (new AuthController())->updateSettings();
         break;
 
