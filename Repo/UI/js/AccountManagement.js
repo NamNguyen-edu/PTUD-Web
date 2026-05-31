@@ -109,9 +109,9 @@ function renderTable() {
         let statusBadge = "";
         const statusLower = user.status ? user.status.toLowerCase() : "";
         if (statusLower === "active") {
-            statusBadge = '<span class="badge bg-success bg-opacity-10 text-success">Hoạt động</span>';
+            statusBadge = '<span class="badge bg-success bg-opacity-10 text-success">Active</span>';
         } else if (statusLower === "pending") {
-            statusBadge = '<span class="badge bg-warning bg-opacity-10 text-warning">Chờ duyệt</span>';
+            statusBadge = '<span class="badge bg-warning bg-opacity-10 text-warning">Pending</span>';
         } else {
             statusBadge = '<span class="badge bg-danger bg-opacity-10 text-danger">Banned</span>';
         }
@@ -121,7 +121,7 @@ function renderTable() {
         let suspendIcon = 'block';
         let suspendColor = 'text-warning';
 
-        if (statusLower === 'banned') {
+        if (statusLower === 'pending') {
             suspendActionText = 'Activate';
             suspendActionCode = 'active';
             suspendIcon = 'check_circle';
@@ -337,13 +337,13 @@ async function updateSingleStatus(userId, actionCode) {
     const isSuspend = actionCode === 'suspend';
     if (typeof Swal !== 'undefined') {
         const confirmResult = await Swal.fire({
-            title: isSuspend ? 'Đình bản tài khoản?' : 'Kích hoạt tài khoản?',
+            title: isSuspend ? 'Đình chỉ tài khoản?' : 'Kích hoạt tài khoản?',
             text: isSuspend ? "Bạn có chắc chắn muốn vô hiệu hóa người dùng này?" : "Tài khoản này sẽ được phép hoạt động trở lại.",
             icon: isSuspend ? 'warning' : 'info',
             showCancelButton: true,
             confirmButtonColor: isSuspend ? '#ffc107' : '#198754',
             cancelButtonColor: '#6c757d',
-            confirmButtonText: isSuspend ? 'Đình bản' : 'Kích hoạt'
+            confirmButtonText: isSuspend ? 'Đình chỉ' : 'Kích hoạt'
         });
         if (!confirmResult.isConfirmed) return;
     } else {

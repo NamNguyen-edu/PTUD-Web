@@ -60,7 +60,7 @@ class AccountController
     return match ($action) {
       'change_role' => $this->changeRole($input),
       'delete'      => $this->deleteUsers($input['ids'] ?? []),
-      'suspend'     => $this->updateStatus($input['ids'] ?? [], 'banned'),
+      'suspend'     => $this->updateStatus($input['ids'] ?? [], 'pending'),
       'active'      => $this->updateStatus($input['ids'] ?? [], 'active'),
       default   => throw new Exception("Hành động không hợp lệ."),
     };
