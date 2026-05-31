@@ -3,28 +3,29 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 session_start();
 
-require_once __DIR__ . '/Services/auth_service.php';
-require_once __DIR__ . '/Controller/auth_controller.php';
-require_once __DIR__ . '/Controller/DashboardController.php';
 
-function redirect(string $url): void
-{
+  require_once __DIR__ . '/Services/auth_service.php';
+  require_once __DIR__ . '/Controller/auth_controller.php';
+  require_once __DIR__ . '/Controller/DashboardController.php';
+
+  function redirect(string $url): void
+  {
     header('Location: ' . $url);
     exit;
-}
+  }
 
-$page = trim((string)($_GET['page'] ?? 'home'));
-
-function authorize(string $action): void
-{
+  function authorize(string $action): void
+  {
     $auth = new AuthService();
     $role = $_SESSION['role'] ?? 'guest';
 
     if (!$auth->checkPermission($role, $action)) {
-        http_response_code(403);
-        die("<h1>403 Forbidden: Bạn không có quyền truy cập trang này.</h1>");
+      http_response_code(403);
+      die("<h1>403 Forbidden: Bạn không có quyền truy cập trang này.</h1>");
     }
-}
+  }
+
+  $page = trim((string)($_GET['page'] ?? 'home'));
 
 switch ($page) {
     case 'save_post':
