@@ -4,7 +4,9 @@ $envPath = __DIR__ . '/.env';
 if (!file_exists($envPath)) {
     $examplePath = __DIR__ . '/.env.example';
     if (file_exists($examplePath)) {
-        @copy($examplePath, $envPath);
+        if (@copy($examplePath, $envPath)) {
+            @unlink($examplePath); // Tự động xóa tệp mẫu để tránh lộ lọt thông tin
+        }
     }
 }
 
