@@ -48,6 +48,17 @@ function initSidebar() {
       document.body.classList.toggle('sidebar-open');
     });
   }
+
+  // Phân quyền Frontend: Ẩn Account Management nếu là editor
+  fetch('?page=get_current_user')
+    .then(res => res.json())
+    .then(data => {
+      if (data.logged && data.user.role === 'editor') {
+        const accLink = document.querySelector('a[href="index.php?page=accountmanagement"]');
+        if (accLink) accLink.style.display = 'none';
+      }
+    })
+    .catch(err => console.error(err));
 }
 
 if (document.readyState === 'loading') {
