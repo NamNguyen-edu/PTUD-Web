@@ -4,67 +4,7 @@
 document.addEventListener("DOMContentLoaded", function() {
     const BASE = "/PTUD-Web/Repo/UI";
 
-    // Tải Header
-    fetch(BASE + "/components/header.html")
-        .then(response => {
-            if (!response.ok) throw new Error("Không thể load header");
-            return response.text();
-        })
-        .then(data => {
-            const el = document.getElementById("header-placeholder");
-            if (!el) return;
-            el.innerHTML = data;
 
-            const headerScript = document.createElement('script');
-            headerScript.src = BASE + '/js/header_user.js';
-            headerScript.defer = true;
-            headerScript.onload = function() {
-                if (window.initHeaderUser) window.initHeaderUser();
-            };
-            document.head.appendChild(headerScript);
-
-            const loginSection = document.getElementById("login-section");
-            const profileSection = document.getElementById("profile-section");
-            if (loginSection) loginSection.classList.add("d-none");
-            if (profileSection) {
-                profileSection.classList.remove("d-none");
-                profileSection.classList.add("d-flex");
-            }
-
-            const realName = document.querySelector('.profile-sidebar h4')?.innerText || 'Biên tập viên';
-            const profileName = document.getElementById("profile-name");
-            const profileMenuName = document.getElementById("profile-menu-name");
-            if (profileName) profileName.innerText = realName;
-            if (profileMenuName) profileMenuName.innerText = realName;
-
-            const profileBtn = document.querySelector('.profile-info');
-            const profileMenu = document.querySelector('.profile-menu');
-            if (profileBtn && profileMenu) {
-                profileBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    profileMenu.classList.toggle('d-block');
-                });
-                document.addEventListener('click', function(e) {
-                    if (!profileMenu.contains(e.target) && !profileBtn.contains(e.target)) {
-                        profileMenu.classList.remove('d-block');
-                    }
-                });
-            }
-        })
-        .catch(err => console.error(err));
-
-    // Tải Footer
-    fetch(BASE + "/components/footer.html")
-        .then(response => {
-            if (!response.ok) throw new Error("Không thể load footer");
-            return response.text();
-        })
-        .then(data => {
-            const el = document.getElementById("footer-placeholder");
-            if (!el) return;
-            el.innerHTML = data;
-        })
-        .catch(err => console.error(err));
 
     // Skills
     const hiddenSkillsInput = document.getElementById('hiddenSkills');
@@ -75,7 +15,6 @@ document.addEventListener("DOMContentLoaded", function() {
         } catch(e) {
             console.error("Lỗi parse JSON kỹ năng:", e);
         }
-            checkFirstTimeLogin();
             checkArticleAlerts();
         }
     }); // Đóng DOMContentLoaded ở dòng 4
@@ -129,7 +68,6 @@ function checkArticleAlerts() {
 
     // 2. KHỞI TẠO KHI TRANG LOAD XONG (Phần logic cũ của Profile)
     function initProfile() {
-        checkFirstTimeLogin();
         loadReadingHistory();
         $('[data-toggle="tooltip"]').tooltip();
     }
@@ -159,53 +97,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 });
 
 
-// 5. KIỂM TRA TRẠNG THÁI ĐĂNG NHẬP LẦN ĐẦU
-function checkFirstTimeLogin() {
-    const hasPrefs = localStorage.getItem('newsPulse_UserPrefs');
-    
-    if (!hasPrefs) {
-        
-        setTimeout(() => {
-            $('#userPreferenceModal').modal('show');
-        }, 1000);
-    }
-}
-
-// 6. XỬ LÝ CHỌN TAG CHỦ ĐỀ TRONG POPUP
-$(document).on('click', '.topic-tag', function() {
-    $(this).toggleClass('selected');
-    const selectedCount = $('.topic-tag.selected').length;
-    
-});
-
-function saveUserPreferences() {
-    const selectedTags = [];
-    $('.topic-tag.selected').each(function() {
-        selectedTags.push($(this).data('topic'));
-    });
-
-    if (selectedTags.length < 2) {
-        alert("Bảo ơi, bạn hãy chọn ít nhất 2 chủ đề để NewsPulse có thể đề xuất tin tốt nhất nhé!");
-        return;
-    }
-
-    const prefRecord = {
-        userId: "nguyenduybao_87",
-        topics: selectedTags,
-        updatedAt: new Date().toISOString()
-    };
-
-    localStorage.setItem('newsPulse_UserPrefs', JSON.stringify(prefRecord));
-    
-    const btn = event.target;
-    btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i> ĐÃ LƯU THÀNH CÔNG';
-    btn.classList.replace('btn-pulse-primary', 'btn-success');
-
-    setTimeout(() => {
-        $('#userPreferenceModal').modal('hide');
-        alert("Tuyệt vời! Sở thích của bạn đã được ghi nhận. Hệ thống sẽ cá nhân hóa bảng tin ngay bây giờ.");
-    }, 800);
-}
+// 5. KIỂM TRA TRẠNG THÁI ĐĂNG NHẬP LẦN ĐẦU (ĐÃ XÓA THEO YÊU CẦU)
 
 // 7. XỬ LÝ LƯU THAY ĐỔI HỒ SƠ (TAB SETTINGS)
 
@@ -571,6 +463,44 @@ window.processArticleAction = function(articleId, actionType, successMsg, extraD
         console.error('Error during fetch:', error);
         alert("❌ Đã xảy ra lỗi kết nối hoặc xử lý phía máy chủ.");
     });}
+let loadedBookmarks = [];
+
+function renderBookmarks(bookmarks) {
+    const container = document.getElementById('bookmarkContainer');
+    if (!container) return;
+
+    container.innerHTML = bookmarks.map(b => {
+        // Render category name if available
+        const categoryBadge = b.category_name 
+            ? `<span class="badge badge-primary mb-2 px-2.5 py-1" style="font-size: 0.72rem; font-weight: 700; background-color: #eff6ff; color: #0d6efd; border-radius: 6px;">${b.category_name}</span>` 
+            : '';
+        return `
+            <div class="col-md-6 mb-4" id="bookmark-card-${b.article_id}">
+                <div class="card h-100 border-0 shadow-sm article-card-mini" style="border-radius: 12px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s;">
+                    <div style="position: relative; height: 160px; overflow: hidden;">
+                        <img src="${b.thumbnail_url || 'https://picsum.photos/400/200'}" class="w-100 h-100 object-fit-cover" alt="${b.title}">
+                    </div>
+                    <div class="card-body p-3 d-flex flex-column justify-content-between">
+                        <div>
+                            ${categoryBadge}
+                            <h6 class="font-weight-bold line-clamp-2" style="font-size: 0.88rem; line-height: 1.4; color: #1e293b; margin-top: 4px;">${b.title}</h6>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top border-light">
+                            <small class="text-muted" style="font-size: 0.75rem;">
+                                <i class="far fa-clock mr-1"></i>${timeAgoProfile(b.bookmarked_at)}
+                            </small>
+                            <button class="btn btn-link btn-sm text-danger p-0" title="Bỏ lưu" onclick="removeBookmark(${b.article_id})" style="position: relative; z-index: 2;">
+                                <i class="fas fa-bookmark"></i>
+                            </button>
+                        </div>
+                        <a href="?page=article&slug=${b.slug}" class="stretched-link"></a>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
 window.loadBookmarks = async function() {
     try {
         const res = await fetch('?page=get_bookmarks');
@@ -587,35 +517,18 @@ window.loadBookmarks = async function() {
             return;
         }
 
-        const bookmarks = result.data;
-        count.textContent = bookmarks.length;
-        statCount.textContent = bookmarks.length;
+        loadedBookmarks = result.data;
+        count.textContent = loadedBookmarks.length;
+        statCount.textContent = loadedBookmarks.length;
         empty.classList.add('d-none');
 
-        container.innerHTML = bookmarks.map(b => `
-            <div class="col-md-6 mb-4" id="bookmark-card-${b.article_id}">
-                <div class="card h-100 border-0 shadow-sm article-card-mini">
-                    <img src="${b.thumbnail_url || 'https://picsum.photos/400/200'}" class="card-img-top" alt="${b.title}" style="height:160px;object-fit:cover;">
-                    <div class="card-body p-3">
-                        <h6 class="font-weight-bold line-clamp-2">${b.title}</h6>
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                            <small class="text-muted">
-                                <i class="far fa-clock mr-1"></i>${timeAgoProfile(b.bookmarked_at)}
-                            </small>
-                            <button class="btn btn-link btn-sm text-danger p-0" title="Bỏ lưu" onclick="removeBookmark(${b.article_id})">
-                                <i class="fas fa-bookmark"></i>
-                            </button>
-                        </div>
-                        <a href="?page=article&slug=${b.slug}" class="stretched-link"></a>
-                    </div>
-                </div>
-            </div>
-        `).join('');
+        renderBookmarks(loadedBookmarks);
 
     } catch (e) {
         console.error('Lỗi load bookmark:', e);
     }
 }
+
 window.removeBookmark = async function(articleId) {
     try {
         const res = await fetch('?page=bookmark_toggle', {
@@ -626,6 +539,8 @@ window.removeBookmark = async function(articleId) {
         const result = await res.json();
         if (result.success && !result.is_bookmarked) {
             document.getElementById(`bookmark-card-${articleId}`)?.remove();
+            loadedBookmarks = loadedBookmarks.filter(b => b.article_id !== articleId);
+            
             const count = document.getElementById('bookmarkCount');
             const statCount = document.getElementById('statBookmarks');
             const newCount = parseInt(count.textContent) - 1;
@@ -640,6 +555,41 @@ window.removeBookmark = async function(articleId) {
     }
 }
 
+window.initBookmarkSorting = function() {
+    const sortBtn = document.querySelector('#bookmarks .dropdown-toggle');
+    const menuItems = document.querySelectorAll('#bookmarks .dropdown-menu .dropdown-item');
+
+    if (!sortBtn || !menuItems.length) return;
+
+    menuItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            const sortType = this.getAttribute('data-sort');
+            const label = this.textContent.trim();
+
+            sortBtn.innerHTML = `${label} <i class="fas fa-chevron-down ml-1" style="font-size: 0.7rem;"></i>`;
+
+            if (sortType === 'newest') {
+                loadedBookmarks.sort((a, b) => new Date(b.bookmarked_at) - new Date(a.bookmarked_at));
+            } else if (sortType === 'oldest') {
+                loadedBookmarks.sort((a, b) => new Date(a.bookmarked_at) - new Date(b.bookmarked_at));
+            } else if (sortType === 'category') {
+                loadedBookmarks.sort((a, b) => {
+                    const catA = a.category_name || '';
+                    const catB = b.category_name || '';
+                    return catA.localeCompare(catB, 'vi');
+                });
+            }
+
+            renderBookmarks(loadedBookmarks);
+        });
+    });
+}
+
+window.handleLogout = function() {
+    window.location.href = "?page=logout";
+}
+
 window.timeAgoProfile = function(dateStr) {
     const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000);
     if (diff < 60) return 'Vừa xong';
@@ -650,4 +600,5 @@ window.timeAgoProfile = function(dateStr) {
 
 document.addEventListener('DOMContentLoaded', function() {
     loadBookmarks();
+    initBookmarkSorting();
 });

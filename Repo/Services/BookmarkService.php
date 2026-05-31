@@ -26,7 +26,14 @@ class BookmarkService
     public function getUserBookmarks(int $userId): array
     {
         return pdo_query("
-            SELECT a.article_id, a.title, a.slug, a.thumbnail_url, a.excerpt, a.published_at, b.created_at AS bookmarked_at
+            SELECT a.article_id, a.title, a.slug, a.thumbnail_url, a.excerpt, a.published_at, b.created_at AS bookmarked_at,
+                   (
+                       SELECT c.name 
+                       FROM categories c
+                       INNER JOIN article_categories ac ON c.category_id = ac.category_id
+                       WHERE ac.article_id = a.article_id
+                       LIMIT 1
+                   ) AS category_name
             FROM bookmarks b
             INNER JOIN articles a ON b.article_id = a.article_id
             WHERE b.user_id = ?
