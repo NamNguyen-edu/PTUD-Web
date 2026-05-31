@@ -1,5 +1,5 @@
 
-const API_URL = "/PTUD-WEB/Repo/Controller/Controller/User_controller.php";
+const API_URL = "index.php?page=api_account";
 
 let currentUsersList = [];
 let filteredData = [];
@@ -16,7 +16,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 3. Kích hoạt bộ lắng nghe sự kiện Checkbox tất cả
     initCheckboxEvents();
-z
     // 4. Đăng ký sự kiện Thao tác hàng loạt (Bulk Actions ở sticky-footer)
     initBulkActions();
 });

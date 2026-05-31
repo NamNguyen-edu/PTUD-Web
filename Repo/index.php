@@ -21,7 +21,7 @@ session_start();
 
     if (!$auth->checkPermission($role, $action)) {
       http_response_code(403);
-      die("<h1>403 Forbidden: Bạn không có quyền truy cập trang này.</h1>");
+      die("<h1>403 Forbidden: Bạn không có quyền truy cập trang này. (Vai trò hiện tại: " . htmlspecialchars($role) . ", Quyền yêu cầu: " . htmlspecialchars($action) . ")</h1>");
     }
   }
 
@@ -264,6 +264,7 @@ switch ($page) {
 
     case 'admin_userm':
     case 'accountmangement':
+    case 'accountmanagement':
         authorize('manage_users');
         require_once __DIR__ . '/Controller/account_controller.php';
         (new AccountController())->render();
@@ -278,6 +279,12 @@ switch ($page) {
         authorize('manage_category');
         require_once __DIR__ . '/Controller/category_controller.php';
         (new CategoryController())->handleApi();
+        break;
+
+    case 'api_account':
+        authorize('manage_users');
+        require_once __DIR__ . '/Controller/account_controller.php';
+        (new AccountController())->handleApi();
         break;
 
     default:

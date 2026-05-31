@@ -1,6 +1,6 @@
 <?php
+require_once __DIR__ . '/../Services/category_service.php';
 require_once __DIR__ . '/../View/categoryview.php';
-require_once __DIR__ . '/../Model/CategoryTagModel.php';
 
 class CategoryController
 {

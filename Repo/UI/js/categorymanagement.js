@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
     // === 1. ĐƯỜNG DẪN API CHUẨN (ĐÃ BỎ ĐUÔI .PHP SAI LỆCH) ===
-    const API_URL = "/index.php?page=api_category";
+    const API_URL = "index.php?page=api_category";
 
     // === Khởi tạo biến DOM ===
     const pageTitle = document.querySelector('.page-title');
@@ -105,7 +105,12 @@ document.addEventListener('DOMContentLoaded', function () {
         const type = selectType.value;
 
         if (!name) {
-            alert('Vui lòng nhập tên hiển thị!');
+            Swal.fire({
+                icon: 'warning',
+                title: 'Chú ý!',
+                text: 'Vui lòng nhập tên hiển thị!',
+                confirmButtonColor: '#002D5E'
+            });
             return;
         }
 
@@ -135,13 +140,31 @@ document.addEventListener('DOMContentLoaded', function () {
                     inputName.value = '';
                     inputSlug.value = '';
                     if (addItemModal) addItemModal.hide();
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Thành công!',
+                        text: `Đã thêm ${type === 'Category' ? 'chuyên mục' : 'thẻ'} "${name}" thành công.`,
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
                 } else {
-                    alert("Lỗi lưu dữ liệu: " + data.message);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi!',
+                        text: "Lỗi lưu dữ liệu: " + data.message,
+                        confirmButtonColor: '#002D5E'
+                    });
                 }
             })
             .catch(err => {
                 console.error("Lỗi hệ thống Fetch POST:", err);
-                alert("Không thể kết nối tới máy chủ API!");
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi kết nối!',
+                    text: 'Không thể kết nối tới máy chủ API!',
+                    confirmButtonColor: '#002D5E'
+                });
             });
     });
 
@@ -170,7 +193,12 @@ document.addEventListener('DOMContentLoaded', function () {
     // === 8. THỰC THI SỬA GỬI LÊN PHP (PUT) ===
     btnUpdate?.addEventListener('click', function () {
         if (!rowToEdit || inputEditName.value.trim() === "") {
-            alert("Tên phân loại không được để trống!");
+            Swal.fire({
+                icon: 'warning',
+                title: 'Chú ý!',
+                text: 'Tên phân loại không được để trống!',
+                confirmButtonColor: '#002D5E'
+            });
             return;
         }
 
@@ -190,11 +218,32 @@ document.addEventListener('DOMContentLoaded', function () {
                     rowToEdit.querySelector('.item-name').innerText = name;
                     rowToEdit.querySelector('.item-slug').innerText = slug;
                     if (editItemModal) editItemModal.hide();
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Đã cập nhật!',
+                        text: `Cập nhật ${type === 'Category' ? 'chuyên mục' : 'thẻ'} thành công.`,
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
                 } else {
-                    alert("Lỗi cập nhật: " + data.message);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi cập nhật!',
+                        text: data.message,
+                        confirmButtonColor: '#002D5E'
+                    });
                 }
             })
-            .catch(err => console.error("Lỗi Fetch PUT:", err));
+            .catch(err => {
+                console.error("Lỗi Fetch PUT:", err);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi kết nối!',
+                    text: 'Không thể cập nhật dữ liệu. Vui lòng thử lại sau.',
+                    confirmButtonColor: '#002D5E'
+                });
+            });
     });
 
     // === 9. THỰC THI XÓA GỬI LÊN PHP (DELETE) ===
@@ -203,6 +252,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const id = rowToDelete.getAttribute('data-id');
         const type = rowToDelete.getAttribute('data-type');
+        const name = rowToDelete.querySelector('.item-name')?.innerText || '';
 
         fetch(API_URL, {
             method: 'DELETE',
@@ -211,6 +261,8 @@ document.addEventListener('DOMContentLoaded', function () {
         })
             .then(res => res.json())
             .then(data => {
+                if (deleteModal) deleteModal.hide();
+
                 if (data.status === "success") {
                     rowToDelete.style.transition = "0.3s";
                     rowToDelete.style.opacity = "0";
@@ -218,12 +270,33 @@ document.addEventListener('DOMContentLoaded', function () {
                         rowToDelete.remove();
                         rowToDelete = null;
                     }, 300);
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Đã xóa!',
+                        text: `Xóa ${type === 'Category' ? 'chuyên mục' : 'thẻ'} "${name}" thành công.`,
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
                 } else {
-                    alert("Lỗi xóa phân loại: " + data.message);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Không thể xóa!',
+                        text: data.message,
+                        confirmButtonColor: '#002D5E'
+                    });
                 }
-                if (deleteModal) deleteModal.hide();
             })
-            .catch(err => console.error("Lỗi Fetch DELETE:", err));
+            .catch(err => {
+                console.error("Lỗi Fetch DELETE:", err);
+                if (deleteModal) deleteModal.hide();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi kết nối!',
+                    text: 'Không thể thực hiện yêu cầu xóa. Vui lòng thử lại sau.',
+                    confirmButtonColor: '#002D5E'
+                });
+            });
     };
 
     // === 10. BỘ LỌC TÌM KIẾM NHANH TRÊN MÀN HÌNH ===
