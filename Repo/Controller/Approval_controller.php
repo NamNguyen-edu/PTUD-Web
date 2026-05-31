@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../View/ApprovalView.php';
+require_once __DIR__ . '/../View/ApprovalListView.php';
 require_once __DIR__ . '/../Services/Approval_service.php';
 
 class ApprovalController
@@ -14,8 +15,8 @@ class ApprovalController
             (int)($_GET['article_id'] ?? 0);
 
         if ($article_id <= 0) {
-
-            header('Location: ?page=version-list');
+            $articles = getPendingArticlesList();
+            (new ApprovalListView())->render($articles);
             exit;
         }
 
