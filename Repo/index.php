@@ -135,6 +135,18 @@ switch ($page) {
         (new VersionControlController())->restoreVersion();
         break;
 
+    case 'user-version-control':
+        authorize('manage_post');
+        require_once __DIR__ . '/Controller/UserVersionControlController.php';
+        (new UserVersionControlController())->show();
+        break;
+
+    case 'user_version_restore':
+        authorize('manage_post');
+        require_once __DIR__ . '/Controller/UserVersionControlController.php';
+        (new UserVersionControlController())->restoreVersion();
+        break;
+
     case 'version-list':
         require_once __DIR__ . '/Controller/Version_list_controller.php';
         (new VersionListController())->index();
@@ -245,6 +257,11 @@ switch ($page) {
 
     // --- CÁC CASE QUẢN TRỊ ADMIN (BỊ THIẾU TỪ REPO GỐC ĐƯỢC TÍCH HỢP LẠI) ---
     case 'admin_dashboard':
+        authorize('manage_users');
+        require_once __DIR__ . '/Controller/DashboardController.php';
+        (new DashboardController())->render();
+        break;
+
     case 'admin_userm':
     case 'accountmangement':
     case 'accountmanagement':
