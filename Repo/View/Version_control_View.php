@@ -116,12 +116,6 @@ class VersionControlView
         if ($role === 'contributor') {
             echo $this->engine->render('VersionControl_View', $data);
         } else {
-            $sidebarHtml = @file_get_contents($basePath . '/UI/html/sidebar_admin.html') ?: '';
-            $headerHtml  = @file_get_contents($basePath . '/UI/html/header_admin.html') ?: '';
-
-            $data['SIDEBAR_COMPONENT'] = $sidebarHtml;
-            $data['HEADER_COMPONENT']  = $headerHtml;
-
             echo $this->engine->render('version-control', $data);
         }
     }

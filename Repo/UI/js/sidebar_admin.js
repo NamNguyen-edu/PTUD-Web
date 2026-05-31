@@ -1,9 +1,7 @@
 // UI/js/sidebar_admin.js
 
-document.addEventListener('DOMContentLoaded', () => {
+function initSidebar() {
   const sidebarLinks = document.querySelectorAll('.sidebar .nav-link-custom');
-
-
   const currentUrlParams = new URLSearchParams(window.location.search);
   const currentPage = currentUrlParams.get('page') ? currentUrlParams.get('page').toLowerCase() : '';
 
@@ -17,7 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
         link.classList.add('active');
       }
 
-      // Lắng nghe sự kiện click (Không dùng preventDefault để trình duyệt chuyển trang tự nhiên)
       link.addEventListener('click', function () {
         sidebarLinks.forEach(item => item.classList.remove('active'));
         this.classList.add('active');
@@ -34,4 +31,10 @@ document.addEventListener('DOMContentLoaded', () => {
       document.body.classList.toggle('sidebar-open');
     });
   }
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initSidebar);
+} else {
+  initSidebar();
+}

@@ -1,6 +1,6 @@
 <?php
 // =============================================
-// FILE: View/Version_list_View.php
+// FILE: View/VersionListView.php
 // =============================================
 
 require_once __DIR__ . '/../View/ViewEngine.php';
@@ -16,15 +16,9 @@ class VersionListView
 
     public function render(array $articles): void
     {
-        $basePath = dirname(__DIR__);
-        $sidebarHtml = @file_get_contents($basePath . '/UI/html/sidebar_admin.html') ?: '';
-        $headerHtml  = @file_get_contents($basePath . '/UI/html/header_admin.html') ?: '';
-
         $tableHtml = $this->buildTable($articles);
 
         $data = [
-            'SIDEBAR_COMPONENT' => $sidebarHtml,
-            'HEADER_COMPONENT'  => $headerHtml,
             'PENDING_COUNT'     => count($articles),
             'ARTICLES_TABLE'    => $tableHtml,
         ];
@@ -37,8 +31,8 @@ class VersionListView
         if (empty($articles)) {
             return '
             <tr>
-                <td colspan="5" class="empty-row">
-                    Không có bài viết nào đang chờ duyệt
+                <td colspan="5" class="empty-row text-center py-5 text-muted">
+                    Không có bài viết nào đang có yêu cầu chỉnh sửa
                 </td>
             </tr>';
         }
@@ -51,6 +45,7 @@ class VersionListView
                 class="article-row"
                 data-article-id="' . (int)$a['article_id'] . '"
                 onclick="goToVersionControl(' . (int)$a['article_id'] . ')"
+                style="cursor: pointer;"
                 title="Xem lịch sử phiên bản"
             >
                 <td class="col-title">

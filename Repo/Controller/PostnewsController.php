@@ -35,8 +35,12 @@ class PostnewsController
             }
         }
 
+        require_once __DIR__ . '/../Services/category_service.php';
+        $categoryModel = new CategoryTagModel();
+        $categories = $categoryModel->getAllCategories();
+
         $view = new PostnewsView();
-        $view->render($article);
+        $view->render($article, $categories);
     }
 
   // Controller/PostnewsController.php
