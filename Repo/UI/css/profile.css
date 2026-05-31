@@ -176,6 +176,9 @@ body {
 
 /* 5. HISTORY TIMELINE */
 .profile-wrapper .border-left-pulse { border-left: 4px solid var(--pulse-primary) !important; }
+.profile-wrapper .border-left-warning { border-left: 4px solid #ffc107 !important; }
+.profile-wrapper .border-left-danger { border-left: 4px solid #dc3545 !important; }
+.profile-wrapper .border-left-success { border-left: 4px solid #28a745 !important; }
 
 .profile-wrapper .history-item {
     transition: transform 0.2s;
@@ -474,4 +477,29 @@ body.theme-dark .dropdown-item {
 
 body.theme-dark .dropdown-item:hover {
     background-color: #333333 !important;
+}
+
+body.theme-dark .list-group-item {
+    background-color: #222222 !important;
+    border-color: #333333 !important;
+    color: #f5f5f5 !important;
+}
+
+body.theme-dark .text-primary {
+    color: #87CEEB !important;
+}
+
+body.theme-dark .badge-primary {
+    background-color: rgba(26, 115, 232, 0.2) !important;
+    color: #87CEEB !important;
+}
+
+body.theme-dark .profile-wrapper .table thead.bg-light {
+    background-color: #222222 !important;
+}
+
+body.theme-dark .alert-warning {
+    background-color: rgba(249, 171, 0, 0.15) !important;
+    border-color: rgba(249, 171, 0, 0.3) !important;
+    color: #f9ab00 !important;
 }

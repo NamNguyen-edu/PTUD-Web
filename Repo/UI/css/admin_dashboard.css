@@ -308,11 +308,11 @@
                 transform: translateX(0);
             }
             body.sidebar-open .top-header {
-                left: var(--sidebar-width);
+                left: 0 !important;
             }
             body.sidebar-open main {
-                margin-left: var(--sidebar-width);
-                width: calc(100% - var(--sidebar-width));
+                margin-left: 0 !important;
+                width: 100% !important;
             }
             .top-header,
             main {
@@ -498,4 +498,107 @@ main {
   .activity-item {
     gap: 10px;
   }
+}
+
+/* Dark Mode styles for Admin Dashboard */
+body.theme-dark {
+  background-color: #0a0a0a !important;
+  color: #f5f5f5 !important;
+}
+
+body.theme-dark main {
+  background-color: #0a0a0a !important;
+}
+
+body.theme-dark .card {
+  background-color: #161616 !important;
+  border: 1px solid #262626 !important;
+  color: #f5f5f5 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;
+}
+
+body.theme-dark h1,
+body.theme-dark h2,
+body.theme-dark h3,
+body.theme-dark h5,
+body.theme-dark .h1,
+body.theme-dark .h5 {
+  color: #f5f5f5 !important;
+}
+
+body.theme-dark .text-muted,
+body.theme-dark p.text-muted,
+body.theme-dark .text-secondary {
+  color: #a3a3a3 !important;
+}
+
+body.theme-dark .table {
+  color: #f5f5f5 !important;
+}
+
+body.theme-dark .table th {
+  background-color: #121212 !important;
+  color: #a3a3a3 !important;
+  border-bottom-color: #262626 !important;
+}
+
+body.theme-dark .table td {
+  border-bottom-color: #262626 !important;
+  color: #f5f5f5 !important;
+}
+
+body.theme-dark .table-hover tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+}
+
+body.theme-dark .table-hover tbody tr:hover td {
+  color: #ffffff !important;
+}
+
+body.theme-dark .table-responsive {
+  border-color: #262626 !important;
+}
+
+body.theme-dark .bg-white {
+  background-color: #161616 !important;
+}
+
+body.theme-dark .border-bottom {
+  border-bottom-color: #262626 !important;
+}
+
+body.theme-dark svg circle {
+  stroke: #262626 !important;
+}
+
+body.theme-dark svg .chart-path[stroke="var(--bs-primary)"] {
+  stroke: #1a73e8 !important;
+}
+
+body.theme-dark .activity-item::before {
+  background-color: #262626 !important;
+}
+
+body.theme-dark .activity-dot {
+  border-color: #161616 !important;
+}
+
+body.theme-dark .fab {
+  background-color: #1a73e8 !important;
+  box-shadow: 0 10px 25px rgba(26, 115, 232, 0.4) !important;
+}
+
+body.theme-dark .btn-light {
+  background-color: #262626 !important;
+  border-color: #333333 !important;
+  color: #f5f5f5 !important;
+}
+
+body.theme-dark .btn-light:hover {
+  background-color: #333333 !important;
+  color: #ffffff !important;
+}
+
+body.theme-dark .bg-light {
+  background-color: #121212 !important;
 }

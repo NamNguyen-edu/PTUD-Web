@@ -19,7 +19,7 @@ class AccountController
 
     $view = new AccountView();
     $view->render([
-      'TITLE' => 'Account Management',
+      'TITLE' => 'Quản lý Người dùng',
       'USERS' => $mappedUsers
     ]);
   }
