@@ -391,6 +391,34 @@
                     
                     avatars.forEach(img => img.src = avatarUrl);
 
+                    // Lấy vai trò (role) để hiển thị nút quản trị tương ứng
+                    fetch('get_role.php')
+                        .then(r => r.json())
+                        .then(roleData => {
+                            const role = roleData.role || 'guest';
+                            const adminBtn = document.getElementById('menu-admin-btn');
+                            const adminDesc = document.getElementById('menu-admin-desc');
+                            
+                            if (adminBtn) {
+                                if (role === 'admin') {
+                                    adminBtn.classList.remove('d-none');
+                                    adminBtn.setAttribute('href', '?page=admin_dashboard');
+                                    const titleEl = adminBtn.querySelector('.menu-title');
+                                    if (titleEl) titleEl.textContent = 'Trang quản trị';
+                                    if (adminDesc) adminDesc.textContent = 'Quản lý người dùng, chuyên mục & hệ thống';
+                                } else if (role === 'editor' || role === 'chief editor') {
+                                    adminBtn.classList.remove('d-none');
+                                    adminBtn.setAttribute('href', '?page=version-list');
+                                    const titleEl = adminBtn.querySelector('.menu-title');
+                                    if (titleEl) titleEl.textContent = 'Phê duyệt tin bài';
+                                    if (adminDesc) adminDesc.textContent = 'Duyệt bài viết & Lịch sử phiên bản';
+                                } else {
+                                    adminBtn.classList.add('d-none');
+                                }
+                            }
+                        })
+                        .catch(err => console.warn('Lỗi lấy vai trò:', err));
+
                     // Xử lý Dark Mode cho User đã login
                     const dbSettings = data.user.settings;
                     if (dbSettings && dbSettings.theme) {
@@ -492,7 +520,123 @@
     }
 
     /* =============================================
-       7. KÍCH HOẠT HỆ THỐNG KHI TẢI TRANG
+       7. GLOBAL POPUP MODAL (Không dùng Icon)
+    ============================================= */
+    window.showGlobalModal = function(title, message, onConfirm = null, hasCancel = false) {
+        const oldModal = document.getElementById('global-popup-modal-overlay');
+        if (oldModal) oldModal.remove();
+
+        const overlay = document.createElement('div');
+        overlay.id = 'global-popup-modal-overlay';
+        overlay.style.cssText = `
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999999;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        `;
+
+        overlay.innerHTML = `
+            <div class="global-popup-box" style="
+                background: #ffffff;
+                width: 90%;
+                max-width: 420px;
+                padding: 28px;
+                border-radius: 20px;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+                transform: scale(0.95);
+                transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+                font-family: 'Inter', -apple-system, sans-serif;
+            ">
+                <h4 style="
+                    font-weight: 800;
+                    font-size: 1.35rem;
+                    color: #1e293b;
+                    margin-top: 0;
+                    margin-bottom: 12px;
+                    line-height: 1.3;
+                ">${title}</h4>
+                <p style="
+                    color: #64748b;
+                    font-size: 0.95rem;
+                    line-height: 1.6;
+                    margin-bottom: 24px;
+                ">${message}</p>
+                <div style="
+                    display: flex;
+                    justify-content: flex-end;
+                    gap: 12px;
+                ">
+                    ${hasCancel ? `
+                    <button id="global-popup-cancel" style="
+                        background: #f1f5f9;
+                        color: #475569;
+                        border: none;
+                        padding: 10px 20px;
+                        border-radius: 30px;
+                        font-weight: 600;
+                        font-size: 0.9rem;
+                        cursor: pointer;
+                        transition: all 0.2s;
+                    " onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#f1f5f9'">Hủy</button>
+                    ` : ''}
+                    <button id="global-popup-confirm" style="
+                        background: #2563eb;
+                        color: #ffffff;
+                        border: none;
+                        padding: 10px 24px;
+                        border-radius: 30px;
+                        font-weight: 700;
+                        font-size: 0.9rem;
+                        cursor: pointer;
+                        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+                        transition: all 0.2s;
+                    " onmouseover="this.style.background='#1d4ed8'; this.style.boxShadow='0 6px 16px rgba(37, 99, 235, 0.3)'" onmouseout="this.style.background='#2563eb'; this.style.boxShadow='0 4px 12px rgba(37, 99, 235, 0.2)'">Xác nhận</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+
+        setTimeout(() => {
+            overlay.style.opacity = '1';
+            overlay.querySelector('.global-popup-box').style.transform = 'scale(1)';
+        }, 10);
+
+        const closeModal = () => {
+            overlay.style.opacity = '0';
+            overlay.querySelector('.global-popup-box').style.transform = 'scale(0.95)';
+            setTimeout(() => overlay.remove(), 250);
+        };
+
+        const confirmBtn = overlay.querySelector('#global-popup-confirm');
+        confirmBtn.focus();
+        confirmBtn.addEventListener('click', () => {
+            closeModal();
+            if (onConfirm) onConfirm();
+        });
+
+        const cancelBtn = overlay.querySelector('#global-popup-cancel');
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', () => {
+                closeModal();
+            });
+        }
+
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                closeModal();
+            }
+        });
+    };
+
+    /* =============================================
+       8. KÍCH HOẠT HỆ THỐNG KHI TẢI TRANG
     ============================================= */
     window.initHeaderUser = initHeaderUser;
 

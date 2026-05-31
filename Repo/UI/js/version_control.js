@@ -194,15 +194,22 @@ document
     const previewBtn = document.getElementById('btn-preview');
     const deleteBtn = document.getElementById('btn-delete');
 
+    const getArticleId = () => {
+      const restoreBtn = document.querySelector('.restore-btn');
+      return restoreBtn ? restoreBtn.dataset.articleId : '';
+    };
+
     if (editBtn) {
       editBtn.addEventListener('click', () => {
-        window.location.href = '?page=postnews';
+        const articleId = getArticleId();
+        window.location.href = `?page=postnews&id=${articleId}`;
       });
     }
 
     if (previewBtn) {
       previewBtn.addEventListener('click', () => {
-        window.open('?action=article_detail&preview=1', '_blank');
+        const articleId = getArticleId();
+        window.open(`?page=article&id=${articleId}`, '_blank');
       });
     }
 

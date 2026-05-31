@@ -104,10 +104,13 @@ function checkArticleAlerts() {
             let st = statusMap[art.status] || { label: art.status, cls: 'secondary', icon: 'fa-info' };
 
             listHtml += `
-                <li class="list-group-item border-left-${st.cls} shadow-sm mb-3 rounded" style="border-width: 0 0 0 4px !important;">
+                <li class="list-group-item border-left-${st.cls} shadow-sm mb-3 rounded" style="border-width: 0 0 0 4px !important; cursor: pointer;" onclick="window.location.href='?page=version-control&article_id=${art.article_id}'">
                     <div class="d-flex w-100 justify-content-between align-items-center">
-                        <h6 class="mb-0 font-weight-bold text-truncate" style="max-width: 70%;">${art.title}</h6>
+                        <h6 class="mb-0 font-weight-bold text-truncate" style="max-width: 65%;">${art.title}</h6>
                         <span class="badge badge-${st.cls} p-1"><i class="fas ${st.icon} mr-1"></i>${st.label}</span>
+                    </div>
+                    <div class="text-right mt-2">
+                        <small class="text-primary font-weight-bold">Xem nhận xét & So sánh thay đổi <i class="fas fa-arrow-right ml-1"></i></small>
                     </div>
                 </li>
             `;

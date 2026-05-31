@@ -38,32 +38,19 @@ switch ($page) {
         break;
 
     case 'login':
-      (new AuthController())->login();
-      break;
+        require_once __DIR__ . '/Controller/auth_controller.php';
+        (new AuthController())->login();
+        break;
 
     case 'signup':
-      (new AuthController())->signup();
-      break;
+        require_once __DIR__ . '/Controller/auth_controller.php';
+        (new AuthController())->signup();
+        break;
 
     case 'logout':
-      (new AuthController())->logout();
-      break;
-    case 'accountmangement':
-      authorize('manage_users');
-      require_once __DIR__ . '/Controller/account_controller.php';
-      (new AccountController())->render();
-      break;
-
-    case 'categorymanagement':
-      authorize('manage_category');
-      require_once __DIR__ . '/Controller/category_controller.php';
-      (new CategoryController())->render();
-      break;
-    case 'api_category':
-      authorize('manage_category');
-      require_once __DIR__ . '/Controller/category_controller.php';
-      (new CategoryController())->handleApi();
-      break;
+        require_once __DIR__ . '/Controller/auth_controller.php';
+        (new AuthController())->logout();
+        break;
 
     case 'update_settings':
         require_once __DIR__ . '/Controller/auth_controller.php';
@@ -86,7 +73,7 @@ switch ($page) {
         break;
 
     case 'get_current_user':
-        require_once __DIR__ . '/Controller/AuthController.php';
+        require_once __DIR__ . '/Controller/auth_controller.php';
         (new AuthController())->currentUser();
         break;
 
@@ -139,7 +126,6 @@ switch ($page) {
         break;
 
     case 'version-control':
-        authorize('manage_version');
         require_once __DIR__ . '/Controller/Version_control_controller.php';
         (new VersionControlController())->show();
         break;
