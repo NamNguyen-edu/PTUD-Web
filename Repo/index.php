@@ -60,11 +60,11 @@ switch ($page) {
         (new AuthController())->login();
         break;
 
-    case 'update_settings':
-        authorize('manage_profile');
-        require_once __DIR__ . '/Controller/auth_controller.php';
-        (new AuthController())->updateSettings();
-        break;
+    // case 'update_settings':
+    //     authorize('manage_profile');
+    //     require_once __DIR__ . '/Controller/auth_controller.php';
+    //     (new AuthController())->updateSettings();
+    //     break;
 
     case 'google_auth':
         require_once __DIR__ . '/Controller/auth_controller.php';

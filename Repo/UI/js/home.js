@@ -729,9 +729,9 @@ async function loadVideoSegment() {
                             <h6 class="video-up-next-title">Up next</h6>
                             <div class="video-up-next-list d-flex flex-column gap-2">
                                 ${videos.map((vid, idx) => {
-                                    const ytId = getYoutubeId(vid.url);
-                                    const embedUrl = ytId ? `https://www.youtube.com/embed/${ytId}` : vid.url;
-                                    const thumbUrl = ytId ? `https://img.youtube.com/vi/${ytId}/mqdefault.jpg` : 'https://picsum.photos/100/60';
+                                    // Parse Youtube ID to show official thumbnail
+                                    const ytId = vid.url.split('/').pop().split('?')[0];
+                                    const thumbUrl = `https://img.youtube.com/vi/${ytId}/mqdefault.jpg`;
                                     return `
                                         <div class="video-up-next-item ${idx === 0 ? 'active' : ''}" data-video-url="${embedUrl}" data-video-title="${escapeHtml(vid.title)}" data-video-date="${new Date(vid.created_at).toLocaleDateString('vi-VN')}">
                                             <div class="video-thumb-container">

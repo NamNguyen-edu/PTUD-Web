@@ -79,6 +79,7 @@ function pdo_get_connection()
     $sslCaFile = realpath($sslCaFile);
 
     try {
+
         $dburl = "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4";
 
         $options = [
@@ -87,6 +88,7 @@ function pdo_get_connection()
         ];
 
         if (
+            $sslCaFile &&
             $sslCaFile &&
             file_exists($sslCaFile) &&
             defined('PDO::MYSQL_ATTR_SSL_CA')
