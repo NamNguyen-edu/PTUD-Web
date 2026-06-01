@@ -140,17 +140,55 @@ function processContentImage(event) {
     }
 }
 
-// 6. XỬ LÝ ẢNH ĐẠI DIỆN (THUMBNAIL)
 function previewThumbnail(event) {
     const file = event.target.files[0];
     const previewZone = document.getElementById('thumbPreview');
+    const currentThumbUrlInput = document.getElementById('currentThumbUrl');
     
     if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            previewZone.innerHTML = `<img src="${e.target.result}" style="width:100%; height:100%; object-fit:cover;">`;
-        };
-        reader.readAsDataURL(file);
+        // 1. Hiển thị loading trong lúc upload
+        const originalContent = previewZone.innerHTML;
+        previewZone.innerHTML = `
+            <div class="d-flex flex-column align-items-center justify-content-center h-100 py-4">
+                <i class="fas fa-spinner fa-spin fa-2x text-primary mb-2"></i>
+                <p class="small text-muted mb-0">Đang tải ảnh lên máy chủ...</p>
+            </div>
+        `;
+        
+        // 2. Tạo FormData và bắn lên API upload_thumbnail
+        const formData = new FormData();
+        formData.append('thumbnail', file);
+        
+        fetch('?page=upload_thumbnail', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                // 3. Cập nhật preview bằng url thật từ server
+                previewZone.innerHTML = `<img src="${data.url}" style="width:100%; height:100%; object-fit:cover; border-radius: 8px;">`;
+                
+                // 4. Lưu đường dẫn vào input ẩn #currentThumbUrl
+                if (currentThumbUrlInput) {
+                    currentThumbUrlInput.value = data.url;
+                }
+                
+                if (window.showToast) {
+                    window.showToast("Tải ảnh đại diện lên máy chủ thành công!", "success");
+                } else {
+                    alert("✔️ Tải ảnh đại diện lên máy chủ thành công!");
+                }
+            } else {
+                previewZone.innerHTML = originalContent;
+                alert("Lỗi upload: " + (data.message || "Tải ảnh thất bại"));
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            previewZone.innerHTML = originalContent;
+            alert("Lỗi kết nối khi tải ảnh lên máy chủ!");
+        });
     }
 }
 
@@ -246,6 +284,12 @@ function handleQuickAction(action, event) {
         // Gắn file ảnh vào form nếu user có chọn ảnh mới
         if (thumbnailFile) {
             formData.append('thumbnail', thumbnailFile);
+        }
+
+        // Gắn đường dẫn ảnh đại diện đã được upload trực tiếp
+        const currentThumbUrl = document.getElementById('currentThumbUrl')?.value || '';
+        if (currentThumbUrl) {
+            formData.append('thumbnail_url', currentThumbUrl);
         }
 
         // Nếu đang sửa bài thì truyền ID

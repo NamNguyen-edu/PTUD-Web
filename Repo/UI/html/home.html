@@ -2,6 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NewsPulse</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="../css/header.css">
@@ -13,10 +14,10 @@
 <div id="header-placeholder"></div>
 <div class="container-fluid">
   <div class="row navbar-custom text-center">
-    <div class="col"><a class="nav-link active" onclick="loadCategory(event, 'for-you')">Dành cho bạn</a></div>
-    <div class="col"><a class="nav-link" onclick="loadCategory(event, 'trending')">Tin thịnh hành</a></div>
+    <div class="col-6 col-sm-4 col-md-2"><a class="nav-link active" onclick="loadCategory(event, 'for-you')">Dành cho bạn</a></div>
+    <div class="col-6 col-sm-4 col-md-2"><a class="nav-link" onclick="loadCategory(event, 'trending')">Tin thịnh hành</a></div>
     
-    <div class="col nav-item" data-category="thoi-su">
+    <div class="col-6 col-sm-4 col-md-2 nav-item" data-category="thoi-su">
       <a class="nav-link" href="?page=category&slug=thoi-su">Thời sự ▾</a>
       <div class="mega-menu text-start">
         <div class="row">
@@ -38,7 +39,7 @@
       </div>
     </div>
     
-    <div class="col nav-item" data-category="cong-nghe">
+    <div class="col-6 col-sm-4 col-md-2 nav-item" data-category="cong-nghe">
       <a class="nav-link" href="?page=category&slug=cong-nghe">Công nghệ ▾</a>
       <div class="mega-menu text-start">
         <div class="row">
@@ -61,7 +62,7 @@
       </div>
     </div>
 
-    <div class="col nav-item" data-category="kinh-doanh">
+    <div class="col-6 col-sm-4 col-md-2 nav-item" data-category="kinh-doanh">
       <a class="nav-link" href="?page=category&slug=kinh-doanh">Kinh doanh ▾</a>
       <div class="mega-menu text-start">
         <div class="row">
@@ -83,7 +84,7 @@
       </div>
     </div>
 
-    <div class="col nav-item" id="more-nav-item">
+    <div class="col-6 col-sm-4 col-md-2 nav-item" id="more-nav-item">
       <a class="nav-link" href="#" onclick="event.preventDefault()">More ▾</a>
       <div class="mega-menu text-start">
         <div class="row">

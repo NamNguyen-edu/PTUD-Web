@@ -1,4 +1,15 @@
 <?php
+// Tự động khởi tạo tệp cấu hình .env từ tệp mẫu .env.example nếu khởi chạy lần đầu
+$envPath = __DIR__ . '/.env';
+if (!file_exists($envPath)) {
+    $examplePath = __DIR__ . '/.env.example';
+    if (file_exists($examplePath)) {
+        if (@copy($examplePath, $envPath)) {
+            @unlink($examplePath); // Tự động xóa tệp mẫu để tránh lộ lọt thông tin
+        }
+    }
+}
+
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 session_start();
@@ -32,6 +43,11 @@ switch ($page) {
         authorize('manage_own_posts');
         require_once __DIR__ . '/Controller/PostnewsController.php';
         (new PostnewsController())->savePost();
+        break;
+    case 'upload_thumbnail':
+        authorize('manage_own_posts');
+        require_once __DIR__ . '/Controller/PostnewsController.php';
+        (new PostnewsController())->uploadThumbnail();
         break;
     case 'postnews_action':
         authorize('manage_own_posts');

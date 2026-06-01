@@ -392,32 +392,27 @@
                     avatars.forEach(img => img.src = avatarUrl);
 
                     // Lấy vai trò (role) để hiển thị nút quản trị tương ứng
-                    fetch('get_role.php')
-                        .then(r => r.json())
-                        .then(roleData => {
-                            const role = roleData.role || 'guest';
-                            const adminBtn = document.getElementById('menu-admin-btn');
-                            const adminDesc = document.getElementById('menu-admin-desc');
-                            
-                            if (adminBtn) {
-                                if (role === 'admin') {
-                                    adminBtn.classList.remove('d-none');
-                                    adminBtn.setAttribute('href', '?page=admin_dashboard');
-                                    const titleEl = adminBtn.querySelector('.menu-title');
-                                    if (titleEl) titleEl.textContent = 'Trang quản trị';
-                                    if (adminDesc) adminDesc.textContent = 'Quản lý người dùng, chuyên mục & hệ thống';
-                                } else if (role === 'editor' || role === 'chief editor') {
-                                    adminBtn.classList.remove('d-none');
-                                    adminBtn.setAttribute('href', '?page=version-list');
-                                    const titleEl = adminBtn.querySelector('.menu-title');
-                                    if (titleEl) titleEl.textContent = 'Phê duyệt tin bài';
-                                    if (adminDesc) adminDesc.textContent = 'Duyệt bài viết & Lịch sử phiên bản';
-                                } else {
-                                    adminBtn.classList.add('d-none');
-                                }
-                            }
-                        })
-                        .catch(err => console.warn('Lỗi lấy vai trò:', err));
+                    const role = data.user.role || 'guest';
+                    const adminBtn = document.getElementById('menu-admin-btn');
+                    const adminDesc = document.getElementById('menu-admin-desc');
+                    
+                    if (adminBtn) {
+                        if (role === 'admin') {
+                            adminBtn.classList.remove('d-none');
+                            adminBtn.setAttribute('href', '?page=admin_dashboard');
+                            const titleEl = adminBtn.querySelector('.menu-title');
+                            if (titleEl) titleEl.textContent = 'Trang quản trị';
+                            if (adminDesc) adminDesc.textContent = 'Quản lý người dùng, chuyên mục & hệ thống';
+                        } else if (role === 'editor' || role === 'chief editor') {
+                            adminBtn.classList.remove('d-none');
+                            adminBtn.setAttribute('href', '?page=version-list');
+                            const titleEl = adminBtn.querySelector('.menu-title');
+                            if (titleEl) titleEl.textContent = 'Phê duyệt tin bài';
+                            if (adminDesc) adminDesc.textContent = 'Duyệt bài viết & Lịch sử phiên bản';
+                        } else {
+                            adminBtn.classList.add('d-none');
+                        }
+                    }
 
                     // Xử lý Dark Mode cho User đã login
                     const dbSettings = data.user.settings;
